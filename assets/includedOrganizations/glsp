@@ -1,0 +1,15 @@
+{
+	"organizationName":"GLSP (Georgia Legal Services Project)",
+	"organizationDetails":{
+		"address":"89 Legal Place, Suite 4",
+		"city": "Anytown",
+		"state": "GA",
+		"zip": 19570,
+		"phone": 5045552424,
+		"fax": 5045552626
+	},
+	"newRequest":{
+		"method":"email",
+		"address":"harlo@guardianproject.info"
+	}
+}

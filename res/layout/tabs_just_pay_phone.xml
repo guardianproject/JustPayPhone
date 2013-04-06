@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="center_vertical" >
+    <TextView style="@style/jpp_h1"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name" />
+     <View
+  	    android:id="@+id/tab_selector"
+  	    android:layout_width="match_parent"
+  	    android:layout_height="8dip"
+  	    android:layout_alignParentBottom="true"
+  	    android:background="@drawable/tab_underline_selector" />
+</RelativeLayout>

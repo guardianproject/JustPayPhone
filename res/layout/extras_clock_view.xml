@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dip"
+    android:orientation="horizontal"
+    android:weightSum="1"
+    android:layout_gravity="top" >
+    <ImageView
+        android:layout_width="0dip"
+        android:layout_weight="0.25"
+        android:layout_height="match_parent"
+        android:src="@drawable/jpp_clock_icon"
+        android:scaleType="centerInside" />
+    <TextView style="@style/jpp_p_timer"
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_weight="0.75"
+        android:layout_marginLeft="10dip"
+        android:id="@+id/home_clock_counter"
+        android:text="@string/at_work_x" />
+
+</LinearLayout>

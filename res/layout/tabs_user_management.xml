@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <TextView
+        style="@style/jpp_sub_tab_text"
+  	    android:id="@+id/tab_label"
+  	    android:layout_width="match_parent"
+  	    android:layout_height="match_parent"
+  	    android:background="@drawable/subtab_background_selector" />
+
+</RelativeLayout>

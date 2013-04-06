@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <drawable name="white">#ffffffff</drawable>
+    <drawable name="periwinkle">#ff6c7ae3</drawable>
+    <drawable name="cornflower">#ff3443d1</drawable>
+    <drawable name="black">#ff383838</drawable>
+    <drawable name="grey">#ffd0d2d3</drawable>
+    <drawable name="peuter">#ff6d6d6d</drawable>
+    <drawable name="trans_grey_1">#80ffffff</drawable>
+    <drawable name="trans_black">#80000000</drawable>
+    <drawable name="blue">#ff002aff</drawable>
+</resources>
