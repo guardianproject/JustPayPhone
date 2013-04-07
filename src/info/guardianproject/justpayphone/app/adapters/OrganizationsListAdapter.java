@@ -1,6 +1,8 @@
 package info.guardianproject.justpayphone.app.adapters;
 
 import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.app.popups.AudioNotePopup;
+import info.guardianproject.justpayphone.app.popups.TextareaPopup;
 
 import java.util.List;
 
@@ -10,7 +12,10 @@ import org.witness.informacam.models.IOrganization;
 import org.witness.informacam.utils.Constants.App;
 import org.witness.informacam.utils.Constants.Models;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +27,11 @@ import android.widget.TextView;
 
 public class OrganizationsListAdapter extends BaseAdapter{
 	List<IOrganization> organizations;
-	Context c;
+	Activity c;
 	
 	private final static String LOG = App.LOG;
 	
-	public OrganizationsListAdapter(List<IOrganization> organizations, Context c) {
+	public OrganizationsListAdapter(List<IOrganization> organizations, Activity c) {
 		this.organizations = organizations;
 		this.c = c;
 	}
@@ -47,16 +52,16 @@ public class OrganizationsListAdapter extends BaseAdapter{
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		convertView = LayoutInflater.from(c).inflate(R.layout.adapter_organization_list_item, null);
-		IOrganization organization = organizations.get(position);
+		final IOrganization organization = organizations.get(position);
 		
 		TextView name = (TextView) convertView.findViewById(R.id.organization_name);
 		name.setText(organization.organizationName);
 		
 		try {
 			StringBuffer detailsStringBuffer = new StringBuffer();
-			JSONObject detailsObject = (JSONObject) organization.inflateContent(organization.organizationDetails);
+			final JSONObject detailsObject = (JSONObject) organization.inflateContent(organization.organizationDetails);
 			detailsStringBuffer.append(detailsObject.getString(Models.IOrganization.ADDRESS)).append(System.getProperty("line.separator"));
 			
 			detailsStringBuffer.append(detailsObject.getString(Models.IOrganization.CITY)).append(", ");
@@ -73,7 +78,14 @@ public class OrganizationsListAdapter extends BaseAdapter{
 			launchCall.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					// TODO: launch call
+					try {
+						Intent intent = new Intent(Intent.ACTION_DIAL).setData(Uri.parse("tel:" + detailsObject.getString(Models.IOrganization.PHONE)));
+						c.startActivity(intent);
+					} catch (JSONException e) {
+						Log.e(LOG, e.toString());
+						e.printStackTrace();
+					}
+					
 				}
 			});
 			
@@ -81,7 +93,13 @@ public class OrganizationsListAdapter extends BaseAdapter{
 			launchMessage.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					// TODO: launch message
+					new TextareaPopup(c, organization) {
+						@Override
+						public void cancel() {
+							// TODO: handle form
+							super.cancel();
+						}
+					};
 				}
 			});
 			
@@ -89,7 +107,13 @@ public class OrganizationsListAdapter extends BaseAdapter{
 			launchRecording.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					// TODO: launch recording
+					new AudioNotePopup(c) {
+						@Override
+						public void cancel() {
+							// TODO: handle form
+							super.cancel();
+						}
+					};
 				}
 			});
 			

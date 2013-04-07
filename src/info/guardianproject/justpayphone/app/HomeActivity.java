@@ -1,7 +1,12 @@
 package info.guardianproject.justpayphone.app;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
+import org.witness.informacam.utils.Constants.Actions;
+import org.witness.informacam.utils.Constants.Codes;
+import org.witness.informacam.utils.Constants.App.Camera;
 
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.screens.CameraFragment;
@@ -9,12 +14,16 @@ import info.guardianproject.justpayphone.app.screens.UserManagementFragment;
 import info.guardianproject.justpayphone.app.screens.WorkStatusFragment;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
+import info.guardianproject.justpayphone.utils.Constants.App.Home;
 
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -29,6 +38,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
+import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
@@ -36,15 +46,20 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	Intent init;
 	private final static String LOG = Constants.App.Home.LOG;
 	private String packageName;
-	
+
 	List<Fragment> fragments = new Vector<Fragment>();
 	Fragment userManagementFragment, workStatusFragment, cameraFragment;
-	
+
 	LayoutInflater li;
 	TabHost tabHost;
 	ViewPager viewPager;
 	TabPager pager;
+
+	private Intent cameraIntent = null;
+	private ComponentName cameraComponent = null;
 	
+	Handler h = new Handler();
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -52,16 +67,17 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 		Log.d(LOG, "hello " + packageName);
 		setContentView(R.layout.activity_home);
-		
+
 		userManagementFragment = Fragment.instantiate(this, UserManagementFragment.class.getName());
 		workStatusFragment = Fragment.instantiate(this, WorkStatusFragment.class.getName());
 		cameraFragment = Fragment.instantiate(this, CameraFragment.class.getName());
-		
+
 		fragments.add(workStatusFragment);
 		fragments.add(userManagementFragment);
 		fragments.add(cameraFragment);
+
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -69,10 +85,17 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	}
 	
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putBoolean(Camera.TAG, true);
+		outState.putInt(Home.Tabs.LAST, viewPager.getCurrentItem());
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
 	public void onPause() {
 		super.onPause();
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -89,7 +112,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		setResult(Activity.RESULT_CANCELED);
 		finish();
 	}
-	
+
 	private void initLayout() {
 		pager = new TabPager(getSupportFragmentManager());
 
@@ -108,7 +131,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		li.inflate(R.layout.fragment_home_work_status, tabHost.getTabContentView(), true);
 		tab.setContent(R.id.work_status_root_view);
 		tabHost.addTab(tab); 
-		
+
 		tab = tabHost.newTabSpec(UserManagementFragment.class.getName()).setIndicator(generateTab(li, R.layout.tabs_jpp_header, getResources().getDrawable(R.drawable.jpp_briefcase)));
 		li.inflate(R.layout.fragment_home_user_management, tabHost.getTabContentView(), true);
 		tab.setContent(R.id.user_management_root_view);
@@ -133,39 +156,74 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		viewPager.setCurrentItem(0);
 	}
 	
-	private void launchCamera() {
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		try {
+			Iterator<String> i = savedInstanceState.keySet().iterator();
+			while(i.hasNext()) {
+				String outState = i.next();
+				if(outState.equals(Camera.TAG) && savedInstanceState.getBoolean(Camera.TAG)) {
+					Log.d(LOG, "we saw camera: " + String.valueOf(outState));
+				} else if(outState.equals(Home.Tabs.LAST)){
+					Log.d(LOG, "we should move to tab #" + outState);
+				}
+			}
+		} catch(NullPointerException e) {}
 		
+		super.onRestoreInstanceState(savedInstanceState);
 	}
-	
+
+	private void launchCamera() {
+		List<ResolveInfo> resolveInfo = getPackageManager().queryIntentActivities(new Intent(Actions.CAMERA), 0);
+
+		for(ResolveInfo ri : resolveInfo) {
+			String packageName = ri.activityInfo.packageName;
+			String name = ri.activityInfo.name;
+
+			Log.d(LOG, "found camera app: " + packageName);
+
+			if(Camera.SUPPORTED.indexOf(packageName) >= 0) {
+				cameraComponent = new ComponentName(packageName, name);
+				break;
+			}
+		}
+
+		if(resolveInfo.isEmpty() || cameraComponent == null) {
+			Toast.makeText(this, getString(R.string.could_not_find_any_camera_activity), Toast.LENGTH_LONG).show();
+		}
+		
+		
+
+		cameraIntent = new Intent(Camera.Intents.CAMERA);
+		cameraIntent.setComponent(cameraComponent);
+		startActivityForResult(cameraIntent, Codes.Routes.IMAGE_CAPTURE);
+	}
+
 	public static View generateTab(final LayoutInflater li, final int resource) {
 		return generateTab(li, resource, null, null);
 	}
-	
+
 	public static View generateTab(final LayoutInflater li, final int resource, final String tabLabel) {
 		return generateTab(li, resource, null, tabLabel);
 	}
-	
+
 	public static View generateTab(final LayoutInflater li, final int resource, final Drawable iconResource) {
 		return generateTab(li, resource, iconResource, null);
 	}
-	
+
 	public static View generateTab(final LayoutInflater li, final int resource, final Drawable iconResource, final String tabLabel) {
 		View v = li.inflate(resource, null);
 		if(iconResource != null) {
 			((ImageView) v.findViewById(R.id.tab_icon)).setImageDrawable(iconResource);
 		}
-		
+
 		if(tabLabel != null) {
 			((TextView) v.findViewById(R.id.tab_label)).setText(tabLabel);
 		}
-		
+
 		return v;
 	}
-	
-	public void swapLayout(Fragment fragment) {
-		swapLayout(fragment, R.id.work_status_fragment_root);
-	}
-	
+
 	public void swapLayout(Fragment fragment, int layoutRoot) {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(layoutRoot, fragment);
@@ -173,16 +231,23 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		ft.commit();
 		pager.notifyDataSetChanged();
 	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		viewPager.setCurrentItem(0);
+		
+		super.onActivityResult(requestCode, resultCode, data);
+	}
 	
 	class TabPager extends FragmentStatePagerAdapter implements TabHost.OnTabChangeListener, OnPageChangeListener {
 
 		public TabPager(FragmentManager fm) {
 			super(fm);
 		}
-		
+
 		@Override
 		public int getItemPosition(Object object) {
-		    return POSITION_NONE;
+			return POSITION_NONE;
 		}
 
 		@Override
@@ -212,7 +277,13 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 			tabHost.setCurrentTab(page);
 			Log.d(LOG, "setting current page as " + page);
 			if(page == 2) {
-				launchCamera();
+				h.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						launchCamera();
+					}
+				}, 1500);
+				
 			}
 		}
 

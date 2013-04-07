@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="260dip"
+    android:padding="10dip" >
+
+    <GridView
+        android:id="@+id/keypad_popup_numbers"
+        android:layout_width="match_parent"
+        android:layout_height="200dip"
+        android:layout_above="@+id/keypad_popup_control"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:horizontalSpacing="2dp"
+        android:numColumns="3"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="2dip" />
+
+    <LinearLayout
+        android:id="@+id/keypad_popup_control"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="1" >
+
+        <TextView
+            android:id="@+id/keypad_popup_output"
+            style="@style/jpp_edittext"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0.6" />
+
+        <Button style="@style/button_d"
+            android:id="@+id/keypad_popup_clear"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:text="@string/clear" />
+
+        <Button style="@style/button_d"
+            android:id="@+id/keypad_popup_commit"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:text="@string/ok" />
+    </LinearLayout>
+
+</RelativeLayout>

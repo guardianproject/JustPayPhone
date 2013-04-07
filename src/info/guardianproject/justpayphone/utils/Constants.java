@@ -45,11 +45,21 @@ public class Constants {
 				
 				public class UserManagement {
 					public final static String TAG = App.UserManagement.TAG;
+					
+					public class MyLawyer {
+						public final static String TAG = "my_lawyer";
+					}
+					
+					public class MyWorkplaces {
+						public final static String TAG = "my_workplaces";
+					}
 				}
 				
 				public class WorkStatus {
 					public final static String TAG = App.WorkStatus.TAG;
 				}
+
+				public static final String LAST = "last_tab";
 				
 				
 			}

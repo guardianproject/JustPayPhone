@@ -1,6 +1,6 @@
 package info.guardianproject.justpayphone.models;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import org.witness.informacam.models.ILocation;
 import org.witness.informacam.models.Model;
@@ -9,7 +9,7 @@ import org.witness.informacam.utils.Constants.Models;
 
 public class JPPWorkspace extends Model {
 	public ILocation location = null;
-	public List<IMedia> associatedMedia = null;
+	public ArrayList<IMedia> associatedMedia = null;
 	
 	public int getNumberOfDaysWorkedHere() {
 		int days = 0;
@@ -20,5 +20,16 @@ public class JPPWorkspace extends Model {
 		}
 		
 		return days;
+	}
+	
+	public ArrayList<IMedia> getImagesAndVideo() {
+		ArrayList<IMedia> imagesAndVideo = new ArrayList<IMedia>();
+		for(IMedia media : associatedMedia) {
+			if(media.dcimEntry.mediaType != Models.IMedia.MimeType.LOG) {
+				imagesAndVideo.add(media);
+			}
+		}
+		
+		return imagesAndVideo;
 	}
 }

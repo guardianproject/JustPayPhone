@@ -19,7 +19,7 @@
         <ImageView
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="0.2"
+            android:layout_weight="0.25"
             android:scaleType="fitXY"
             android:src="@drawable/jpp_phone" />
 
@@ -28,7 +28,7 @@
             android:layout_width="0dip"
             android:layout_height="match_parent"
             android:layout_marginLeft="6dip"
-            android:layout_weight="0.8"
+            android:layout_weight="0.75"
             android:gravity="bottom"
             android:text="@string/just_pay_phone_logo" />
     </LinearLayout>

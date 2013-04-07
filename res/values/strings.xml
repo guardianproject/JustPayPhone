@@ -7,13 +7,13 @@
 	<string name="just_pay_phone_logo">JUST\nPAY\nPHONE</string>
 	<string name="where_i_work">Where I Work</string>
 	<string name="my_attorney">My Lawyer</string>
-	<string name="x_location">%1$f, %2$f</string>
+	<string name="x_location">Location: %1$f, %2$f</string>
 	<plurals name="x_days_worked">
 	    <item quantity="one">%1$d day worked here.</item>
 	    <item quantity="other">%1$d days worked here.</item>
 	</plurals>
-	<string name="ph">ph.</string>
-	<string name="fax">fax.</string>
+	<string name="ph">ph. </string>
+	<string name="fax">fax. </string>
 	<string name="call_my_lawyer">Call my lawyer</string>
 	<string name="write_a_message_to">Write a message to my lawyer</string>
 	<string name="record_a_message_for">Record a message for my lawyer</string>

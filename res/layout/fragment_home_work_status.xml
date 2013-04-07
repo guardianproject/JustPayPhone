@@ -11,9 +11,40 @@
         style="@style/jpp_button_a"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <include layout="@layout/layout_work_status_inactive"
-        android:id="@+id/work_status_inactive" />
-    <include layout="@layout/layout_work_status_active"
-        android:id="@+id/work_status_active" />
+
+    <LinearLayout
+        android:id="@+id/work_status_clock_holder"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:weightSum="1" >
+
+        <ImageView
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="0.25"
+            android:scaleType="centerInside"
+            android:src="@drawable/jpp_clock_icon" />
+
+        <TextView
+            android:id="@+id/work_status_time_at_work"
+            style="@style/jpp_p_timer"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dip"
+            android:layout_weight="0.35"
+            android:text="@string/at_work_x" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <include
+            android:id="@+id/work_status_lunch_questionnaire"
+            layout="@layout/forms_lunch_questionnaire"
+            android:visibility="gone" />
+    </ScrollView>
 
 </LinearLayout>

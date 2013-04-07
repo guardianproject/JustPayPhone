@@ -27,7 +27,8 @@
     
     <style name="jpp_sub_tab_text">
         <item name="android:textColor">@drawable/black</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center_horizontal</item>
     </style>
     
     <style name="jpp_camera_chooser_button">
@@ -73,7 +74,7 @@
     
     <style name="jpp_p_timer">
         <item name="android:textColor">@drawable/blue</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">18sp</item>
     </style>
     
     <style name="jpp_list">
@@ -89,6 +90,7 @@
         <item name="android:background">@drawable/extras_button_d_background_inactive</item>
         <item name="android:padding">8dip</item>
         <item name="android:textStyle">italic</item>
+        <item name="android:gravity">center_vertical</item>
     </style>
     
     <style name="button_a">
