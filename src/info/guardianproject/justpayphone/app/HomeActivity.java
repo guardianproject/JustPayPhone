@@ -6,9 +6,7 @@ import java.util.Vector;
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.screens.CameraFragment;
 import info.guardianproject.justpayphone.app.screens.UserManagementFragment;
-import info.guardianproject.justpayphone.app.screens.WorkStatusActiveFragment;
-import info.guardianproject.justpayphone.app.screens.WorkStatusInactiveFragment;
-import info.guardianproject.justpayphone.app.screens.WorkStatusStubFragment;
+import info.guardianproject.justpayphone.app.screens.WorkStatusFragment;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 
@@ -47,8 +45,6 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	ViewPager viewPager;
 	TabPager pager;
 	
-	boolean isAtWork = false;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -58,7 +54,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		setContentView(R.layout.activity_home);
 		
 		userManagementFragment = Fragment.instantiate(this, UserManagementFragment.class.getName());
-		workStatusFragment = isAtWork ? Fragment.instantiate(this, WorkStatusActiveFragment.class.getName()) : Fragment.instantiate(this, WorkStatusInactiveFragment.class.getName());
+		workStatusFragment = Fragment.instantiate(this, WorkStatusFragment.class.getName());
 		cameraFragment = Fragment.instantiate(this, CameraFragment.class.getName());
 		
 		fragments.add(workStatusFragment);
@@ -135,7 +131,6 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		}
 
 		viewPager.setCurrentItem(0);
-		setWorkStatus(isAtWork);
 	}
 	
 	private void launchCamera() {
@@ -232,18 +227,5 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 			return fragments.size();
 		}
 
-	}
-
-	@Override
-	public void setWorkStatus(boolean isAtWork) {
-		this.isAtWork = isAtWork;
-		
-		workStatusFragment = isAtWork ? Fragment.instantiate(this, WorkStatusActiveFragment.class.getName()) : Fragment.instantiate(this, WorkStatusInactiveFragment.class.getName());
-		swapLayout(workStatusFragment);
-	}
-	
-	@Override
-	public boolean getWorkStatus() {
-		return isAtWork;
 	}
 }

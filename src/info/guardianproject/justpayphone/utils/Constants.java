@@ -4,8 +4,6 @@ public class Constants {
 	
 	public interface HomeActivityListener {
 		public int[] getDimensions();
-		public void setWorkStatus(boolean isAtWork);
-		public boolean getWorkStatus();
 	}
 	
 	public class Codes {

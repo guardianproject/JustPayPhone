@@ -3,12 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
-    <Button
-        android:id="@+id/work_status_clock_in_toggle"
-        style="@style/jpp_button_a"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/clock_out" />
+    <include layout="@layout/extras_clock_view" />
+	<include layout="@layout/forms_lunch_questionnaire"
+	    android:id="@+id/lunch_questionnaire" />
+    
 
 </LinearLayout>

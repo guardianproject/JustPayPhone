@@ -6,9 +6,14 @@
     android:orientation="vertical"
     android:padding="14dip" >
 
-    <FrameLayout
-        android:id="@+id/work_status_fragment_root"
+    <Button
+        android:id="@+id/work_status_toggle"
+        style="@style/jpp_button_a"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
+    <include layout="@layout/layout_work_status_inactive"
+        android:id="@+id/work_status_inactive" />
+    <include layout="@layout/layout_work_status_active"
+        android:id="@+id/work_status_active" />
 
 </LinearLayout>

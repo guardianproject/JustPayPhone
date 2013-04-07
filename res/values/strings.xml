@@ -17,4 +17,10 @@
 	<string name="call_my_lawyer">Call my lawyer</string>
 	<string name="write_a_message_to">Write a message to my lawyer</string>
 	<string name="record_a_message_for">Record a message for my lawyer</string>
+	<string name="did_you_stop_working">Did you stop working to eat lunch?</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	<string name="how_many_minutes_did">How many minutes did you stop working to eat lunch?</string>
+	<string name="go">Go!</string>
+	<string name="x_minutes">%1$d minutes</string>
 </resources>
