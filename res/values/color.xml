@@ -9,4 +9,8 @@
     <drawable name="trans_grey_1">#80ffffff</drawable>
     <drawable name="trans_black">#80000000</drawable>
     <drawable name="blue">#ff002aff</drawable>
+    <drawable name="green">#ff60d400</drawable>
+    <drawable name="trans_green">#8060d400</drawable>
+    <drawable name="red">#ffff0627</drawable>
+    <drawable name="trans_red">#80ff0627</drawable>
 </resources>

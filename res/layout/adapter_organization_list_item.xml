@@ -24,6 +24,13 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/organization_view_work_summary"
+        style="@style/jpp_button_a"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/view_my_work_summary" />
+
+    <Button
         android:id="@+id/organization_launch_call"
         style="@style/jpp_button_a"
         android:layout_width="match_parent"

@@ -23,4 +23,12 @@
 	<string name="how_many_minutes_did">How many minutes did you stop working to eat lunch?</string>
 	<string name="go">Go!</string>
 	<string name="x_minutes">%1$d minutes</string>
+	<string name="ok">OK</string>
+	<string name="other_amount">Other amount\u2026</string>
+	<string name="change">(change?)</string>
+	<string name="my_gallery">My Gallery</string>
+	<string name="glsp">Georgia Legal Services Program</string>
+	<string name="previous_day">Previous Day</string>
+	<string name="next_day">Next Day</string>
+	<string name="view_my_work_summary">View my Work Summary</string>
 </resources>

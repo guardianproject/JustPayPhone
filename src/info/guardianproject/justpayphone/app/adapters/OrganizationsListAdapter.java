@@ -2,18 +2,18 @@ package info.guardianproject.justpayphone.app.adapters;
 
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.popups.AudioNotePopup;
+import info.guardianproject.justpayphone.app.popups.PayStubPopup;
 import info.guardianproject.justpayphone.app.popups.TextareaPopup;
 
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.witness.informacam.models.IOrganization;
+import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.utils.Constants.App;
 import org.witness.informacam.utils.Constants.Models;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -114,6 +114,14 @@ public class OrganizationsListAdapter extends BaseAdapter{
 							super.cancel();
 						}
 					};
+				}
+			});
+			
+			Button viewWorkSummary = (Button) convertView.findViewById(R.id.organization_view_work_summary);
+			viewWorkSummary.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					new PayStubPopup(c);
 				}
 			});
 			

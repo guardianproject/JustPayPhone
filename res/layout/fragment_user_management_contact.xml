@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/user_management_my_lawyer_root" >
+    <TextView
+        style="@style/h1"
+        android:id="@+id/gallery_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/my_attorney" />
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -3,29 +3,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dip"
+        android:layout_gravity="center_vertical"
         android:layout_marginBottom="10dip"
         android:orientation="horizontal"
-        android:layout_gravity="center_vertical"
         android:weightSum="1" >
+
         <ImageView
             android:layout_width="0dip"
             android:layout_height="match_parent"
             android:layout_weight="0.15"
             android:scaleType="centerInside"
             android:src="@drawable/jpp_meal_icon" />
+
         <TextView
             android:layout_width="0dip"
-            android:layout_marginLeft="10dip"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
+            android:layout_marginLeft="10dip"
             android:layout_weight="0.85"
+            android:gravity="center_vertical"
             android:text="@string/did_you_stop_working" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/lunch_taken_choice_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1" >
+
+        <Button
+            android:id="@+id/lunch_taken_yes"
+            style="@style/jpp_button_b"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/yes" />
+
+        <Button
+            android:id="@+id/lunch_taken_no"
+            style="@style/jpp_button_b"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/no" />
+    </LinearLayout>
+
     <RadioGroup
+        android:visibility="gone"
+        android:id="@+id/lunch_taken_proxy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="30dip"
@@ -35,13 +64,12 @@
         <RadioButton
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/yes" />
+            android:layout_weight="0.5" />
+
         <RadioButton
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/no" />
+            android:layout_weight="0.5" />
     </RadioGroup>
 
     <LinearLayout
@@ -67,19 +95,53 @@
             android:layout_weight="0.85"
             android:gravity="center_vertical"
             android:text="@string/how_many_minutes_did" />
-
     </LinearLayout>
-    <EditText
-        android:id="@+id/lunch_minutes_answerHolder"
-        android:editable="false"
-        android:layout_marginBottom="10dip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <Button style="@style/jpp_button_a"
-        android:id="@+id/odk_commit"
-        android:layout_marginBottom="10dip"
+
+    <LinearLayout
+        android:id="@+id/lunch_minutes_choice_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/go" />
+        android:orientation="vertical" >
+
+        <Button
+            style="@style/jpp_button_b"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/x_minutes" />
+
+        <Button
+            style="@style/jpp_button_b"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/x_minutes" />
+
+        <Button
+            style="@style/jpp_button_b"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/x_minutes" />
+
+        <Button
+            style="@style/jpp_button_b"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/other_amount" />
+    </LinearLayout>
+
+    <EditText
+        android:visibility="gone"
+        android:id="@+id/lunch_minutes_proxy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dip"
+        android:editable="false" />
+
+    <Button
+        android:id="@+id/odk_commit"
+        style="@style/jpp_button_a"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dip"
+        android:text="@string/ok" />
 
 </LinearLayout>

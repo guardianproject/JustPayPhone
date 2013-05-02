@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/user_management_my_workplaces_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+    <TextView
+        style="@style/h1"
+        android:id="@+id/gallery_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/my_gallery" />
 
     <ScrollView
+        android:layout_below="@+id/gallery_label"
+        android:layout_above="@+id/gallery_to_camera"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
+
             <ListView
                 android:id="@+id/my_workplaces_list_holder"
                 android:layout_width="match_parent"
@@ -19,4 +29,12 @@
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+    <ImageButton
+        android:src="@drawable/ic_action_camera"
+        android:id="@+id/gallery_to_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true" />
+
+</RelativeLayout>

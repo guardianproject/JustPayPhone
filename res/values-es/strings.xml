@@ -1,0 +1,33 @@
+<resources>
+
+    <string name="app_name">Marca Mis Horas</string>
+	<string name="check_in">Nota la entrada</string>
+	<string name="clock_out">Nota la salida</string>
+	<string name="at_work_x">tiempo trabajando:\n%1$s</string>
+	<string name="just_pay_phone_logo">MARCA\nMIS\nHORAS</string>
+	<string name="where_i_work">Where I Work</string>
+	<string name="my_attorney">Mi Abogado</string>
+	<string name="x_location">Location: %1$f, %2$f</string>
+	<plurals name="x_days_worked">
+	    <item quantity="one">%1$d day worked here.</item>
+	    <item quantity="other">%1$d days worked here.</item>
+	</plurals>
+	<string name="ph">ph. </string>
+	<string name="fax">fax. </string>
+	<string name="call_my_lawyer">Llamar a mi abogado</string>
+	<string name="write_a_message_to">Mandar un mensaje de texto a mi abogado</string>
+	<string name="record_a_message_for">Grabar un mensaje para mi abogado</string>
+	<string name="did_you_stop_working">Paró para almorzar o cenar?</string>
+	<string name="yes">Sí</string>
+	<string name="no">No</string>
+	<string name="how_many_minutes_did">Cuantos minutos tocó para comer?</string>
+	<string name="go">Go!</string>
+	<string name="x_minutes">%1$d minutes</string>
+	<string name="ok">OK</string>
+	<string name="other_amount">Other amount\u2026</string>
+	<string name="change">(change?)</string>
+	<string name="my_gallery">My Gallery</string>
+	<string name="glsp">Servicios Legales de Georgia</string>
+	<string name="previous_day">Previous Day</string>
+	<string name="next_day">Next Day</string>
+</resources>

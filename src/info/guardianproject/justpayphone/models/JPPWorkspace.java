@@ -2,8 +2,8 @@ package info.guardianproject.justpayphone.models;
 
 import java.util.ArrayList;
 
-import org.witness.informacam.models.ILocation;
 import org.witness.informacam.models.Model;
+import org.witness.informacam.models.j3m.ILocation;
 import org.witness.informacam.models.media.IMedia;
 import org.witness.informacam.utils.Constants.Models;
 

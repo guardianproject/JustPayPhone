@@ -43,6 +43,16 @@
         <item name="android:background">@drawable/extras_button_c_selector</item>
     </style>
     
+    <style name="jpp_button_b">
+        <item name="android:textColor">@drawable/black</item>
+        <item name="android:background">@drawable/extras_button_b_unknown</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:layout_marginTop">4dip</item>
+        <item name="android:layout_marginBottom">4dip</item>
+        <item name="android:layout_marginLeft">4dip</item>
+        <item name="android:layout_marginRight">4dip</item>
+    </style>
+    
     <style name="jpp_image_button">
          <item name="android:background">@drawable/extras_image_button_selector</item>
     </style>
