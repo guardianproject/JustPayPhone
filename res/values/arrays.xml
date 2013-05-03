@@ -6,4 +6,19 @@
         <item>30</item>
         <item>@string/other_amount</item>
     </string-array>
+    <string-array name="languages">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="languages_">
+        <item>@string/pref_languages_default</item>
+        <item>@string/pref_languages_en_us</item>
+        <item>@string/pref_languages_es</item>
+    </string-array>
+    <string-array name="locales">
+        <item>default</item>
+        <item>en</item>
+        <item>es</item>
+    </string-array>
 </resources>

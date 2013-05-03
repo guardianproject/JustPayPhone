@@ -29,6 +29,7 @@
             android:name="info.guardianproject.justpayphone.app.HomeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
+        <activity android:name="info.guardianproject.justpayphone.app.PreferencesActivity" />
     </application>
 
 </manifest>

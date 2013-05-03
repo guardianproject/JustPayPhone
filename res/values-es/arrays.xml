@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="lunch_minutes_choices">
-        <item>10</item>
-        <item>20</item>
-        <item>30</item>
-        <item>@string/other_amount</item>
-    </string-array>
-</resources>

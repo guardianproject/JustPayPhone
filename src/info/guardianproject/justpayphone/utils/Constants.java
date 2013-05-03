@@ -6,6 +6,15 @@ public class Constants {
 		public int[] getDimensions();
 	}
 	
+	public static class Settings {
+		public static final String LANGUAGE = "jpp_language";
+		public static final class Locales {
+			public final static int DEFAULT = 0;
+			public final static int EN = 1;
+			public final static int ES = 2;
+		}
+	}
+	
 	public class Codes {
 		public class Routes {
 			public static final int HOME = 1;

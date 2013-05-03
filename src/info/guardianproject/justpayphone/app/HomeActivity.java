@@ -2,6 +2,7 @@ package info.guardianproject.justpayphone.app;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
 import org.witness.informacam.utils.Constants.Actions;
@@ -16,15 +17,18 @@ import info.guardianproject.justpayphone.app.screens.WorkStatusFragment;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 import info.guardianproject.justpayphone.utils.Constants.App.Home;
+import info.guardianproject.justpayphone.utils.Constants.Settings;
 
 
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -35,11 +39,13 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
-import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
@@ -47,6 +53,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	Intent init;
 	private final static String LOG = Constants.App.Home.LOG;
 	private String packageName;
+	private String lastLocale;
 
 	List<Fragment> fragments = new Vector<Fragment>();
 	Fragment userManagementFragment, workStatusFragment, galleryFragment;
@@ -55,6 +62,8 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	TabHost tabHost;
 	ViewPager viewPager;
 	TabPager pager;
+	
+	Handler h;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -71,13 +80,80 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		fragments.add(workStatusFragment);
 		fragments.add(userManagementFragment);
 		fragments.add(galleryFragment);
+		
+		h = new Handler();
+		
+		lastLocale = PreferenceManager.getDefaultSharedPreferences(this).getString(Settings.LANGUAGE, "0");
 
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		String currentLocale = PreferenceManager.getDefaultSharedPreferences(this).getString(Settings.LANGUAGE, "0");
+		if(!lastLocale.equals(currentLocale))
+			setNewLocale(currentLocale);
+		
 		initLayout();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+		MenuInflater mi = getMenuInflater();
+		mi.inflate(R.menu.menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case R.id.jpp_about:
+			// TODO: we'll have an about page
+			return true;
+		case R.id.jpp_preferences:
+			lastLocale = PreferenceManager.getDefaultSharedPreferences(this).getString(Settings.LANGUAGE, "0");
+			startActivity(new Intent(this, PreferencesActivity.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	private void setNewLocale(String locale_code) {
+		Configuration configuration = new Configuration();
+		switch(Integer.parseInt(locale_code)) {
+		case Settings.Locales.DEFAULT:
+			configuration.locale = new Locale(Locale.getDefault().getLanguage());
+			break;
+		case Settings.Locales.EN:
+			configuration.locale = new Locale("en");
+			break;
+		case Settings.Locales.ES:
+			configuration.locale = new Locale("es");
+			break;
+		}
+		getResources().updateConfiguration(configuration, getResources().getDisplayMetrics());
+		restart();
+	}
+	
+	private void restart() {
+		Log.d(LOG, "RESTARTING?");
+		h.post(new Runnable() {
+			@Override
+			public void run() {
+				Intent intent = getIntent();
+				intent.setAction(Intent.ACTION_MAIN);
+				
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+				overridePendingTransition(0, 0);
+				finish();
+
+				overridePendingTransition(0, 0);
+				startActivity(intent);
+			}
+		});
 	}
 	
 	@Override

@@ -8,8 +8,5 @@
 		"phone": 5045552424,
 		"fax": 5045552626
 	},
-	"newRequest":{
-		"method":"email",
-		"address":"harlo@guardianproject.info"
-	}
+	"requestUrl":"https://something.com:8080"
 }

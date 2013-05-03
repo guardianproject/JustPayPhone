@@ -31,4 +31,12 @@
 	<string name="previous_day">Previous Day</string>
 	<string name="next_day">Next Day</string>
 	<string name="view_my_work_summary">View my Work Summary</string>
+	
+	<string name="about">About</string>
+	
+	<string name="preferences">Preferences</string>
+    <string name="prefs_language_title">Language</string>
+    <string name="pref_languages_default">System Default</string>
+    <string name="pref_languages_en_us">English (US)</string>
+    <string name="pref_languages_es">Spanish</string>
 </resources>
