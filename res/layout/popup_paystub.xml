@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <TextView
+    <TextView style="@style/jpp_h2"
         android:id="@+id/paystub_current_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,15 +14,7 @@
         android:id="@+id/paystub_current_stats_holder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/paystub_weekly_total"
         android:layout_below="@+id/paystub_current_date" />
-
-    <TextView
-        android:id="@+id/paystub_weekly_total"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/paystub_day_navigation"
-        android:gravity="center" />
 
     <LinearLayout
         android:id="@+id/paystub_day_navigation"
@@ -34,7 +26,7 @@
 
         <Button
             android:id="@+id/paystub_previous_day"
-            style="@style/jpp_button_a"
+            style="@style/jpp_button_c"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
@@ -42,7 +34,7 @@
 
         <Button
             android:id="@+id/paystub_next_day"
-            style="@style/jpp_button_a"
+            style="@style/jpp_button_c"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"

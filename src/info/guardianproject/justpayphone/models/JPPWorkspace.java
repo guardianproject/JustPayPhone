@@ -11,6 +11,10 @@ public class JPPWorkspace extends Model {
 	public ILocation location = null;
 	public ArrayList<IMedia> associatedMedia = null;
 	
+	public JPPWorkspace() {
+		super();
+	}
+	
 	public int getNumberOfDaysWorkedHere() {
 		int days = 0;
 		for(IMedia media : associatedMedia) {

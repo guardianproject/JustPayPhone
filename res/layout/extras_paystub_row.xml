@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="6dip" >
+    <TextView
+        android:layout_marginRight="20dip"
+        android:id="@+id/paystub_row_label" />
+    <TextView
+        android:id="@+id/paystub_row_value" />
+</TableRow>
