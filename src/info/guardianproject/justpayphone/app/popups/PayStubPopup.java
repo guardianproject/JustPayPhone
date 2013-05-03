@@ -82,16 +82,17 @@ public class PayStubPopup extends Popup implements OnClickListener {
 	public void onClick(View v) {
 		if(v == previousDay) {
 			ILog iLog = new ILog();
-			iLog.startTime = TimeUtility.minusOneDay(workSummary.iLog.startTime + (60000 * random(-90, 90)));
-			iLog.endTime = iLog.startTime + (6000 * 60 * random(7, 13));
+			iLog.startTime = TimeUtility.minusOneDay(workSummary.iLog.startTime);
+			iLog.endTime = iLog.startTime + (1000 * 60 * 60 * random(7, 13));
 			
 			workSummary = new JPPWorkSummary(iLog);
 			workSummary.timeForLunch = random(10, 45);
 			setData();
 		} else if(v == nextDay) {
 			ILog iLog = new ILog();
-			iLog.startTime = TimeUtility.plusOneDay(workSummary.iLog.startTime + (60000 * random(-90, 90)));
-			iLog.endTime = iLog.startTime + (6000 * 60 * random(7, 13));
+			iLog.startTime = TimeUtility.plusOneDay(workSummary.iLog.startTime);
+			iLog.endTime = iLog.startTime + (1000 * 60 * 60 * random(7, 13));
+			
 			workSummary = new JPPWorkSummary(iLog);
 			workSummary.timeForLunch = random(10, 45);
 			setData();
