@@ -19,6 +19,9 @@ public class Constants {
 		public class Routes {
 			public static final int HOME = 1;
 			public static final int CAMERA = 2;
+			public static final int WIZARD = org.witness.informacam.utils.Constants.Codes.Messages.Wizard.INIT;
+			public static final int LOGIN = org.witness.informacam.utils.Constants.Codes.Messages.Login.DO_LOGIN;
+			public static final int LOGOUT = org.witness.informacam.utils.Constants.Codes.Messages.Login.DO_LOGOUT;
 		}
 		
 		public class Media {
