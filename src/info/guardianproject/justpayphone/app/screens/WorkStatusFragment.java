@@ -3,7 +3,10 @@ package info.guardianproject.justpayphone.app.screens;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.witness.informacam.InformaCam;
+import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.utils.Constants.App;
+import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 import org.witness.informacam.utils.TimeUtility;
 
 import info.guardianproject.justpayphone.R;
@@ -11,6 +14,7 @@ import info.guardianproject.justpayphone.app.popups.KeypadPopup;
 import info.guardianproject.justpayphone.app.popups.TextareaPopup;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -27,7 +31,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-public class WorkStatusFragment extends Fragment implements OnClickListener {
+public class WorkStatusFragment extends Fragment implements OnClickListener, InformaCamStatusListener {
 	View rootView;
 	Activity a;
 
@@ -45,6 +49,9 @@ public class WorkStatusFragment extends Fragment implements OnClickListener {
 	TextView timeAtWork;
 	long timeWorked = 0;
 	boolean isAtWork = false;
+	
+	ILog iLog = null;
+	InformaCam informaCam = null;
 
 	private final static String LOG = App.LOG;
 
@@ -181,6 +188,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener {
 		lunchQuestionnaire.setVisibility((!isAtWork && !isStarting) ? View.VISIBLE : View.GONE);
 		
 		if(isAtWork) {
+			informaCam.startInforma();
 			workStatusToggle.setVisibility(View.VISIBLE);
 			
 			timeWorked = 0;
@@ -202,6 +210,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener {
 				}
 			}, 0L, 1000);
 		} else {
+			informaCam.stopInforma();
 			if(!isStarting) {
 				t.cancel();
 				t = null;
@@ -232,5 +241,36 @@ public class WorkStatusFragment extends Fragment implements OnClickListener {
 			}
 		}
 
+	}
+
+	@Override
+	public void onInformaCamStart(Intent intent) {}
+
+	@Override
+	public void onInformaCamStop(Intent intent) {}
+
+	@Override
+	public void onInformaStop(Intent intent) {
+		// TODO: saving it all...
+	}
+
+	@Override
+	public void onInformaStart(Intent intent) {
+		if(informaCam == null) {
+			informaCam = InformaCam.getInstance();
+		}
+		
+		// get the day's log (log in progress)
+		iLog = ILog.getLogByDay(System.currentTimeMillis());
+		
+		// if null, init
+		if(iLog == null) {
+			iLog = new ILog();
+			iLog.startTime = informaCam.informaService.getCurrentTime();
+		}
+		
+		// associate to new log
+		informaCam.informaService.associateMedia(iLog);
+		
 	}	
 }
