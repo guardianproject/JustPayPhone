@@ -8,9 +8,9 @@ import java.util.Vector;
 import org.witness.informacam.utils.Constants.Actions;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.App.Camera;
+import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 
 import info.guardianproject.justpayphone.R;
-import info.guardianproject.justpayphone.app.screens.CameraFragment;
 import info.guardianproject.justpayphone.app.screens.GalleryFragment;
 import info.guardianproject.justpayphone.app.screens.UserManagementFragment;
 import info.guardianproject.justpayphone.app.screens.WorkStatusFragment;
@@ -49,14 +49,14 @@ import android.widget.TabHost;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
-public class HomeActivity extends FragmentActivity implements HomeActivityListener {
+public class HomeActivity extends FragmentActivity implements HomeActivityListener, InformaCamStatusListener {
 	Intent init;
 	private final static String LOG = Constants.App.Home.LOG;
 	private String packageName;
 	private String lastLocale;
 
 	List<Fragment> fragments = new Vector<Fragment>();
-	Fragment userManagementFragment, workStatusFragment, galleryFragment;
+	Fragment userManagementFragment, workStatusFragment, galleryFragment, currentFragment;
 
 	LayoutInflater li;
 	TabHost tabHost;
@@ -70,7 +70,6 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		super.onCreate(savedInstanceState);
 		packageName = getClass().getName();
 
-		Log.d(LOG, "hello " + packageName);
 		setContentView(R.layout.activity_home);
 
 		userManagementFragment = Fragment.instantiate(this, UserManagementFragment.class.getName());
@@ -226,6 +225,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		}
 
 		viewPager.setCurrentItem(0);
+		currentFragment = fragments.get(0);
 	}
 	
 	@Override
@@ -280,7 +280,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		viewPager.setCurrentItem(0);
+		//viewPager.setCurrentItem(0);
 		
 		super.onActivityResult(requestCode, resultCode, data);
 	}
@@ -312,7 +312,6 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		@Override
 		public void onPageScrollStateChanged(int state) {
 			// TODO Auto-generated method stub
-
 		}
 
 		@Override
@@ -321,8 +320,9 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		@Override
 		public void onPageSelected(int page) {
 			tabHost.setCurrentTab(page);
-			Log.d(LOG, "setting current page as " + page);
+			currentFragment = fragments.get(page);
 			
+			Log.d(LOG, "setting current page as " + page);
 		}
 
 		@Override
@@ -336,5 +336,30 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 			return fragments.size();
 		}
 
+	}
+
+	
+	@Override
+	public void onInformaCamStart(Intent intent) {
+		((InformaCamStatusListener) currentFragment).onInformaCamStart(intent);
+		
+	}
+	
+
+	@Override
+	public void onInformaCamStop(Intent intent) {
+		((InformaCamStatusListener) currentFragment).onInformaCamStop(intent);
+	}
+	
+
+	@Override
+	public void onInformaStop(Intent intent) {
+		((InformaCamStatusListener) currentFragment).onInformaStop(intent);
+	}
+	
+
+	@Override
+	public void onInformaStart(Intent intent) {
+		((InformaCamStatusListener) currentFragment).onInformaStart(intent);
 	}
 }

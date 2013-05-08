@@ -15,6 +15,14 @@ public class Constants {
 		}
 	}
 	
+	public static class Forms {
+		public static final String LUNCH_QUESTIONNAIRE = "Just Pay Phone: Clock-Out Questions";
+		public static class LunchQuestionnaire {
+			public static final String LUNCH_TAKEN = "jpp_did_have_lunch";
+			public static final String LUNCH_MINUTES = "jpp_lunch_minutes";
+		}
+	}
+	
 	public class Codes {
 		public class Routes {
 			public static final int HOME = 1;
@@ -22,6 +30,7 @@ public class Constants {
 			public static final int WIZARD = org.witness.informacam.utils.Constants.Codes.Messages.Wizard.INIT;
 			public static final int LOGIN = org.witness.informacam.utils.Constants.Codes.Messages.Login.DO_LOGIN;
 			public static final int LOGOUT = org.witness.informacam.utils.Constants.Codes.Messages.Login.DO_LOGOUT;
+			public static final int FINISH_SAFELY = 3;
 		}
 		
 		public class Media {
@@ -32,6 +41,7 @@ public class Constants {
 
 		public class Extras {
 			public final static String MEDIA_ID = "media_id";
+			public static final String LOGOUT_USER = org.witness.informacam.utils.Constants.Codes.Extras.LOGOUT_USER;
 		}
 	}
 	

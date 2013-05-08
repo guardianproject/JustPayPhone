@@ -4,18 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+
     <TextView
-        style="@style/h1"
         android:id="@+id/gallery_label"
+        style="@style/h1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/my_gallery" />
 
     <ScrollView
-        android:layout_below="@+id/gallery_label"
-        android:layout_above="@+id/gallery_to_camera"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:layout_above="@+id/gallery_to_camera"
+        android:layout_below="@+id/gallery_label" >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,12 +30,56 @@
         </LinearLayout>
     </ScrollView>
 
-    <ImageButton
-        android:src="@drawable/ic_action_camera"
-        android:id="@+id/gallery_to_camera"
+    <LinearLayout
+        android:id="@+id/gallery_to_cameras"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:background="@drawable/extras_button_c_selector"
+            android:id="@+id/gallery_to_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="4dip"
+            android:layout_marginRight="4dip" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_camera" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/camera" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:background="@drawable/extras_button_c_selector"
+            android:id="@+id/gallery_to_camcorder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dip"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="4dip" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_video" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/camcorder" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </RelativeLayout>

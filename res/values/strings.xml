@@ -38,6 +38,8 @@
 	<string name="total_work_time">Total work time</string>
 	<string name="weekly_total">Weekly total</string>
 	<string name="we_could_not_log">We could not log you in.  Please try again.</string>
+	<string name="camera">Camera</string>
+	<string name="camcorder">Camcorder</string>
 	
 	<string name="about">About</string>
 	

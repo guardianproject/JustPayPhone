@@ -1,6 +1,7 @@
 package info.guardianproject.justpayphone.app.screens;
 
 import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.app.CameraActivity;
 import info.guardianproject.justpayphone.app.adapters.MyWorkspacesListAdapter;
 import info.guardianproject.justpayphone.models.JPPWorkspace;
 import info.guardianproject.justpayphone.utils.Constants;
@@ -29,8 +30,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -41,7 +41,7 @@ public class GalleryFragment extends Fragment implements OnClickListener {
 	List<JPPWorkspace> workspaces;
 	ListView workplacesHolder;
 	
-	ImageButton toCamera;
+	LinearLayout toCamera, toCamcorder;
 
 	private Intent cameraIntent = null;
 	private ComponentName cameraComponent = null;
@@ -61,8 +61,11 @@ public class GalleryFragment extends Fragment implements OnClickListener {
 		
 		rootView = li.inflate(R.layout.fragment_user_management_my_workspaces, null);
 		
-		toCamera = (ImageButton) rootView.findViewById(R.id.gallery_to_camera);
+		toCamera = (LinearLayout) rootView.findViewById(R.id.gallery_to_camera);
 		toCamera.setOnClickListener(this);
+		
+		toCamcorder = (LinearLayout) rootView.findViewById(R.id.gallery_to_camcorder);
+		toCamcorder.setOnClickListener(this);
 		
 		workplacesHolder = (ListView) rootView.findViewById(R.id.my_workplaces_list_holder);
 		return rootView;
@@ -113,30 +116,32 @@ public class GalleryFragment extends Fragment implements OnClickListener {
 		workplacesHolder.setAdapter(new MyWorkspacesListAdapter(workspaces, a));
 	}
 	
+	private void launchCamcorder() {
+		cameraIntent = new Intent(a, CameraActivity.class).putExtra(Codes.Extras.CAMERA_TYPE, Camera.Type.CAMCORDER);
+		startActivityForResult(cameraIntent, Codes.Routes.IMAGE_CAPTURE);
+	}
+	
 	private void launchCamera() {
-		List<ResolveInfo> resolveInfo = a.getPackageManager().queryIntentActivities(new Intent(Actions.CAMERA), 0);
-
-		for(ResolveInfo ri : resolveInfo) {
-			String packageName = ri.activityInfo.packageName;
-			String name = ri.activityInfo.name;
-
-			Log.d(LOG, "found camera app: " + packageName);
-
-			if(Camera.SUPPORTED.indexOf(packageName) >= 0) {
-				cameraComponent = new ComponentName(packageName, name);
+		cameraIntent = new Intent(a, CameraActivity.class).putExtra(Codes.Extras.CAMERA_TYPE, Camera.Type.CAMERA);
+		startActivityForResult(cameraIntent, Codes.Routes.IMAGE_CAPTURE);
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(resultCode == Activity.RESULT_OK) {
+			switch(requestCode) {
+			case Codes.Routes.IMAGE_CAPTURE:
+				
+				// get current log
+				
+				// add as associated media
+				
+				// push thumbnails to list
+				
 				break;
 			}
 		}
-
-		if(resolveInfo.isEmpty() || cameraComponent == null) {
-			Toast.makeText(a, getString(R.string.could_not_find_any_camera_activity), Toast.LENGTH_LONG).show();
-		}
-		
-		
-
-		cameraIntent = new Intent(Camera.Intents.CAMERA_SIMPLE);
-		cameraIntent.setComponent(cameraComponent);
-		startActivityForResult(cameraIntent, Codes.Routes.IMAGE_CAPTURE);
 	}
 	
 	
@@ -147,6 +152,13 @@ public class GalleryFragment extends Fragment implements OnClickListener {
 				@Override
 				public void run() {
 					launchCamera();
+				}
+			}, 100);
+		} else if(v == toCamcorder) {
+			h.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					launchCamcorder();
 				}
 			}, 100);
 		}

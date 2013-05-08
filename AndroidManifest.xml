@@ -7,13 +7,49 @@
         android:minSdkVersion="10"
         android:targetSdkVersion="17" />
     <uses-permission android:name="android.permission.ACTION_DIAL" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.Sherlock.Light.NoActionBar" >
+        <receiver
+            android:name="org.witness.informacam.utils.InformaCamBroadcaster"
+            android:enabled="true"
+            android:exported="true"
+            android:singleUser="false" >
+            <intent-filter>
+                <action android:name="org.witness.informacam.action.INFORMACAM_START" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.witness.informacam.action.INFORMACAM_STOP" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.witness.informacam.action.INFORMA_SERVICE_START" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.witness.informacam.action.INFORMA_SERVICE_STOP" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.FOUND" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.net.wifi.SCAN_RESULTS" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name="info.guardianproject.justpayphone.JustPayPhone"
             android:label="@string/app_name" >
@@ -31,6 +67,47 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
         <activity android:name="info.guardianproject.justpayphone.app.PreferencesActivity" />
+        <activity android:name="info.guardianproject.justpayphone.app.KillScreen" />
+        
+        <activity
+            android:name="org.witness.informacam.ui.WizardActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="org.witness.informacam.ui.SurfaceGrabberActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="org.witness.informacam.ui.CameraActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/app_name" />
+
+        <service
+            android:name="org.witness.informacam.InformaCam"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name="org.witness.informacam.informa.InformaService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name="org.witness.informacam.storage.IOService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name="org.witness.informacam.transport.UploaderService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name="org.witness.informacam.crypto.SignatureService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name="org.witness.informacam.utils.BackgroundProcessor"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

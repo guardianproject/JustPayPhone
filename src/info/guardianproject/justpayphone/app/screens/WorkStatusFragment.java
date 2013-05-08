@@ -1,10 +1,13 @@
 package info.guardianproject.justpayphone.app.screens;
 
+import java.io.FileNotFoundException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.witness.informacam.InformaCam;
+import org.witness.informacam.models.forms.IForm;
 import org.witness.informacam.models.media.ILog;
+import org.witness.informacam.storage.FormUtility;
 import org.witness.informacam.utils.Constants.App;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 import org.witness.informacam.utils.TimeUtility;
@@ -12,6 +15,7 @@ import org.witness.informacam.utils.TimeUtility;
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.popups.KeypadPopup;
 import info.guardianproject.justpayphone.app.popups.TextareaPopup;
+import info.guardianproject.justpayphone.utils.Constants.Forms;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -91,7 +95,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 					}
 					
 					rb.setChecked(true);
-					
+					iLog.attachedForm.answer(Forms.LunchQuestionnaire.LUNCH_TAKEN);
 				}
 				
 			});
@@ -106,14 +110,18 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			
 			if(l != (lunchMinutesChoices.length - 1)) {
 				final String lunchMinutes = getString(R.string.x_minutes, Integer.parseInt(getResources().getStringArray(R.array.lunch_minutes_choices)[l]));
+				final int currentNum = Integer.parseInt(getResources().getStringArray(R.array.lunch_minutes_choices)[l]);
+				
 				lunchMinutesChoice.setText(lunchMinutes);
 				lunchMinutesChoice.setOnClickListener(new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
 						setSelectedInGroup(lunchMinutesChoices, (Button) v);
-						lunchMinutesProxy.setText(lunchMinutes);
+						lunchMinutesProxy.setText(String.valueOf(currentNum));
 						lunchMinutesChoices[lunchMinutesChoices.length - 1].setText(getString(R.string.other_amount));
+						
+						iLog.attachedForm.answer(Forms.LunchQuestionnaire.LUNCH_MINUTES);
 					}
 					
 				});
@@ -129,8 +137,10 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 								setSelectedInGroup(lunchMinutesChoices, (Button) v);
 								
 								String customMinutes = a.getString(R.string.x_minutes, Integer.parseInt(currentNum));
-								lunchMinutesProxy.setText(customMinutes);
+								lunchMinutesProxy.setText(currentNum);
 								((Button) v).setText(customMinutes + " " + a.getString(R.string.change));
+								
+								iLog.attachedForm.answer(Forms.LunchQuestionnaire.LUNCH_MINUTES);
 								super.cancel();
 							}
 						};
@@ -165,7 +175,8 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	@Override
 	public void onAttach(Activity a) {
 		super.onAttach(a);
-		this.a = a;		
+		this.a = a;
+		informaCam = InformaCam.getInstance(this.a);
 	}
 
 	@Override
@@ -176,6 +187,50 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 
 	private void initLayout() {
 		toggleWorkStatus(true);
+	}
+	
+	private void persistLog() {
+		informaCam.mediaManifest.getById(iLog._id).inflate(iLog.asJson());
+		informaCam.mediaManifest.save();
+	}
+	
+	private void initLog() {
+		iLog = new ILog();
+		
+		iLog.startTime = informaCam.informaService.getCurrentTime();
+		iLog._id = iLog.generateId("log_" + System.currentTimeMillis());
+		
+		info.guardianproject.iocipher.File rootFolder = new info.guardianproject.iocipher.File(iLog._id);
+		if(!rootFolder.exists()) {
+			rootFolder.mkdir();
+		}
+		
+		iLog.rootFolder = rootFolder.getAbsolutePath();
+		for(IForm form : FormUtility.getAvailableForms()) {
+			if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
+				info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(rootFolder, "form");
+				
+				iLog.formPath = formContent.getAbsolutePath();
+				iLog.attachedForm = new IForm(form, a);
+				
+				// attach elements to form
+				iLog.attachedForm.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
+				iLog.attachedForm.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
+				Log.d(LOG, "OK form should exist now? " + String.valueOf(iLog.attachedForm != null));
+				
+				
+				break;
+			}
+		}
+		
+		informaCam.mediaManifest.media.add(iLog);
+		informaCam.mediaManifest.save();
+		
+		informaCam.informaService.associateMedia(iLog);
+	}
+	
+	private void stopLog() {
+		iLog.endTime = informaCam.informaService.getCurrentTime();		
 	}
 
 	private void toggleWorkStatus() {
@@ -188,7 +243,6 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		lunchQuestionnaire.setVisibility((!isAtWork && !isStarting) ? View.VISIBLE : View.GONE);
 		
 		if(isAtWork) {
-			informaCam.startInforma();
 			workStatusToggle.setVisibility(View.VISIBLE);
 			
 			timeWorked = 0;
@@ -210,7 +264,6 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 				}
 			}, 0L, 1000);
 		} else {
-			informaCam.stopInforma();
 			if(!isStarting) {
 				t.cancel();
 				t = null;
@@ -227,8 +280,25 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	public void onClick(View v) {
 		if(v == workStatusToggle) {
 			isAtWork = !isAtWork;
-			toggleWorkStatus();
+			if(isAtWork) {
+				informaCam.startInforma();
+			} else {
+				informaCam.stopInforma();
+			}
 		} else if(v == lunchQuestionnaireCommit) {
+			try {
+				info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(iLog.formPath);			
+				iLog.attachedForm.save(fos);
+				
+			} catch (FileNotFoundException e) {
+				Log.e(LOG, e.toString());
+				e.printStackTrace();
+			}
+			
+			
+			persistLog();
+			iLog = null;
+			
 			isAtWork = false;
 			toggleWorkStatus(true);
 			
@@ -251,26 +321,15 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 
 	@Override
 	public void onInformaStop(Intent intent) {
-		// TODO: saving it all...
+		toggleWorkStatus();
+		stopLog();
 	}
 
 	@Override
 	public void onInformaStart(Intent intent) {
-		if(informaCam == null) {
-			informaCam = InformaCam.getInstance();
-		}
+		toggleWorkStatus();
+		initLog();
 		
-		// get the day's log (log in progress)
-		iLog = ILog.getLogByDay(System.currentTimeMillis());
-		
-		// if null, init
-		if(iLog == null) {
-			iLog = new ILog();
-			iLog.startTime = informaCam.informaService.getCurrentTime();
-		}
-		
-		// associate to new log
-		informaCam.informaService.associateMedia(iLog);
 		
 	}	
 }

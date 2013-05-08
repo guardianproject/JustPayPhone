@@ -1,17 +1,29 @@
 package  info.guardianproject.justpayphone;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.InformaCam.LocalBinder;
+import org.witness.informacam.models.organizations.IInstalledOrganizations;
+import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.storage.FormUtility;
 import org.witness.informacam.ui.WizardActivity;
+import org.witness.informacam.utils.Constants.IManifest;
+import org.witness.informacam.utils.Constants.App.Storage.Type;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 
-import info.guardianproject.justpayphone.app.CameraActivity;
 import info.guardianproject.justpayphone.app.HomeActivity;
+import info.guardianproject.justpayphone.app.KillScreen;
 import info.guardianproject.justpayphone.app.LoginActivity;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.Codes;
-import info.guardianproject.justpayphone.utils.Constants.App.*;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -22,19 +34,17 @@ import android.os.IBinder;
 import android.util.Log;
 
 public class JustPayPhone extends Activity implements InformaCamStatusListener {
-	Intent init, route;
+	Intent route;
 	int routeCode;
 	
 	private InformaCam informaCam;
 	private ServiceConnection sc;
 	
 	private final static String LOG = Constants.App.Router.LOG;
-	private String packageName;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		packageName = getClass().getName();
 		
 		setContentView(R.layout.activity_camera_waiter);
 		sc = new ServiceConnection() {
@@ -61,20 +71,6 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 		
 		try {
 			informaCam = InformaCam.getInstance(this);
-			if(route != null) {
-				routeByIntent();
-				Log.d(LOG, "we have a route! lets go!");
-			} else {
-				Log.d(LOG, "route is null now, please wait");
-				if(informaCam.isAbsolutelyLoggedIn()) {
-					route = new Intent(this, HomeActivity.class);
-					routeCode = Codes.Routes.HOME;
-					routeByIntent();
-				} else {
-					Log.d(LOG, "no, not logged in");
-				}
-			}
-			
 		} catch(NullPointerException e) {
 			Log.e(LOG, "informacam has not started again yet");
 		}
@@ -92,50 +88,97 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	
 	@Override
 	public void onDestroy() {
-		unbindService(sc);
 		super.onDestroy();
+	}
+	
+	private void routeByIntent() {
+		route.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		if(routeCode == Codes.Routes.FINISH_SAFELY) {
+			finish();
+			startActivity(route);
+		} else {
+			startActivityForResult(route, routeCode);
+		}
+	}
+	
+	private void installOrganization() {
+		Log.d(LOG, "OK WIZARD COMPLETED!");
+		try {
+			if(getAssets().list("includedOrganizations").length > 0) {
+				List<IOrganization> includedOrganizations = new ArrayList<IOrganization>();
+				for(String organizationManifest : getAssets().list("includedOrganizations")) {
+					IOrganization organization = new IOrganization();
+					organization.inflate((JSONObject) new JSONTokener(
+							new String(
+									informaCam.ioService.getBytes(
+											("includedOrganizations/" + organizationManifest), 
+											Type.APPLICATION_ASSET)
+									)
+							).nextValue());
+					
+					InputStream is = getResources().openRawResource(R.raw.glsp);
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					int size = 0;
+					byte[] buf = new byte[1024];
+					while((size = is.read(buf, 0, buf.length)) >= 0) {
+						baos.write(buf, 0, size);
+					}
+					is.close();
+					
+					info.guardianproject.iocipher.File publicKey = new info.guardianproject.iocipher.File("glsp.asc");
+					informaCam.ioService.saveBlob(baos.toByteArray(), publicKey);
+					
+					organization.publicKeyPath = publicKey.getAbsolutePath();
+					includedOrganizations.add(organization);
+				}
+
+				IInstalledOrganizations installedOrganizations = new IInstalledOrganizations();
+				installedOrganizations.organizations = includedOrganizations;
+				informaCam.saveState(installedOrganizations, new info.guardianproject.iocipher.File(IManifest.ORGS));
+			}
+		} catch(IOException e) {
+			Log.e(LOG, e.toString());
+			e.printStackTrace();
+		} catch (JSONException e) {
+			Log.e(LOG, e.toString());
+			e.printStackTrace();
+		}
 	}
 	
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(resultCode == Activity.RESULT_CANCELED) {
-			Log.d(LOG, "finishing with request code " + requestCode);
-			finish();
+		if(resultCode == Activity.RESULT_CANCELED) {			
+			// modify route so it does not restart the app
+			route = new Intent(this, KillScreen.class);
+			routeCode = Codes.Routes.FINISH_SAFELY;
+			
 		} else if(resultCode == Activity.RESULT_OK) {
 			route = new Intent(this, HomeActivity.class);
 			routeCode = Codes.Routes.HOME;
 			
 			switch(requestCode) {
 			case Codes.Routes.WIZARD:
+				installOrganization();
 				FormUtility.installIncludedForms(this);
-				break;
-			case Codes.Routes.CAMERA:
-				// TODO?
 				
 				break;
 			case Codes.Routes.LOGIN:
 				informaCam.startup();
 				break;
+			case Codes.Routes.HOME:
+				route = new Intent(this, KillScreen.class);
+				routeCode = Codes.Routes.FINISH_SAFELY;
+				
+				if(data.hasExtra(Codes.Extras.LOGOUT_USER) && data.getBooleanExtra(Codes.Extras.LOGOUT_USER, false)) {
+					informaCam.attemptLogout();
+				}
+				
+				break;
 			}
 			
 			routeByIntent();
-		}
-	}
-	
-	private void routeByIntent() {
-		Log.d(LOG, "intent is: " + init.getAction());
-				
-		if(Intent.ACTION_MAIN.equals(init.getAction())) {
-			route = new Intent(this, HomeActivity.class);
-			routeCode = Home.ROUTE_CODE;
-		} else if("android.media.action.IMAGE_CAPTURE".equals(init.getAction())) {
-			route = new Intent(this, CameraActivity.class);
-			routeCode = Camera.ROUTE_CODE;
-		}
-		
-		route.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		startActivityForResult(route, routeCode);
+		}		
 	}
 	
 	@Override
@@ -145,7 +188,9 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 		int code = intent.getBundleExtra(org.witness.informacam.utils.Constants.Codes.Keys.SERVICE).getInt(org.witness.informacam.utils.Constants.Codes.Extras.MESSAGE_CODE);
 		
 		switch(code) {
-		case org.witness.informacam.utils.Constants.Codes.Messages.Wizard.INIT:			
+		case org.witness.informacam.utils.Constants.Codes.Messages.Wizard.INIT:
+			informaCam.user.isInOfflineMode = true;
+			
 			route = new Intent(this, WizardActivity.class);
 			routeCode = Codes.Routes.WIZARD;
 			break;
@@ -163,7 +208,16 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	}
 	
 	@Override
-	public void onInformaCamStop(Intent intent) {}
+	public void onInformaCamStop(Intent intent) {
+		Log.d(LOG, "INFORMA CAM HAS STOPPED! so calling onDestroy (unbinding service)");
+		try {
+			unbindService(sc);
+		} catch(IllegalArgumentException e) {
+			Log.d(LOG, "it appears the service is already unbound");
+		}
+		
+		finish();
+	}
 	
 	@Override
 	public void onInformaStop(Intent intent) {}
