@@ -45,4 +45,6 @@
     <string name="pref_languages_default">System Default</string>
     <string name="pref_languages_en_us">English (US)</string>
     <string name="pref_languages_es">Spanish</string>
+    
+    <string name="you_cannot_take_a">You cannot take a picture.  You\'re not at work!</string>
 </resources>

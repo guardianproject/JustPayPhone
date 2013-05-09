@@ -1,9 +1,14 @@
 package info.guardianproject.justpayphone.utils;
 
+import org.witness.informacam.models.media.ILog;
+
 public class Constants {
 	
 	public interface HomeActivityListener {
 		public int[] getDimensions();
+		public ILog getCurrentLog();
+		public void setCurrentLog(ILog currentLog);
+		public void persistLog();
 	}
 	
 	public static class Settings {

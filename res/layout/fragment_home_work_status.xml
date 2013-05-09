@@ -10,7 +10,13 @@
         android:id="@+id/work_status_toggle"
         style="@style/jpp_button_a"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+    <ProgressBar
+        android:id="@+id/work_status_waiter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
 
     <LinearLayout
         android:id="@+id/work_status_clock_holder"

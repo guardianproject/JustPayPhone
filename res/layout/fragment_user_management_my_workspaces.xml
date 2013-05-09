@@ -12,23 +12,12 @@
         android:layout_height="wrap_content"
         android:text="@string/my_gallery" />
 
-    <ScrollView
+    <ListView
+        android:id="@+id/my_workplaces_list_holder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/gallery_to_camera"
-        android:layout_below="@+id/gallery_label" >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-
-            <ListView
-                android:id="@+id/my_workplaces_list_holder"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </ScrollView>
+        android:layout_above="@+id/gallery_to_cameras"
+        android:layout_below="@+id/gallery_label" />
 
     <LinearLayout
         android:id="@+id/gallery_to_cameras"
@@ -39,14 +28,14 @@
         android:orientation="horizontal" >
 
         <LinearLayout
-            android:background="@drawable/extras_button_c_selector"
             android:id="@+id/gallery_to_camera"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_marginRight="4dip"
+            android:background="@drawable/extras_button_c_selector"
             android:gravity="center"
-            android:padding="4dip"
-            android:layout_marginRight="4dip" >
+            android:orientation="vertical"
+            android:padding="4dip" >
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -60,11 +49,11 @@
         </LinearLayout>
 
         <LinearLayout
-            android:background="@drawable/extras_button_c_selector"
             android:id="@+id/gallery_to_camcorder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="4dip"
+            android:background="@drawable/extras_button_c_selector"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="4dip" >
@@ -79,7 +68,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/camcorder" />
         </LinearLayout>
-
     </LinearLayout>
 
 </RelativeLayout>
