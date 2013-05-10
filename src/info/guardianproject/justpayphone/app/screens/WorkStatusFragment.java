@@ -203,6 +203,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		waiter.setVisibility(View.GONE);
 		workStatusToggle.setVisibility(View.VISIBLE);
 		if(((HomeActivityListener) a).getCurrentLog() != null && !((HomeActivityListener) a).getCurrentLog().has(Models.IMedia.ILog.IS_CLOSED)) {
+			informaCam.informaService.associateMedia(((HomeActivityListener) a).getCurrentLog());
 			isAtWork = true;
 		} else {
 			isAtWork = false;
@@ -330,6 +331,9 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 				}
 
 				IRegionData regionData = new IRegionData(((HomeActivityListener) a).getCurrentLog().attachedForm, ((HomeActivityListener) a).getCurrentLog().formPath);
+				
+				regionData.metadata.put(Models.IMedia.ILog.START_TIME, ((HomeActivityListener) a).getCurrentLog().startTime);
+				regionData.metadata.put(Models.IMedia.ILog.END_TIME, ((HomeActivityListener) a).getCurrentLog().endTime);
 				regionData.timestamp = informaCam.informaService.getCurrentTime();
 				((HomeActivityListener) a).getCurrentLog().data.regionData.add(regionData);
 
@@ -338,6 +342,9 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 				informaCam.stopInforma();
 
 			} catch (FileNotFoundException e) {
+				Log.e(LOG, e.toString());
+				e.printStackTrace();
+			} catch (JSONException e) {
 				Log.e(LOG, e.toString());
 				e.printStackTrace();
 			}
