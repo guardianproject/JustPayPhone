@@ -426,7 +426,8 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 					currentLog.put(Models.IMedia.ILog.IS_CLOSED, true);
 				}
 			} catch(NullPointerException e) {
-				Log.e(LOG, "FUCKING LOG IS NULL");
+				Log.e(LOG, e.toString());
+				e.printStackTrace();
 			} catch (JSONException e) {
 				Log.e(LOG, e.toString());
 				e.printStackTrace();

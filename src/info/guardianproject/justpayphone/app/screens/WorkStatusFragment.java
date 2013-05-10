@@ -193,7 +193,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		
+
 		if(((HomeActivityListener) a).getInitFlag()) {
 			init();
 		}
@@ -225,12 +225,12 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		iLog.rootFolder = rootFolder.getAbsolutePath();
 		informaCam.mediaManifest.media.add(iLog);
 		informaCam.mediaManifest.save();
-		
+
 		((HomeActivityListener) a).setCurrentLog(iLog);
 
 		informaCam.informaService.associateMedia(((HomeActivityListener) a).getCurrentLog());
 	}
-	
+
 	private void toggleWorkStatus() {
 		clockHolder.setVisibility(isAtWork ? View.VISIBLE : View.GONE);
 		workStatusToggle.setText(isAtWork ? a.getString(R.string.clock_out) : a.getString(R.string.check_in));
@@ -241,16 +241,16 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			long currentTime = informaCam.informaService.getCurrentTime();
 
 			timeWorked = (currentTime - ((HomeActivityListener) a).getCurrentLog().startTime);
-			
+
 			if(!timerIsRunning) {
 				t = new Timer();
 				t.schedule(new TimerTask() {
 					@Override
 					public void run() {
-						
+
 						if(isAtWork) {
 							timeWorked += 1000;
-							
+
 							h.post(new Runnable() {
 								@Override
 								public void run() {
@@ -262,7 +262,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 				}, 0L, 1000);
 				timerIsRunning = true;
 			}
-			
+
 		} else {
 			if(timerIsRunning) {
 				t.cancel();
@@ -281,11 +281,11 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	public void onClick(View v) {
 		if(v == workStatusToggle) {
 			isAtWork = !isAtWork;
-			
+
 			if(isAtWork) {
 				if(((HomeActivityListener) a).getCurrentLog() == null) {
 					initLog();
-					
+
 				} else {
 					try {
 						if(!((HomeActivityListener) a).getCurrentLog().getBoolean(Models.IMedia.ILog.IS_CLOSED)) {
@@ -297,7 +297,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 				}
 			} else {
 				((HomeActivityListener) a).getCurrentLog().endTime = informaCam.informaService.getCurrentTime();
-				
+
 				for(IForm form : FormUtility.getAvailableForms()) {
 					if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
 						info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(((HomeActivityListener) a).getCurrentLog().rootFolder, "form");
@@ -312,27 +312,27 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 						break;
 					}
 				}
-				
+
 				lunchQuestionnaire.setVisibility(View.VISIBLE);
 			}
-			
+
 			toggleWorkStatus();
 		} else if(v == lunchQuestionnaireCommit) {
 			try {
 				info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(((HomeActivityListener) a).getCurrentLog().formPath);			
 				((HomeActivityListener) a).getCurrentLog().attachedForm.save(fos);
-				
+
 				if(((HomeActivityListener) a).getCurrentLog().data == null) {
 					((HomeActivityListener) a).getCurrentLog().data = new IData();
 					((HomeActivityListener) a).getCurrentLog().data.regionData = new ArrayList<IRegionData>();
 				}
-				
+
 				IRegionData regionData = new IRegionData(((HomeActivityListener) a).getCurrentLog().attachedForm, ((HomeActivityListener) a).getCurrentLog().formPath);
 				regionData.timestamp = informaCam.informaService.getCurrentTime();
 				((HomeActivityListener) a).getCurrentLog().data.regionData.add(regionData);
 
 				((HomeActivityListener) a).persistLog();
-				
+
 				informaCam.stopInforma();
 
 			} catch (FileNotFoundException e) {
@@ -363,15 +363,17 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 
 	@Override
 	public void onInformaStop(Intent intent) {
-		Log.d(LOG, "LOG IS NOW: " + ((HomeActivityListener) a).getCurrentLog().asJson().toString());
-		((HomeActivityListener) a).getCurrentLog().export(new Handler() {
-			@Override
-			public void handleMessage(Message msg) {
-				Log.d(LOG, "MSG DATA: " + msg.getData().toString());
-			}
-		}, null, true);
-		
-		((HomeActivityListener) a).setCurrentLog(null);
+		if(((HomeActivityListener) a).getCurrentLog() != null) {
+			Log.d(LOG, "LOG IS NOW: " + ((HomeActivityListener) a).getCurrentLog().asJson().toString());
+			((HomeActivityListener) a).getCurrentLog().export(new Handler() {
+				@Override
+				public void handleMessage(Message msg) {
+					Log.d(LOG, "MSG DATA: " + msg.getData().toString());
+				}
+			}, null, true);
+
+			((HomeActivityListener) a).setCurrentLog(null);
+		}
 	}
 
 	@Override
