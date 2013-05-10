@@ -293,7 +293,9 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 							return;
 						}
 					} catch(JSONException e) {}
+					
 					Toast.makeText(a, getString(R.string.you_have_already_logged), Toast.LENGTH_LONG).show();
+					return;
 				}
 			} else {
 				((HomeActivityListener) a).getCurrentLog().endTime = informaCam.informaService.getCurrentTime();

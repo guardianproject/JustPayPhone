@@ -423,6 +423,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 			try {
 				currentLog = new ILog(informaCam.mediaManifest.getByDay(currentTime, MimeType.LOG, 1).get(0));
 				if(currentLog.endTime != 0) {
+					Log.d(LOG, "LOG SHOULD BE CLOSED (endTime: " + currentLog.endTime + ")");
 					currentLog.put(Models.IMedia.ILog.IS_CLOSED, true);
 				}
 			} catch(NullPointerException e) {
