@@ -1,11 +1,15 @@
 package info.guardianproject.justpayphone.app.screens;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.json.JSONException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.forms.IForm;
+import org.witness.informacam.models.j3m.IData;
+import org.witness.informacam.models.j3m.IRegionData;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.storage.FormUtility;
 import org.witness.informacam.utils.Constants.App;
@@ -22,6 +26,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +40,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class WorkStatusFragment extends Fragment implements OnClickListener, InformaCamStatusListener {
 	View rootView;
@@ -187,6 +193,10 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		
+		if(((HomeActivityListener) a).getInitFlag()) {
+			init();
+		}
 	}
 
 	private void init() {
@@ -215,6 +225,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		iLog.rootFolder = rootFolder.getAbsolutePath();
 		informaCam.mediaManifest.media.add(iLog);
 		informaCam.mediaManifest.save();
+		
 		((HomeActivityListener) a).setCurrentLog(iLog);
 
 		informaCam.informaService.associateMedia(((HomeActivityListener) a).getCurrentLog());
@@ -272,7 +283,18 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			isAtWork = !isAtWork;
 			
 			if(isAtWork) {
-				initLog();
+				if(((HomeActivityListener) a).getCurrentLog() == null) {
+					initLog();
+					
+				} else {
+					try {
+						if(!((HomeActivityListener) a).getCurrentLog().getBoolean(Models.IMedia.ILog.IS_CLOSED)) {
+							initLog();
+							return;
+						}
+					} catch(JSONException e) {}
+					Toast.makeText(a, getString(R.string.you_have_already_logged), Toast.LENGTH_LONG).show();
+				}
 			} else {
 				((HomeActivityListener) a).getCurrentLog().endTime = informaCam.informaService.getCurrentTime();
 				
@@ -299,8 +321,19 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			try {
 				info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(((HomeActivityListener) a).getCurrentLog().formPath);			
 				((HomeActivityListener) a).getCurrentLog().attachedForm.save(fos);
+				
+				if(((HomeActivityListener) a).getCurrentLog().data == null) {
+					((HomeActivityListener) a).getCurrentLog().data = new IData();
+					((HomeActivityListener) a).getCurrentLog().data.regionData = new ArrayList<IRegionData>();
+				}
+				
+				IRegionData regionData = new IRegionData(((HomeActivityListener) a).getCurrentLog().attachedForm, ((HomeActivityListener) a).getCurrentLog().formPath);
+				regionData.timestamp = informaCam.informaService.getCurrentTime();
+				((HomeActivityListener) a).getCurrentLog().data.regionData.add(regionData);
+
 				((HomeActivityListener) a).persistLog();
-				((HomeActivityListener) a).setCurrentLog(null);
+				
+				informaCam.stopInforma();
 
 			} catch (FileNotFoundException e) {
 				Log.e(LOG, e.toString());
@@ -329,7 +362,17 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	public void onInformaCamStop(Intent intent) {}
 
 	@Override
-	public void onInformaStop(Intent intent) {}
+	public void onInformaStop(Intent intent) {
+		Log.d(LOG, "LOG IS NOW: " + ((HomeActivityListener) a).getCurrentLog().asJson().toString());
+		((HomeActivityListener) a).getCurrentLog().export(new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				Log.d(LOG, "MSG DATA: " + msg.getData().toString());
+			}
+		}, null, true);
+		
+		((HomeActivityListener) a).setCurrentLog(null);
+	}
 
 	@Override
 	public void onInformaStart(Intent intent) {

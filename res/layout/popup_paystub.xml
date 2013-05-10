@@ -10,6 +10,14 @@
         android:layout_alignParentTop="true"
         android:gravity="center" />
 
+    <TextView
+        android:id="@+id/paystub_no_data_for_day"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/paystub_current_date"
+        android:text="@string/no_work_information_to"
+        android:visibility="gone" />
+    
     <TableLayout
         android:id="@+id/paystub_current_stats_holder"
         android:layout_width="match_parent"

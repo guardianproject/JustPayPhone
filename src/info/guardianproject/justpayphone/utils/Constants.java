@@ -9,6 +9,7 @@ public class Constants {
 		public ILog getCurrentLog();
 		public void setCurrentLog(ILog currentLog);
 		public void persistLog();
+		public boolean getInitFlag();
 	}
 	
 	public static class Settings {
@@ -47,6 +48,9 @@ public class Constants {
 		public class Extras {
 			public final static String MEDIA_ID = "media_id";
 			public static final String LOGOUT_USER = org.witness.informacam.utils.Constants.Codes.Extras.LOGOUT_USER;
+			public static final String CHANGE_LOCALE = "changeLocale";
+			public static final String HAS_SEEN_HOME = "hasSeenHome";
+			public static final String PERSISTENT_SERVICE = "persistentService";
 		}
 	}
 	

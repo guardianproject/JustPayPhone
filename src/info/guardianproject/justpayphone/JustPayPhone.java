@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.InformaCam.LocalBinder;
+import org.witness.informacam.informa.PersistentService;
 import org.witness.informacam.models.organizations.IInstalledOrganizations;
 import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.storage.FormUtility;
@@ -39,6 +40,7 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	
 	private InformaCam informaCam;
 	private ServiceConnection sc;
+	private PersistentService ps;
 	
 	private final static String LOG = Constants.App.Router.LOG;
 	
@@ -148,6 +150,8 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		informaCam = InformaCam.getInstance(this);
+		
 		if(resultCode == Activity.RESULT_CANCELED) {			
 			// modify route so it does not restart the app
 			route = new Intent(this, KillScreen.class);
@@ -167,12 +171,25 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 				informaCam.startup();
 				break;
 			case Codes.Routes.HOME:
+				Log.d(LOG, "HEY I AM RETURNING HOME");
+				
+				try {
+					if(data != null && data.hasExtra(Codes.Extras.CHANGE_LOCALE)) {
+						route.putExtra(Codes.Extras.CHANGE_LOCALE, true);
+						break;
+					}
+					
+					if(data.hasExtra(Codes.Extras.LOGOUT_USER) && data.getBooleanExtra(Codes.Extras.LOGOUT_USER, false)) {
+						informaCam.attemptLogout();
+						break;
+					}
+				} catch(NullPointerException e) {
+					Log.e(LOG, e.toString());
+					e.printStackTrace();
+				}
+				
 				route = new Intent(this, KillScreen.class);
 				routeCode = Codes.Routes.FINISH_SAFELY;
-				
-				if(data.hasExtra(Codes.Extras.LOGOUT_USER) && data.getBooleanExtra(Codes.Extras.LOGOUT_USER, false)) {
-					informaCam.attemptLogout();
-				}
 				
 				break;
 			}

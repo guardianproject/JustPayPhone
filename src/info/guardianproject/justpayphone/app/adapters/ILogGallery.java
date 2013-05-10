@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
 public class ILogGallery extends BaseAdapter {
@@ -68,6 +69,10 @@ public class ILogGallery extends BaseAdapter {
 			byte[] bBytes = informaCam.ioService.getBytes(m.bitmapThumb, Type.IOCIPHER);
 			Bitmap b = BitmapFactory.decodeByteArray(bBytes, 0, bBytes.length);
 			
+			LinearLayout.LayoutParams lp = new LayoutParams(90, 90);
+			lp.setMargins(0, 0, 10, 0);
+			
+			iv.setLayoutParams(lp);
 			iv.setImageBitmap(b);
 			
 			imagesAndVideo.addView(iv);

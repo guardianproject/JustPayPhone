@@ -7,8 +7,8 @@ import java.util.Vector;
 
 import org.json.JSONException;
 import org.witness.informacam.InformaCam;
+import org.witness.informacam.informa.PersistentService;
 import org.witness.informacam.models.media.ILog;
-import org.witness.informacam.utils.Constants.Actions;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.App.Camera;
@@ -26,9 +26,7 @@ import info.guardianproject.justpayphone.utils.Constants.Settings;
 
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -71,6 +69,8 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 	InformaCam informaCam;
 	ILog currentLog = null;
+	
+	boolean initFlag = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -90,32 +90,38 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 		lastLocale = PreferenceManager.getDefaultSharedPreferences(this).getString(Settings.LANGUAGE, "0");
 
-		informaCam = InformaCam.getInstance(this);
-		
-		informaCam.mediaManifest.media.clear();
-		informaCam.mediaManifest.save();
+		// XXX HEY! XXX!
+		//InformaCam.getInstance().mediaManifest.media.clear();
+		//InformaCam.getInstance().mediaManifest.save();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-
-		Log.d(LOG, "RESTARTING?");
+		
+		informaCam = InformaCam.getInstance(this);
+		
 		String currentLocale = PreferenceManager.getDefaultSharedPreferences(this).getString(Settings.LANGUAGE, "0");
-		if(!lastLocale.equals(currentLocale))
+		if(!lastLocale.equals(currentLocale)) {
 			setNewLocale(currentLocale);
+			return;
+		}
 
 		initLayout();
-		
+
 		if(informaCam.informaService == null) {
 			informaCam.startInforma();
 		} else {
-			try {
-				((InformaCamStatusListener) currentFragment).onInformaStart(null);
-			} catch(ClassCastException e) {}
+			if(!getIntent().getBooleanExtra(Constants.Codes.Extras.CHANGE_LOCALE, false)) {
+				try {
+					((InformaCamStatusListener) currentFragment).onInformaStart(null);
+				} catch(ClassCastException e) {}
+			} else {
+				initFlag = true;
+			}
+			
+			getIntent().putExtra(Constants.Codes.Extras.CHANGE_LOCALE, false);
 		}
-
-		
 	}
 
 	@Override
@@ -131,14 +137,21 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		switch(item.getItemId()) {
 		case R.id.jpp_about:
 			// TODO: we'll have an about page
-			return true;
+			break;
 		case R.id.jpp_preferences:
 			lastLocale = PreferenceManager.getDefaultSharedPreferences(this).getString(Settings.LANGUAGE, "0");
 			startActivity(new Intent(this, PreferencesActivity.class));
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+
+			break;
+		case R.id.jpp_logout:
+			informaCam.mediaManifest.save();
+			setResult(Activity.RESULT_OK, new Intent().putExtra(Codes.Extras.LOGOUT_USER, true));
+			finish();
+
+			break;
 		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void setNewLocale(String locale_code) {
@@ -155,36 +168,23 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 			break;
 		}
 		getResources().updateConfiguration(configuration, getResources().getDisplayMetrics());
-		restart();
-	}
 
-	private void restart() {
-		h.post(new Runnable() {
-			@Override
-			public void run() {
-				Intent intent = getIntent();
-				intent.setAction(Intent.ACTION_MAIN);
-
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-				overridePendingTransition(0, 0);
-				finish();
-
-				overridePendingTransition(0, 0);
-				startActivity(intent);
-			}
-		});
+		getIntent().putExtra(Constants.Codes.Extras.CHANGE_LOCALE, true);
+		setResult(Activity.RESULT_OK, new Intent().putExtra(Constants.Codes.Extras.CHANGE_LOCALE, true));
+		finish();
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putBoolean(Camera.TAG, true);
+		outState.putBoolean(Constants.Codes.Extras.HAS_SEEN_HOME, true);
 		outState.putInt(Home.Tabs.LAST, viewPager.getCurrentItem());
+
 		super.onSaveInstanceState(outState);
 	}
 
 	@Override
 	public void onStop() {
-		
+
 		super.onStop();
 	}
 
@@ -195,8 +195,10 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 	@Override
 	public void onDestroy() {
-		if(informaCam.informaService != null) {
-			informaCam.stopInforma();
+		if(!getIntent().getBooleanExtra(Constants.Codes.Extras.CHANGE_LOCALE, false)) {
+			if(informaCam.informaService != null) {
+				informaCam.stopInforma();
+			}
 		}
 		super.onDestroy();
 	}
@@ -209,7 +211,15 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 	@Override
 	public void onBackPressed() {
-		setResult(Activity.RESULT_CANCELED);
+		// if we have a log going...
+		if(currentLog != null && !currentLog.shouldAutoLog) {
+			Log.d(LOG, "FUCKING CURRENT LOG: " + currentLog.asJson().toString());
+			currentLog.save();
+			
+			PersistentService ps = new PersistentService(this, android.os.Process.myPid(), currentLog);
+		}
+
+		setResult(Activity.RESULT_OK);
 		finish();
 	}
 
@@ -267,6 +277,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 			Iterator<String> i = savedInstanceState.keySet().iterator();
 			while(i.hasNext()) {
 				String outState = i.next();
+
 				if(outState.equals(Camera.TAG) && savedInstanceState.getBoolean(Camera.TAG)) {
 					Log.d(LOG, "we saw camera: " + String.valueOf(outState));
 				} else if(outState.equals(Home.Tabs.LAST)){
@@ -311,13 +322,6 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		pager.notifyDataSetChanged();
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		//viewPager.setCurrentItem(0);
-
-		super.onActivityResult(requestCode, resultCode, data);
-	}
-
 	class TabPager extends FragmentStatePagerAdapter implements TabHost.OnTabChangeListener, OnPageChangeListener {
 
 		public TabPager(FragmentManager fm) {
@@ -343,9 +347,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		}
 
 		@Override
-		public void onPageScrollStateChanged(int state) {
-			// TODO Auto-generated method stub
-		}
+		public void onPageScrollStateChanged(int state) {}
 
 		@Override
 		public void onPageScrolled(int arg0, float arg1, int arg2) {}
@@ -374,14 +376,12 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 	}
 
-
 	@Override
 	public void onInformaCamStart(Intent intent) {
 		try {
 			((InformaCamStatusListener) currentFragment).onInformaCamStart(intent);
 		} catch(ClassCastException e) {}
 	}
-
 
 	@Override
 	public void onInformaCamStop(Intent intent) {
@@ -390,14 +390,15 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		} catch(ClassCastException e) {}
 	}
 
-
 	@Override
 	public void onInformaStop(Intent intent) {
 		try {
 			((InformaCamStatusListener) currentFragment).onInformaStop(intent);
-		} catch(ClassCastException e) {}
+		} catch(ClassCastException e) {
+			Log.e(LOG, e.toString());
+			e.printStackTrace();
+		}
 	}
-
 
 	@Override
 	public void onInformaStart(Intent intent) {
@@ -405,7 +406,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 			((InformaCamStatusListener) currentFragment).onInformaStart(intent);
 		} catch(ClassCastException e) {}
 	}
-	
+
 	@Override
 	public void persistLog() {
 		if(currentLog != null) {
@@ -418,7 +419,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	public ILog getCurrentLog() {
 		if(currentLog == null) {
 			long currentTime = informaCam.informaService.getCurrentTime();
-			
+
 			try {
 				currentLog = new ILog(informaCam.mediaManifest.getByDay(currentTime, MimeType.LOG, 1).get(0));
 				if(currentLog.endTime != 0) {
@@ -431,12 +432,17 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 				e.printStackTrace();
 			}
 		}
-		
+
 		return currentLog;
 	}
 
 	@Override
 	public void setCurrentLog(ILog currentLog) {
 		this.currentLog = currentLog;		
+	}
+
+	@Override
+	public boolean getInitFlag() {
+		return initFlag;
 	}
 }

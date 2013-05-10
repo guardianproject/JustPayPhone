@@ -5,6 +5,9 @@
 	    android:showAsAction="never" />
 	<item android:id="@+id/jpp_preferences"
 	    android:title="@string/preferences"
-	    android:showAsAction="never" />    
+	    android:showAsAction="never" />
+	<item android:id="@+id/jpp_logout"
+	    android:title="@string/logout"
+	    android:showAsAction="never" />  
 
 </menu>

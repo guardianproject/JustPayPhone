@@ -1,11 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="info.guardianproject.justpayphone"
+    android:installLocation="preferExternal"
     android:versionCode="1"
-    android:versionName="1.0"
-    android:installLocation="preferExternal">
+    android:versionName="1.0" >
+
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="17" />
+
     <uses-permission android:name="android.permission.ACTION_DIAL" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -20,6 +22,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -49,18 +52,27 @@
                 <action android:name="android.net.wifi.SCAN_RESULTS" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name="org.witness.informacam.informa.PersistentService"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="org.witness.informacam.action.PERSISTENT_SERVICE" />
+            </intent-filter>
+            </receiver>
 
         <activity
             android:name="info.guardianproject.justpayphone.JustPayPhone"
             android:label="@string/app_name" >
-            	<intent-filter>
-            	    <action android:name="android.intent.action.MAIN" />
-            	    <category android:name="android.intent.category.LAUNCHER" />
-            	</intent-filter>
-            	<intent-filter>
-            	    <action android:name="android.media.action.IMAGE_CAPTURE" />
-            	    <category android:name="android.intent.category.DEFAULT" />
-            	</intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.media.action.IMAGE_CAPTURE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <activity
             android:name="info.guardianproject.justpayphone.app.HomeActivity"
@@ -68,7 +80,6 @@
             android:screenOrientation="portrait" />
         <activity android:name="info.guardianproject.justpayphone.app.PreferencesActivity" />
         <activity android:name="info.guardianproject.justpayphone.app.KillScreen" />
-        
         <activity
             android:name="org.witness.informacam.ui.WizardActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

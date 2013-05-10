@@ -2,12 +2,15 @@ package info.guardianproject.justpayphone.app.popups;
 
 import java.util.Random;
 
+import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.media.ILog;
+import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 import org.witness.informacam.utils.TimeUtility;
 
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.models.JPPWorkSummary;
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,12 +22,19 @@ import android.widget.TextView;
 public class PayStubPopup extends Popup implements OnClickListener {
 	Button previousDay, nextDay;
 	TableLayout currentDayStatsHolder;
-	TextView currentDate, weeklyTotal;
+	TextView currentDate, weeklyTotal, noDataForDay;
 	
 	JPPWorkSummary workSummary;
+	InformaCam informaCam;
+	
+	long currentTime;
 		
 	public PayStubPopup(Activity a) {
 		super(a, R.layout.popup_paystub);
+		
+		informaCam = InformaCam.getInstance();
+		
+		noDataForDay = (TextView) layout.findViewById(R.id.paystub_no_data_for_day);
 		
 		previousDay = (Button) layout.findViewById(R.id.paystub_previous_day);
 		previousDay.setOnClickListener(this);
@@ -36,18 +46,26 @@ public class PayStubPopup extends Popup implements OnClickListener {
 		
 		currentDayStatsHolder = (TableLayout) layout.findViewById(R.id.paystub_current_stats_holder);
 		
-		// XXX: THIS IS FAKE DATA
-		ILog iLog = new ILog();
-		iLog.startTime = System.currentTimeMillis();
-		iLog.endTime = iLog.startTime + (60000 * 60 * random(7, 13));
+		currentTime = informaCam.informaService.getCurrentTime();
+		if(currentTime == 0) {
+			currentTime = System.currentTimeMillis();
+		}
 		
-		workSummary = new JPPWorkSummary(iLog);
-		workSummary.timeForLunch = random(10, 45);
+		try {
+			workSummary = new JPPWorkSummary(new ILog(informaCam.mediaManifest.getByDay(currentTime, MimeType.LOG, 1).get(0)));
 		
-		
-		setData();
+			setData();
+		} catch(NullPointerException e) {
+			showNoDataForDay();
+		}
+		currentDate.setText(TimeUtility.millisecondsToDayOnly(currentTime));
 		
 		Show();
+	}
+	
+	private void showNoDataForDay() {
+		currentDayStatsHolder.setVisibility(View.GONE);
+		noDataForDay.setVisibility(View.VISIBLE);
 	}
 	
 	private void addTableRow(String labelText, String valueText) {
@@ -63,14 +81,16 @@ public class PayStubPopup extends Popup implements OnClickListener {
 	}
 	
 	private void setData() {
-		currentDate.setText(TimeUtility.millisecondsToDayOnly(workSummary.iLog.startTime));
 		currentDayStatsHolder.removeAllViewsInLayout();
 		
 		addTableRow(a.getString(R.string.start_time), TimeUtility.millisecondsToStopwatchTime(workSummary.iLog.startTime));
-		addTableRow(a.getString(R.string.end_time), TimeUtility.millisecondsToStopwatchTime(workSummary.iLog.endTime));
-		addTableRow(a.getString(R.string.time_for_lunch), a.getString(R.string.x_minutes, workSummary.timeForLunch));
-		addTableRow(a.getString(R.string.total_work_time), a.getString(R.string.x_hours, TimeUtility.millisecondsToHours(Math.abs(workSummary.iLog.startTime - workSummary.iLog.endTime))));
+		addTableRow(a.getString(R.string.end_time), workSummary.iLog.endTime == 0 ? a.getString(R.string.unknown) : TimeUtility.millisecondsToStopwatchTime(workSummary.iLog.endTime));
+		addTableRow(a.getString(R.string.time_for_lunch), workSummary.timeForLunch == 0 ? a.getString(R.string.unknown) : a.getString(R.string.x_minutes, workSummary.timeForLunch));
+		addTableRow(a.getString(R.string.total_work_time), workSummary.iLog.endTime == 0 ? a.getString(R.string.unknown) : a.getString(R.string.x_hours, workSummary.totalWorkTime));
 		addTableRow(a.getString(R.string.weekly_total), a.getString(R.string.x_hours, random(36, 70)));
+		
+		currentDayStatsHolder.setVisibility(View.VISIBLE);
+		noDataForDay.setVisibility(View.GONE);
 	}
 	
 	public int random(int bottom, int top) {
@@ -81,21 +101,37 @@ public class PayStubPopup extends Popup implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		if(v == previousDay) {
-			ILog iLog = new ILog();
-			iLog.startTime = TimeUtility.minusOneDay(workSummary.iLog.startTime);
-			iLog.endTime = iLog.startTime + (1000 * 60 * 60 * random(7, 13));
+			long pDay = TimeUtility.minusOneDay(currentTime);
 			
-			workSummary = new JPPWorkSummary(iLog);
-			workSummary.timeForLunch = random(10, 45);
-			setData();
+			try {
+				workSummary = new JPPWorkSummary(new ILog(informaCam.mediaManifest.getByDay(pDay, MimeType.LOG, 1).get(0)));
+				
+				setData();
+			} catch(NullPointerException e) {
+				Log.e(LOG, e.toString());
+				e.printStackTrace();
+				
+				showNoDataForDay();
+			}
+			
+			currentTime = pDay;
+			currentDate.setText(TimeUtility.millisecondsToDayOnly(currentTime));
 		} else if(v == nextDay) {
-			ILog iLog = new ILog();
-			iLog.startTime = TimeUtility.plusOneDay(workSummary.iLog.startTime);
-			iLog.endTime = iLog.startTime + (1000 * 60 * 60 * random(7, 13));
+			long nDay = TimeUtility.plusOneDay(currentTime);
 			
-			workSummary = new JPPWorkSummary(iLog);
-			workSummary.timeForLunch = random(10, 45);
-			setData();
+			try {
+				workSummary = new JPPWorkSummary(new ILog(informaCam.mediaManifest.getByDay(nDay, MimeType.LOG, 1).get(0)));
+			
+				setData();
+			} catch(NullPointerException e) {
+				Log.e(LOG, e.toString());
+				e.printStackTrace();
+				
+				showNoDataForDay();
+			}
+			
+			currentTime = nDay;
+			currentDate.setText(TimeUtility.millisecondsToDayOnly(currentTime));
 		}
 		
 	}
