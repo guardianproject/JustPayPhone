@@ -7,8 +7,8 @@ import java.util.Vector;
 
 import org.json.JSONException;
 import org.witness.informacam.InformaCam;
-import org.witness.informacam.informa.PersistentService;
 import org.witness.informacam.models.media.ILog;
+import org.witness.informacam.models.media.IMedia;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.App.Camera;
@@ -19,6 +19,7 @@ import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.screens.GalleryFragment;
 import info.guardianproject.justpayphone.app.screens.UserManagementFragment;
 import info.guardianproject.justpayphone.app.screens.WorkStatusFragment;
+import info.guardianproject.justpayphone.app.views.DottedProgressView;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 import info.guardianproject.justpayphone.utils.Constants.App.Home;
@@ -61,7 +62,6 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	Fragment currentFragment = null;
 
 	LayoutInflater li;
-	TabHost tabHost;
 	ViewPager viewPager;
 	TabPager pager;
 
@@ -71,6 +71,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	ILog currentLog = null;
 	
 	boolean initFlag = false;
+	private DottedProgressView progressDots;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -215,8 +216,6 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		if(currentLog != null && !currentLog.shouldAutoLog) {
 			Log.d(LOG, "FUCKING CURRENT LOG: " + currentLog.asJson().toString());
 			currentLog.save();
-			
-			PersistentService ps = new PersistentService(this, android.os.Process.myPid(), currentLog);
 		}
 
 		setResult(Activity.RESULT_OK);
@@ -226,42 +225,14 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	private void initLayout() {
 		pager = new TabPager(getSupportFragmentManager());
 
+		progressDots = (DottedProgressView) findViewById(R.id.progress_dots);
+
 		viewPager = (ViewPager) findViewById(R.id.view_pager_root);
 		viewPager.setAdapter(pager);
 		viewPager.setOnPageChangeListener(pager);
 
+
 		li = LayoutInflater.from(this);
-
-		int[] dims = getDimensions();
-
-		tabHost = (TabHost) findViewById(android.R.id.tabhost);
-		tabHost.setup();
-
-		TabHost.TabSpec tab = tabHost.newTabSpec(workStatusFragment.getClass().getName()).setIndicator(generateTab(li, R.layout.tabs_jpp_main));
-		li.inflate(R.layout.fragment_home_work_status, tabHost.getTabContentView(), true);
-		tab.setContent(R.id.work_status_root_view);
-		tabHost.addTab(tab); 
-
-		tab = tabHost.newTabSpec(UserManagementFragment.class.getName()).setIndicator(generateTab(li, R.layout.tabs_jpp_header, getResources().getDrawable(R.drawable.jpp_briefcase)));
-		li.inflate(R.layout.fragment_user_management_contact, tabHost.getTabContentView(), true);
-		tab.setContent(R.id.user_management_my_lawyer_root);
-		tabHost.addTab(tab);		
-
-		tab = tabHost.newTabSpec(GalleryFragment.class.getName()).setIndicator(generateTab(li, R.layout.tabs_jpp_header, getResources().getDrawable(R.drawable.jpp_camera_icon)));
-		li.inflate(R.layout.fragment_user_management_my_workspaces, tabHost.getTabContentView(), true);
-		tab.setContent(R.id.user_management_my_workplaces_root);
-		tabHost.addTab(tab);
-
-		tabHost.setOnTabChangedListener(pager);
-
-		for(int i=0; i<tabHost.getTabWidget().getChildCount(); i++) {
-			View tab_ = tabHost.getTabWidget().getChildAt(i);
-			if(i == 0) {
-				tab_.setLayoutParams(new LinearLayout.LayoutParams((int) (dims[0] * 0.6), LayoutParams.MATCH_PARENT));
-			} else {
-				tab_.setLayoutParams(new LinearLayout.LayoutParams((int) (dims[0] * 0.2), LayoutParams.MATCH_PARENT));
-			}
-		}
 
 		if(currentFragment == null) {
 			viewPager.setCurrentItem(0);
@@ -269,6 +240,9 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		} else {
 			viewPager.setCurrentItem(fragments.indexOf(currentFragment));
 		}
+		
+		progressDots.setNumberOfDots(pager.getCount());
+		progressDots.setCurrentDot(viewPager.getCurrentItem());
 	}
 
 	@Override
@@ -287,31 +261,6 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		} catch(NullPointerException e) {}
 
 		super.onRestoreInstanceState(savedInstanceState);
-	}
-
-	public static View generateTab(final LayoutInflater li, final int resource) {
-		return generateTab(li, resource, null, null);
-	}
-
-	public static View generateTab(final LayoutInflater li, final int resource, final String tabLabel) {
-		return generateTab(li, resource, null, tabLabel);
-	}
-
-	public static View generateTab(final LayoutInflater li, final int resource, final Drawable iconResource) {
-		return generateTab(li, resource, iconResource, null);
-	}
-
-	public static View generateTab(final LayoutInflater li, final int resource, final Drawable iconResource, final String tabLabel) {
-		View v = li.inflate(resource, null);
-		if(iconResource != null) {
-			((ImageView) v.findViewById(R.id.tab_icon)).setImageDrawable(iconResource);
-		}
-
-		if(tabLabel != null) {
-			((TextView) v.findViewById(R.id.tab_label)).setText(tabLabel);
-		}
-
-		return v;
 	}
 
 	public void swapLayout(Fragment fragment, int layoutRoot) {
@@ -354,13 +303,14 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 		@Override
 		public void onPageSelected(int page) {
-			tabHost.setCurrentTab(page);
 			currentFragment = fragments.get(page);
 			if(currentFragment.equals(workStatusFragment)) {
 				((InformaCamStatusListener) currentFragment).onInformaStart(null);
 			}
 
 			Log.d(LOG, "setting current page as " + page);
+			progressDots.setNumberOfDots(getCount());
+			progressDots.setCurrentDot(page);
 		}
 
 		@Override
@@ -426,6 +376,9 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 					Log.d(LOG, "LOG SHOULD BE CLOSED (endTime: " + currentLog.endTime + ")");
 					currentLog.put(Models.IMedia.ILog.IS_CLOSED, true);
 				}
+			} catch(IndexOutOfBoundsException e) {
+				Log.e(LOG, e.toString());
+				e.printStackTrace();				
 			} catch(NullPointerException e) {
 				Log.e(LOG, e.toString());
 				e.printStackTrace();
@@ -446,5 +399,10 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	@Override
 	public boolean getInitFlag() {
 		return initFlag;
+	}
+
+	@Override
+	public void showLogView() {
+		viewPager.setCurrentItem(fragments.indexOf(galleryFragment));
 	}
 }

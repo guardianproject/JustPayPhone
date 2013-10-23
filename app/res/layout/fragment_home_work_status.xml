@@ -1,56 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/info.guardianproject.justpayphone"
     android:id="@+id/work_status_root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="14dip" >
+    android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/work_status_toggle"
-        style="@style/jpp_button_a"
+    <LinearLayout
+        android:id="@+id/work_sign_in_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
+        android:layout_height="match_parent"
+        android:background="#3F9E4E"
+        android:orientation="vertical"
+        android:paddingBottom="108dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp"
+        android:visibility="gone" >
+
+        <info.guardianproject.justpayphone.app.views.CustomFontTextView
+            android:id="@+id/textView1"
+            style="@style/startWorkText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:text="0:00:00"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_pic_start" />
+
+        <info.guardianproject.justpayphone.app.views.CustomFontButton
+            android:id="@+id/btnSignIn"
+            style="@style/jpp_action_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableTop="@drawable/ic_btn_start"
+            android:minHeight="100dp"
+            android:text="@string/check_in" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/work_sign_out_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#D7DF23"
+        android:orientation="vertical"
+        android:paddingBottom="108dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp"
+        android:visibility="gone" >
+
+        <info.guardianproject.justpayphone.app.views.CustomFontTextView
+            android:id="@+id/tvTimeWorked"
+            style="@style/stopWorkText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:text="0:00:00"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ImageView
+            android:id="@+id/ImageView01"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_pic_stop" />
+
+        <info.guardianproject.justpayphone.app.views.CustomFontButton
+            android:id="@+id/btnSignOut"
+            style="@style/jpp_action_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableTop="@drawable/ic_btn_stop"
+            android:minHeight="100dp"
+            android:text="@string/clock_out" />
+    </LinearLayout>
+
     <ProgressBar
         android:id="@+id/work_status_waiter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
 
-    <LinearLayout
-        android:id="@+id/work_status_clock_holder"
-        android:layout_width="match_parent"
-        android:layout_height="60dip"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        android:weightSum="1" >
-
-        <ImageView
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_weight="0.25"
-            android:scaleType="centerInside"
-            android:src="@drawable/jpp_clock_icon" />
-
-        <TextView
-            android:id="@+id/work_status_time_at_work"
-            style="@style/jpp_p_timer"
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dip"
-            android:layout_weight="0.35"
-            android:text="@string/at_work_x" />
-    </LinearLayout>
-
     <ScrollView
+        android:id="@+id/work_lunch_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="match_parent"
+        android:fillViewport="true" >
 
         <include
             android:id="@+id/work_status_lunch_questionnaire"
             layout="@layout/forms_lunch_questionnaire"
-            android:visibility="gone" />
+            />
     </ScrollView>
 
-</LinearLayout>
+</FrameLayout>

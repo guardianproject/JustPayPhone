@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.InformaCam.LocalBinder;
-import org.witness.informacam.informa.PersistentService;
 import org.witness.informacam.models.organizations.IInstalledOrganizations;
 import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.storage.FormUtility;
@@ -40,7 +39,6 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	
 	private InformaCam informaCam;
 	private ServiceConnection sc;
-	private PersistentService ps;
 	
 	private final static String LOG = Constants.App.Router.LOG;
 	

@@ -10,6 +10,7 @@ public class Constants {
 		public void setCurrentLog(ILog currentLog);
 		public void persistLog();
 		public boolean getInitFlag();
+		public void showLogView();
 	}
 	
 	public static class Settings {

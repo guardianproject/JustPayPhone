@@ -13,4 +13,7 @@
     <drawable name="trans_green">#8060d400</drawable>
     <drawable name="red">#ffff0627</drawable>
     <drawable name="trans_red">#80ff0627</drawable>
+    <color name="brown">#352D2B</color>
+    <color name="cream">#F2EFDE</color>
+    <color name="cream_a06">#9AF2EFDE</color>
 </resources>

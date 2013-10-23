@@ -1,8 +1,8 @@
 <resources>
 
     <string name="app_name">Just Pay Phone</string>
-	<string name="check_in">Clock In</string>
-	<string name="clock_out">Clock Out</string>
+	<string name="check_in">START WORK</string>
+	<string name="clock_out">STOP WORK</string>
 	<string name="at_work_x">at work:\n%1$s</string>
 	<string name="just_pay_phone_logo">JUST\nPAY\nPHONE</string>
 	<string name="where_i_work">Where I Work</string>
@@ -17,7 +17,7 @@
 	<string name="call_my_lawyer">Call my lawyer</string>
 	<string name="write_a_message_to">Write a message to my lawyer</string>
 	<string name="record_a_message_for">Record a message for my lawyer</string>
-	<string name="did_you_stop_working">Did you stop working to eat lunch?</string>
+	<string name="how_long_was_your_lunch_break">How long was your lunch break?</string>
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
 	<string name="how_many_minutes_did">How many minutes did you stop working to eat lunch?</string>
@@ -54,4 +54,7 @@
     <string name="you_have_already_logged">You have already logged today.</string>
     <string name="no_work_information_to">No work information to display</string>
     <string name="unknown">unknown</string>
+    
+    <string name="lunch_no_lunch">No\nLunch</string>
+    <string name="lunch_min">MIN</string>
 </resources>

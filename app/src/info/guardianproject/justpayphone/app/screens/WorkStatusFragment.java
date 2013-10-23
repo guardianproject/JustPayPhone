@@ -12,8 +12,11 @@ import org.witness.informacam.models.j3m.IData;
 import org.witness.informacam.models.j3m.IRegionData;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.storage.FormUtility;
+import org.witness.informacam.ui.CameraActivity;
 import org.witness.informacam.utils.Constants.App;
+import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.Models;
+import org.witness.informacam.utils.Constants.App.Camera;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 import org.witness.informacam.utils.TimeUtility;
 
@@ -46,13 +49,18 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	View rootView;
 	Activity a;
 
+	private enum WorkStatusFragmentMode
+	{
+		Normal, SigningIn, Working, SigningOut, LunchForm
+	}
+
+	WorkStatusFragmentMode mCurrentMode = WorkStatusFragmentMode.Normal;
+	
 	ProgressBar waiter;
-	Button workStatusToggle, lunchQuestionnaireCommit;
-	LinearLayout clockHolder, lunchQuestionnaire, lunchMinutesChoiceRoot, lunchTakenChoiceRoot;
+	View btnLunchNo, btnLunch10, btnLunch20, btnLunch30, btnLunch45, btnLunch60;
+	LinearLayout lunchQuestionnaire, lunchMinutesChoiceRoot, lunchTakenChoiceRoot;
 	RadioGroup lunchTakenProxy;
 	EditText lunchMinutesProxy;
-
-	Button[] lunchMinutesChoices, lunchTakenChoices;
 
 	Timer t;
 	TimerTask tt;
@@ -60,11 +68,18 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 
 	TextView timeAtWork;
 	long timeWorked = 0;
-	boolean isAtWork = false;
 	boolean timerIsRunning = false;
 
 	InformaCam informaCam = null;
-
+	private View mWorkSignInView;
+	private View mBtnSignIn;
+	private View mWorkSignOutView;
+	private View mBtnSignOut;
+	private View mWorkLunchView;
+	private boolean hasBeenInited = false;
+	private RadioButton lunchTakenProxyYes;
+	private RadioButton lunchTakenProxyNo;
+	
 	private final static String LOG = App.LOG;
 
 	@Override
@@ -79,108 +94,44 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		rootView = li.inflate(R.layout.fragment_home_work_status, null);
 		waiter = (ProgressBar) rootView.findViewById(R.id.work_status_waiter);
 
-		workStatusToggle = (Button) rootView.findViewById(R.id.work_status_toggle);
-		workStatusToggle.setOnClickListener(this);
+		mWorkSignInView = rootView.findViewById(R.id.work_sign_in_view);
+		mBtnSignIn = rootView.findViewById(R.id.btnSignIn);
+		mBtnSignIn.setOnClickListener(this);
+		
+		mWorkSignOutView = rootView.findViewById(R.id.work_sign_out_view);
+		mBtnSignOut = rootView.findViewById(R.id.btnSignOut);
+		mBtnSignOut.setOnClickListener(this);
+		
+		timeAtWork = (TextView) rootView.findViewById(R.id.tvTimeWorked);
 
-		clockHolder = (LinearLayout) rootView.findViewById(R.id.work_status_clock_holder);
-		timeAtWork = (TextView) rootView.findViewById(R.id.work_status_time_at_work);
-
+		mWorkLunchView = rootView.findViewById(R.id.work_lunch_view);
+		
 		lunchQuestionnaire = (LinearLayout) rootView.findViewById(R.id.work_status_lunch_questionnaire);
-		lunchQuestionnaireCommit = (Button) rootView.findViewById(R.id.odk_commit);
-		lunchQuestionnaireCommit.setOnClickListener(this);
+		btnLunchNo = rootView.findViewById(R.id.btnLunchNo);
+		btnLunchNo.setOnClickListener(mLunchButtonClickedListener);
+		btnLunch10 = rootView.findViewById(R.id.btnLunch10);
+		btnLunch10.setOnClickListener(mLunchButtonClickedListener);
+		btnLunch20 = rootView.findViewById(R.id.btnLunch20);
+		btnLunch20.setOnClickListener(mLunchButtonClickedListener);
+		btnLunch30 = rootView.findViewById(R.id.btnLunch30);
+		btnLunch30.setOnClickListener(mLunchButtonClickedListener);
+		btnLunch45 = rootView.findViewById(R.id.btnLunch45);
+		btnLunch45.setOnClickListener(mLunchButtonClickedListener);
+		btnLunch60 = rootView.findViewById(R.id.btnLunch60);
+		btnLunch60.setOnClickListener(mLunchButtonClickedListener);
 
-		lunchTakenProxy = (RadioGroup) rootView.findViewById(R.id.lunch_taken_proxy);
-		lunchTakenChoiceRoot = (LinearLayout) rootView.findViewById(R.id.lunch_taken_choice_root);
-		lunchTakenChoices = new Button[lunchTakenChoiceRoot.getChildCount()];
-		for(int l=0; l<lunchTakenChoices.length; l++) {
-			Button lunchTakenChoice = (Button) lunchTakenChoiceRoot.getChildAt(l);
-			final RadioButton rb = (RadioButton) ((RadioGroup) lunchTakenProxy).getChildAt(l);
-			lunchTakenChoice.setOnClickListener(new OnClickListener() {
+		lunchTakenProxy = new RadioGroup(a);
+		lunchTakenProxyYes = new RadioButton(a);
+		lunchTakenProxyNo = new RadioButton(a);
+		lunchTakenProxy.addView(lunchTakenProxyYes);
+		lunchTakenProxy.addView(lunchTakenProxyNo);
 
-				@Override
-				public void onClick(View v) {
-					setSelectedInGroup(lunchTakenChoices, (Button) v);
-					for(int r=0; r< lunchTakenProxy.getChildCount(); r++) {
-						((RadioButton) lunchTakenProxy.getChildAt(r)).setChecked(false);
-					}
-
-					rb.setChecked(true);
-					((HomeActivityListener) a).getCurrentLog().attachedForm.answer(Forms.LunchQuestionnaire.LUNCH_TAKEN);
-				}
-
-			});
-
-			lunchTakenChoices[l] = lunchTakenChoice;
-		}
-
-		lunchMinutesChoiceRoot = (LinearLayout) rootView.findViewById(R.id.lunch_minutes_choice_root);
-		lunchMinutesChoices = new Button[lunchMinutesChoiceRoot.getChildCount()];
-		for(int l=0; l<lunchMinutesChoices.length; l++) {
-			Button lunchMinutesChoice = (Button) lunchMinutesChoiceRoot.getChildAt(l);
-
-			if(l != (lunchMinutesChoices.length - 1)) {
-				final String lunchMinutes = getString(R.string.x_minutes, Integer.parseInt(getResources().getStringArray(R.array.lunch_minutes_choices)[l]));
-				final int currentNum = Integer.parseInt(getResources().getStringArray(R.array.lunch_minutes_choices)[l]);
-
-				lunchMinutesChoice.setText(lunchMinutes);
-				lunchMinutesChoice.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						setSelectedInGroup(lunchMinutesChoices, (Button) v);
-						lunchMinutesProxy.setText(String.valueOf(currentNum));
-						lunchMinutesChoices[lunchMinutesChoices.length - 1].setText(getString(R.string.other_amount));
-
-						((HomeActivityListener) a).getCurrentLog().attachedForm.answer(Forms.LunchQuestionnaire.LUNCH_MINUTES);
-					}
-
-				});
-			} else {
-				lunchMinutesChoice.setText(getString(R.string.other_amount));
-				lunchMinutesChoice.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(final View v) {
-						new KeypadPopup(a, null, R.string.x_minutes) {
-							@Override
-							public void cancel() {
-								setSelectedInGroup(lunchMinutesChoices, (Button) v);
-
-								String customMinutes = a.getString(R.string.x_minutes, Integer.parseInt(currentNum));
-								lunchMinutesProxy.setText(currentNum);
-								((Button) v).setText(customMinutes + " " + a.getString(R.string.change));
-
-								((HomeActivityListener) a).getCurrentLog().attachedForm.answer(Forms.LunchQuestionnaire.LUNCH_MINUTES);
-
-								super.cancel();
-							}
-						};
-
-					}
-
-				});
-			}
-
-			lunchMinutesChoices[l] = lunchMinutesChoice;
-		}
-
-
-		lunchMinutesProxy = (EditText) rootView.findViewById(R.id.lunch_minutes_proxy);
+		lunchMinutesProxy = new EditText(a);
 		lunchMinutesProxy.setText(a.getString(R.string.x_minutes, 0));
 
+		setCurrentMode(mCurrentMode);
+		
 		return rootView;
-	}
-
-	@SuppressLint("NewApi")
-	@SuppressWarnings("deprecation")
-	private void setSelectedInGroup(Button[] buttonGroup, Button selectedButton) {
-		for(Button b : buttonGroup) {
-			if(b != selectedButton) {
-				b.setBackgroundDrawable(getResources().getDrawable(R.drawable.extras_button_b_selected));
-			} else {
-				b.setBackgroundDrawable(getResources().getDrawable(R.drawable.extras_button_b_unselected));
-			}
-		}
 	}
 
 	@Override
@@ -201,15 +152,19 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 
 	private void init() {
 		waiter.setVisibility(View.GONE);
-		workStatusToggle.setVisibility(View.VISIBLE);
+		
+		if (!hasBeenInited)
+		{
+			hasBeenInited = true;
+		boolean isAtWork = false;
 		if(((HomeActivityListener) a).getCurrentLog() != null && !((HomeActivityListener) a).getCurrentLog().has(Models.IMedia.ILog.IS_CLOSED)) {
 			informaCam.informaService.associateMedia(((HomeActivityListener) a).getCurrentLog());
 			isAtWork = true;
 		} else {
 			isAtWork = false;
 		}
-
-		toggleWorkStatus();
+		setCurrentMode(isAtWork ? WorkStatusFragmentMode.Working : WorkStatusFragmentMode.Normal);
+		}
 	}
 
 	private void initLog() {
@@ -232,136 +187,125 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		informaCam.informaService.associateMedia(((HomeActivityListener) a).getCurrentLog());
 	}
 
-	private void toggleWorkStatus() {
-		clockHolder.setVisibility(isAtWork ? View.VISIBLE : View.GONE);
-		workStatusToggle.setText(isAtWork ? a.getString(R.string.clock_out) : a.getString(R.string.check_in));
+	private void setCurrentMode(WorkStatusFragmentMode mode)
+	{
+		Log.d(LOG, "Changing to mode: " + mode.toString());
+		
+		mCurrentMode = mode;
+		if (mCurrentMode == WorkStatusFragmentMode.Normal || mCurrentMode == WorkStatusFragmentMode.SigningIn)
+		{
+			mWorkSignInView.setVisibility(View.VISIBLE);
+			mWorkSignOutView.setVisibility(View.GONE);
+			mWorkLunchView.setVisibility(View.GONE);
+		}
+		else if (mCurrentMode == WorkStatusFragmentMode.Working || mCurrentMode == WorkStatusFragmentMode.SigningOut)
+		{
+			mWorkSignInView.setVisibility(View.GONE);
+			mWorkSignOutView.setVisibility(View.VISIBLE);
+			mWorkLunchView.setVisibility(View.GONE);
+		}
+		
+		if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
+		{
+			getSelfie();
+		}
+		else if (mCurrentMode == WorkStatusFragmentMode.Working)
+		{
+			startWorkTimer();
+		}
+		else if (mCurrentMode == WorkStatusFragmentMode.SigningOut)
+		{
+			stopWorkTimer();
+			getSelfie();
+		}
+		else if (mCurrentMode == WorkStatusFragmentMode.LunchForm)
+		{
+			mWorkSignInView.setVisibility(View.GONE);
+			mWorkSignOutView.setVisibility(View.GONE);
+			mWorkLunchView.setVisibility(View.VISIBLE);
+		}
+	}
+	
+	private void startWorkTimer()
+	{
+		long currentTime = informaCam.informaService.getCurrentTime();
 
-		if(isAtWork) {
-			workStatusToggle.setVisibility(View.VISIBLE);
+		timeWorked = (currentTime - ((HomeActivityListener) a).getCurrentLog().startTime);
 
-			long currentTime = informaCam.informaService.getCurrentTime();
+		if(!timerIsRunning) {
+			t = new Timer();
+			t.schedule(new TimerTask() {
+				@Override
+				public void run() {
 
-			timeWorked = (currentTime - ((HomeActivityListener) a).getCurrentLog().startTime);
+					if(mCurrentMode == WorkStatusFragmentMode.Working) {
+						timeWorked += 1000;
 
-			if(!timerIsRunning) {
-				t = new Timer();
-				t.schedule(new TimerTask() {
-					@Override
-					public void run() {
-
-						if(isAtWork) {
-							timeWorked += 1000;
-
-							h.post(new Runnable() {
-								@Override
-								public void run() {
-									timeAtWork.setText(WorkStatusFragment.this.a.getString(R.string.at_work_x, TimeUtility.millisecondsToTimestamp(timeWorked)));
-								}
-							});
-						}
+						h.post(new Runnable() {
+							@Override
+							public void run() {
+								//timeAtWork.setText(WorkStatusFragment.this.a.getString(R.string.at_work_x, TimeUtility.millisecondsToTimestamp(timeWorked)));
+								timeAtWork.setText(TimeUtility.millisecondsToTimestamp(timeWorked));
+							}
+						});
 					}
-				}, 0L, 1000);
-				timerIsRunning = true;
-			}
+				}
+			}, 0L, 1000);
+			timerIsRunning = true;
+		}
+	}
+	
+	private void stopWorkTimer()
+	{
+		if(timerIsRunning) {
+			t.cancel();
+			t = null;
 
-		} else {
-			if(timerIsRunning) {
-				t.cancel();
-				t = null;
-
-				timerIsRunning = false;
-				workStatusToggle.setVisibility(View.GONE);
-			} else {
-				workStatusToggle.setVisibility(View.VISIBLE);
-			}
+			timerIsRunning = false;
 		}
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onClick(View v) {
-		if(v == workStatusToggle) {
-			isAtWork = !isAtWork;
+		if (v == mBtnSignIn) {
+			if(((HomeActivityListener) a).getCurrentLog() == null) {
+				initLog();
 
-			if(isAtWork) {
-				if(((HomeActivityListener) a).getCurrentLog() == null) {
-					initLog();
-
-				} else {
-					try {
-						if(!((HomeActivityListener) a).getCurrentLog().getBoolean(Models.IMedia.ILog.IS_CLOSED)) {
-							initLog();
-							return;
-						}
-					} catch(JSONException e) {}
-					
-					Toast.makeText(a, getString(R.string.you_have_already_logged), Toast.LENGTH_LONG).show();
-					return;
-				}
 			} else {
-				((HomeActivityListener) a).getCurrentLog().endTime = informaCam.informaService.getCurrentTime();
-
-				for(IForm form : FormUtility.getAvailableForms()) {
-					if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
-						info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(((HomeActivityListener) a).getCurrentLog().rootFolder, "form");
-
-						((HomeActivityListener) a).getCurrentLog().formPath = formContent.getAbsolutePath();
-						((HomeActivityListener) a).getCurrentLog().attachedForm = new IForm(form, a);
-
-						// attach elements to form
-						((HomeActivityListener) a).getCurrentLog().attachedForm.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
-						((HomeActivityListener) a).getCurrentLog().attachedForm.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
-
-						break;
+				try {
+					if(!((HomeActivityListener) a).getCurrentLog().getBoolean(Models.IMedia.ILog.IS_CLOSED)) {
+						initLog();
+						return;
 					}
-				}
-
-				lunchQuestionnaire.setVisibility(View.VISIBLE);
-			}
-
-			toggleWorkStatus();
-		} else if(v == lunchQuestionnaireCommit) {
-			try {
-				info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(((HomeActivityListener) a).getCurrentLog().formPath);			
-				((HomeActivityListener) a).getCurrentLog().attachedForm.save(fos);
-
-				if(((HomeActivityListener) a).getCurrentLog().data == null) {
-					((HomeActivityListener) a).getCurrentLog().data = new IData();
-					((HomeActivityListener) a).getCurrentLog().data.regionData = new ArrayList<IRegionData>();
-				}
-
-				IRegionData regionData = new IRegionData(((HomeActivityListener) a).getCurrentLog().attachedForm, ((HomeActivityListener) a).getCurrentLog().formPath);
+				} catch(JSONException e) {}
 				
-				regionData.metadata.put(Models.IMedia.ILog.START_TIME, ((HomeActivityListener) a).getCurrentLog().startTime);
-				regionData.metadata.put(Models.IMedia.ILog.END_TIME, ((HomeActivityListener) a).getCurrentLog().endTime);
-				regionData.timestamp = informaCam.informaService.getCurrentTime();
-				((HomeActivityListener) a).getCurrentLog().data.regionData.add(regionData);
-
-				((HomeActivityListener) a).persistLog();
-
-				informaCam.stopInforma();
-
-			} catch (FileNotFoundException e) {
-				Log.e(LOG, e.toString());
-				e.printStackTrace();
-			} catch (JSONException e) {
-				Log.e(LOG, e.toString());
-				e.printStackTrace();
+				Toast.makeText(a, getString(R.string.you_have_already_logged), Toast.LENGTH_LONG).show();
+				return;
 			}
-
-			isAtWork = false;
-			lunchQuestionnaire.setVisibility(View.GONE);
-			toggleWorkStatus();
-
-			for(Button b : lunchTakenChoices) {
-				b.setBackgroundDrawable(getResources().getDrawable(R.drawable.extras_button_b_unknown));
-			}
-
-			for(Button b : lunchMinutesChoices) {
-				b.setBackgroundDrawable(getResources().getDrawable(R.drawable.extras_button_b_unknown));
-			}
+			setCurrentMode(WorkStatusFragmentMode.SigningIn);
 		}
+		else if (v == mBtnSignOut) {
 
+			((HomeActivityListener) a).getCurrentLog().endTime = informaCam.informaService.getCurrentTime();
+
+			for(IForm form : FormUtility.getAvailableForms()) {
+				if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
+					info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(((HomeActivityListener) a).getCurrentLog().rootFolder, "form");
+
+					((HomeActivityListener) a).getCurrentLog().formPath = formContent.getAbsolutePath();
+					((HomeActivityListener) a).getCurrentLog().attachedForm = new IForm(form, a);
+
+					// attach elements to form
+					((HomeActivityListener) a).getCurrentLog().attachedForm.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
+					((HomeActivityListener) a).getCurrentLog().attachedForm.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
+
+					break;
+				}
+			}
+
+			setCurrentMode(WorkStatusFragmentMode.SigningOut);
+		} 
 	}
 
 	@Override
@@ -389,4 +333,115 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	public void onInformaStart(Intent intent) {
 		init();
 	}	
+	
+	private void getSelfie()
+	{
+		//Intent surfaceGrabberIntent = new Intent(a, SurfaceGrabberActivity.class);
+		//startActivityForResult(surfaceGrabberIntent, Codes.Routes.IMAGE_CAPTURE);
+		Intent cameraIntent = new Intent(a, CameraActivity.class).putExtra(Codes.Extras.CAMERA_TYPE, Camera.Type.CAMERA);
+		startActivityForResult(cameraIntent, Codes.Routes.IMAGE_CAPTURE);
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(resultCode == Activity.RESULT_OK) {
+			switch(requestCode) {
+			case Codes.Routes.IMAGE_CAPTURE:
+				
+				if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
+					setCurrentMode(WorkStatusFragmentMode.Working);
+				else if (mCurrentMode == WorkStatusFragmentMode.SigningOut)
+					setCurrentMode(WorkStatusFragmentMode.LunchForm);
+				
+//				Log.d(LOG, "THIS RETURNS:\n" + data.getStringExtra(Codes.Extras.RETURNED_MEDIA));
+//				try {
+//					JSONArray returnedMedia = ((JSONObject) new JSONTokener(data.getStringExtra(Codes.Extras.RETURNED_MEDIA)).nextValue()).getJSONArray("dcimEntries");
+//
+//					// add to current log's attached media
+//					IMedia m = new IMedia();
+//					m.inflate(returnedMedia.getJSONObject(0));
+//						
+//					((HomeActivityListener) a).getCurrentLog().attachedMedia.add(m._id);
+//					((HomeActivityListener) a).persistLog();
+//						
+//					// update UI
+//					//updateWorkspaces();
+//						
+//				} catch(JSONException e) {
+//					Log.e(LOG, e.toString());
+//					e.printStackTrace();
+//				}
+				break;
+			}
+		}
+	}
+	
+	private View.OnClickListener mLunchButtonClickedListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			
+			boolean lunchTaken = true;
+			int lunchMinutes = 0;
+			
+			if (v == btnLunchNo)
+				lunchTaken = false;
+			else if (v == btnLunch10)
+				lunchMinutes = 10;
+			else if (v == btnLunch20)
+				lunchMinutes = 20;
+			else if (v == btnLunch30)
+				lunchMinutes = 30;
+			else if (v == btnLunch45)
+				lunchMinutes = 45;
+			else if (v == btnLunch60)
+				lunchMinutes = 60;
+			
+			try {
+				
+				if (lunchTaken)
+				{
+					lunchTakenProxyYes.setChecked(true);
+					lunchTakenProxyNo.setChecked(false);
+				}
+				else
+				{
+					lunchTakenProxyYes.setChecked(false);
+					lunchTakenProxyNo.setChecked(true);
+				}
+				((HomeActivityListener) a).getCurrentLog().attachedForm.answer(Forms.LunchQuestionnaire.LUNCH_TAKEN);
+				lunchMinutesProxy.setText(String.valueOf(lunchMinutes));
+				((HomeActivityListener) a).getCurrentLog().attachedForm.answer(Forms.LunchQuestionnaire.LUNCH_MINUTES);
+						
+				info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(((HomeActivityListener) a).getCurrentLog().formPath);			
+				((HomeActivityListener) a).getCurrentLog().attachedForm.save(fos);
+
+				if(((HomeActivityListener) a).getCurrentLog().data == null) {
+					((HomeActivityListener) a).getCurrentLog().data = new IData();
+					((HomeActivityListener) a).getCurrentLog().data.regionData = new ArrayList<IRegionData>();
+				}
+
+				IRegionData regionData = new IRegionData(((HomeActivityListener) a).getCurrentLog().attachedForm, ((HomeActivityListener) a).getCurrentLog().formPath);
+				
+				regionData.metadata.put(Models.IMedia.ILog.START_TIME, ((HomeActivityListener) a).getCurrentLog().startTime);
+				regionData.metadata.put(Models.IMedia.ILog.END_TIME, ((HomeActivityListener) a).getCurrentLog().endTime);
+				regionData.timestamp = informaCam.informaService.getCurrentTime();
+				((HomeActivityListener) a).getCurrentLog().data.regionData.add(regionData);
+
+				((HomeActivityListener) a).persistLog();
+
+				informaCam.stopInforma();
+
+			} catch (FileNotFoundException e) {
+				Log.e(LOG, e.toString());
+				e.printStackTrace();
+			} catch (JSONException e) {
+				Log.e(LOG, e.toString());
+				e.printStackTrace();
+			}
+
+			((HomeActivityListener) a).showLogView();
+			setCurrentMode(WorkStatusFragmentMode.Normal);
+		}
+	};
 }
