@@ -209,13 +209,18 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			mWorkLunchView.setVisibility(View.GONE);
 		}
 		
-		if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
+		if (mCurrentMode == WorkStatusFragmentMode.Normal)
+		{
+			((HomeActivityListener) a).showNavigationDots(true);
+		}
+		else if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
 		{
 			getSelfie(true);
 		}
 		else if (mCurrentMode == WorkStatusFragmentMode.Working)
 		{
 			startWorkTimer();
+			((HomeActivityListener) a).showNavigationDots(true);
 		}
 		else if (mCurrentMode == WorkStatusFragmentMode.SigningOut)
 		{
@@ -224,6 +229,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		}
 		else if (mCurrentMode == WorkStatusFragmentMode.LunchForm)
 		{
+			((HomeActivityListener) a).showNavigationDots(false);
 			mWorkSignInView.setVisibility(View.GONE);
 			mWorkSignOutView.setVisibility(View.GONE);
 			mWorkLunchView.setVisibility(View.VISIBLE);

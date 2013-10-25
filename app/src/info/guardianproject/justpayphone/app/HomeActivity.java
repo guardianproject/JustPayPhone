@@ -16,7 +16,9 @@ import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 
 import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.app.screens.CallLawyerFragment;
 import info.guardianproject.justpayphone.app.screens.GalleryFragment;
+import info.guardianproject.justpayphone.app.screens.TakePhotosFragment;
 import info.guardianproject.justpayphone.app.screens.UserManagementFragment;
 import info.guardianproject.justpayphone.app.screens.WorkStatusFragment;
 import info.guardianproject.justpayphone.app.views.DottedProgressView;
@@ -58,7 +60,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	private String lastLocale;
 
 	List<Fragment> fragments = new Vector<Fragment>();
-	Fragment userManagementFragment, workStatusFragment, galleryFragment;
+	Fragment userManagementFragment, workStatusFragment, cameraFragment, callLawyerFragment, galleryFragment;
 	Fragment currentFragment = null;
 
 	LayoutInflater li;
@@ -83,9 +85,13 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 		userManagementFragment = Fragment.instantiate(this, UserManagementFragment.class.getName());
 		workStatusFragment = Fragment.instantiate(this, WorkStatusFragment.class.getName());
+		cameraFragment = Fragment.instantiate(this, TakePhotosFragment.class.getName());
+		callLawyerFragment = Fragment.instantiate(this, CallLawyerFragment.class.getName());
 		galleryFragment = Fragment.instantiate(this, GalleryFragment.class.getName());
 
 		fragments.add(workStatusFragment);
+		fragments.add(cameraFragment);
+		fragments.add(callLawyerFragment);
 		fragments.add(userManagementFragment);
 		fragments.add(galleryFragment);
 
@@ -406,5 +412,10 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	@Override
 	public void showLogView() {
 		viewPager.setCurrentItem(fragments.indexOf(galleryFragment));
+	}
+
+	@Override
+	public void showNavigationDots(boolean show) {
+		progressDots.setVisibility(show ? View.VISIBLE : View.GONE);
 	}
 }

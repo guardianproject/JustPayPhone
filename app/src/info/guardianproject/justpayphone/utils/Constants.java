@@ -18,6 +18,7 @@ public class Constants {
 		public void persistLog();
 		public boolean getInitFlag();
 		public void showLogView();
+		public void showNavigationDots(boolean show);
 	}
 	
 	public static class Settings {

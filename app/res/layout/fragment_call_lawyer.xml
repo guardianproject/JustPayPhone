@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/info.guardianproject.justpayphone"
+    android:id="@+id/work_call_lawyer_root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/work_call_lawyer_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#10A89E"
+        android:orientation="vertical"
+        android:paddingBottom="108dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp" >
+
+        <info.guardianproject.justpayphone.app.views.CustomFontButton
+            android:id="@+id/btnAdmin"
+            style="@style/jpp_h5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:drawableLeft="@drawable/ic_admin_pref"
+            android:drawablePadding="10dp"
+            android:gravity="center_vertical"
+            android:text="@string/admin" />
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_pic_lawyer" />
+
+        <info.guardianproject.justpayphone.app.views.CustomFontButton
+            android:id="@+id/btnCallLawyer"
+            style="@style/jpp_action_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableTop="@drawable/ic_btn_call"
+            android:minHeight="100dp"
+            android:text="@string/call_lawyer" />
+
+    </LinearLayout>
+
+</FrameLayout>

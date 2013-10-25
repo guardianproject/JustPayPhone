@@ -94,6 +94,12 @@
         <item name="android:textColor">@drawable/black</item>
         <item name="android:textSize">18sp</item>
     </style>
+
+    <style name="jpp_h5">
+        <item name="asset_font">NotoSans-Bold</item>
+        <item name="android:textColor">@color/cream_a06</item>
+        <item name="android:textSize">17sp</item>
+    </style>
     
     <style name="jpp_p">
         <item name="android:textColor">@drawable/black</item>
