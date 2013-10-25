@@ -86,7 +86,7 @@
     
     <style name="jpp_h2">
         <item name="asset_font">NotoSans-Bold</item>
-        <item name="android:textColor">@drawable/black</item>
+        <item name="android:textColor">@color/cream</item>
         <item name="android:textSize">30sp</item>
     </style>
     
@@ -156,7 +156,6 @@
     </style>
     
     <style name="lunch_h2" parent="jpp_h2">
-        <item name="android:textColor">@color/cream</item>
     </style>
     
     <style name="lunch_h4">

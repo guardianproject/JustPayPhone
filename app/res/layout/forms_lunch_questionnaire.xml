@@ -14,7 +14,7 @@
         android:orientation="vertical" >
 
         <TextView
-            style="@style/lunch_h2"
+            style="@style/jpp_h2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -93,7 +93,7 @@
 
                     <TextView
                         android:id="@+id/tvLunch10"
-                        style="@style/lunch_h2"
+                        style="@style/jpp_h2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/ivLunch10"
@@ -126,7 +126,7 @@
 
                     <TextView
                         android:id="@+id/tvLunch20"
-                        style="@style/lunch_h2"
+                        style="@style/jpp_h2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/ivLunch20"
@@ -168,7 +168,7 @@
 
                     <TextView
                         android:id="@+id/tvLunch30"
-                        style="@style/lunch_h2"
+                        style="@style/jpp_h2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/ivLunch30"
@@ -203,7 +203,7 @@
 
                     <TextView
                         android:id="@+id/tvLunch45"
-                        style="@style/lunch_h2"
+                        style="@style/jpp_h2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/ivLunch45"
@@ -237,7 +237,7 @@
 
                     <TextView
                         android:id="@+id/tvLunch60"
-                        style="@style/lunch_h2"
+                        style="@style/jpp_h2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/ivLunch60"

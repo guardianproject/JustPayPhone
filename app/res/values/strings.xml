@@ -54,7 +54,27 @@
     <string name="you_have_already_logged">You have already logged today.</string>
     <string name="no_work_information_to">No work information to display</string>
     <string name="unknown">unknown</string>
+    <string name="take_your_photo_to_clock_in">Take your photo to clock in</string>
+    <string name="take_your_photo_to_clock_out">Take your photo to clock out</string>
     
     <string name="lunch_no_lunch">No\nLunch</string>
     <string name="lunch_min">MIN</string>
+    
+    <string name="wizard_welcome">Welcome!</string>
+    <string name="wizard_choose_language">Choose a language:</string>
+    <string name="wizard_get_started">Get started</string>
+    <string name="wizard_step_1_of_2">Step 1 of 2:</string>
+    <string name="wizard_create_db">Set up your secure database.</string>
+    <string name="wizard_email_optional">Email (optional)</string>
+    <string name="wizard_password_dont_match">Passwords do not match =(</string>
+    <string name="wizard_password_wrong_format">Your password should be more than 10 characters.</string>
+    <string name="wizard_ok_next">Okay, next</string>
+    <string name="wizard_step_2_of_2">Step 2 of 2:</string>
+    <string name="wizard_take_photo_title">Take 6 boring photos to generate your device key.</string>
+    <string name="wizard_key_information">Your key will allow you to be verified, so that you can share seamlessly and securely.</string>
+    <string name="wizard_take_photo">Take Photos</string>
+    <string name="wizard_take_photo_take">Take</string>
+    <string name="wizard_key_is_being_made">Your key is being made, this may take a while.</string>
+    <string name="wizard_key_made">Your key has been made.</string>
+    <string name="wizard_original_images_should_be">Original images should be:</string>
 </resources>

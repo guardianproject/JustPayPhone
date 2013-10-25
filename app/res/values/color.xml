@@ -16,4 +16,6 @@
     <color name="brown">#352D2B</color>
     <color name="cream">#F2EFDE</color>
     <color name="cream_a06">#9AF2EFDE</color>
+    
+    <color name="blue_dark">#FF1D1F21</color>
 </resources>

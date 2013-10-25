@@ -11,6 +11,7 @@ import org.witness.informacam.models.forms.IForm;
 import org.witness.informacam.models.j3m.IData;
 import org.witness.informacam.models.j3m.IRegionData;
 import org.witness.informacam.models.media.ILog;
+import org.witness.informacam.models.media.IRegion;
 import org.witness.informacam.storage.FormUtility;
 import org.witness.informacam.ui.CameraActivity;
 import org.witness.informacam.utils.Constants.App;
@@ -21,6 +22,7 @@ import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListen
 import org.witness.informacam.utils.TimeUtility;
 
 import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.app.SelfieActivity;
 import info.guardianproject.justpayphone.app.popups.KeypadPopup;
 import info.guardianproject.justpayphone.utils.Constants.Forms;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
@@ -79,6 +81,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	private boolean hasBeenInited = false;
 	private RadioButton lunchTakenProxyYes;
 	private RadioButton lunchTakenProxyNo;
+	private IForm mLunchForm;
 	
 	private final static String LOG = App.LOG;
 
@@ -151,7 +154,8 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	}
 
 	private void init() {
-		waiter.setVisibility(View.GONE);
+		if (waiter != null)
+			waiter.setVisibility(View.GONE);
 		
 		if (!hasBeenInited)
 		{
@@ -170,7 +174,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	private void initLog() {
 		ILog iLog = new ILog();
 
-		iLog.startTime = informaCam.informaService.getCurrentTime();
+		iLog.startTime = 0; //informaCam.informaService.getCurrentTime();
 		iLog._id = iLog.generateId("log_" + System.currentTimeMillis());
 
 		info.guardianproject.iocipher.File rootFolder = new info.guardianproject.iocipher.File(iLog._id);
@@ -179,7 +183,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		}
 
 		iLog.rootFolder = rootFolder.getAbsolutePath();
-		informaCam.mediaManifest.media.add(iLog);
+		informaCam.mediaManifest.addMediaItem(iLog);
 		informaCam.mediaManifest.save();
 
 		((HomeActivityListener) a).setCurrentLog(iLog);
@@ -207,7 +211,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		
 		if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
 		{
-			getSelfie();
+			getSelfie(true);
 		}
 		else if (mCurrentMode == WorkStatusFragmentMode.Working)
 		{
@@ -216,7 +220,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		else if (mCurrentMode == WorkStatusFragmentMode.SigningOut)
 		{
 			stopWorkTimer();
-			getSelfie();
+			getSelfie(false);
 		}
 		else if (mCurrentMode == WorkStatusFragmentMode.LunchForm)
 		{
@@ -230,7 +234,13 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	{
 		long currentTime = informaCam.informaService.getCurrentTime();
 
-		timeWorked = (currentTime - ((HomeActivityListener) a).getCurrentLog().startTime);
+		ILog log = ((HomeActivityListener) a).getCurrentLog();
+		
+		// If not started, start now
+		if (log.startTime == 0)
+			log.startTime = informaCam.informaService.getCurrentTime();
+
+		timeWorked = (currentTime - log.startTime);
 
 		if(!timerIsRunning) {
 			t = new Timer();
@@ -287,18 +297,23 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		}
 		else if (v == mBtnSignOut) {
 
-			((HomeActivityListener) a).getCurrentLog().endTime = informaCam.informaService.getCurrentTime();
+			ILog log = ((HomeActivityListener) a).getCurrentLog();
+			log.endTime = informaCam.informaService.getCurrentTime();
 
 			for(IForm form : FormUtility.getAvailableForms()) {
 				if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
 					info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(((HomeActivityListener) a).getCurrentLog().rootFolder, "form");
 
-					((HomeActivityListener) a).getCurrentLog().formPath = formContent.getAbsolutePath();
-					((HomeActivityListener) a).getCurrentLog().attachedForm = new IForm(form, a);
+					mLunchForm = new IForm(form, a);
+					mLunchForm.answerPath = formContent.getAbsolutePath();
+					IRegion topRegion = log.getTopLevelRegion();
+					if (topRegion == null)
+						topRegion = log.addRegion(a, null);
+					topRegion.addForm(mLunchForm);
 
 					// attach elements to form
-					((HomeActivityListener) a).getCurrentLog().attachedForm.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
-					((HomeActivityListener) a).getCurrentLog().attachedForm.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
+					mLunchForm.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
+					mLunchForm.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
 
 					break;
 				}
@@ -316,17 +331,17 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 
 	@Override
 	public void onInformaStop(Intent intent) {
-		if(((HomeActivityListener) a).getCurrentLog() != null) {
-			Log.d(LOG, "LOG IS NOW: " + ((HomeActivityListener) a).getCurrentLog().asJson().toString());
-			((HomeActivityListener) a).getCurrentLog().export(new Handler() {
-				@Override
-				public void handleMessage(Message msg) {
-					Log.d(LOG, "MSG DATA: " + msg.getData().toString());
-				}
-			}, null, true);
-
-			((HomeActivityListener) a).setCurrentLog(null);
-		}
+//		if(((HomeActivityListener) a).getCurrentLog() != null) {
+//			Log.d(LOG, "LOG IS NOW: " + ((HomeActivityListener) a).getCurrentLog().asJson().toString());
+//			((HomeActivityListener) a).getCurrentLog().export(new Handler() {
+//				@Override
+//				public void handleMessage(Message msg) {
+//					Log.d(LOG, "MSG DATA: " + msg.getData().toString());
+//				}
+//			}, null, true);
+//
+//			((HomeActivityListener) a).setCurrentLog(null);
+//		}
 	}
 
 	@Override
@@ -334,12 +349,12 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		init();
 	}	
 	
-	private void getSelfie()
+	private void getSelfie(boolean signingIn)
 	{
-		//Intent surfaceGrabberIntent = new Intent(a, SurfaceGrabberActivity.class);
-		//startActivityForResult(surfaceGrabberIntent, Codes.Routes.IMAGE_CAPTURE);
-		Intent cameraIntent = new Intent(a, CameraActivity.class).putExtra(Codes.Extras.CAMERA_TYPE, Camera.Type.CAMERA);
-		startActivityForResult(cameraIntent, Codes.Routes.IMAGE_CAPTURE);
+		Intent surfaceGrabberIntent = new Intent(a, SelfieActivity.class);
+		if (!signingIn)
+			surfaceGrabberIntent.putExtra(info.guardianproject.justpayphone.utils.Constants.Codes.Extras.IS_SIGNING_OUT, true);
+		startActivityForResult(surfaceGrabberIntent, Codes.Routes.IMAGE_CAPTURE);
 	}
 
 	@Override
@@ -409,33 +424,31 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 					lunchTakenProxyYes.setChecked(false);
 					lunchTakenProxyNo.setChecked(true);
 				}
-				((HomeActivityListener) a).getCurrentLog().attachedForm.answer(Forms.LunchQuestionnaire.LUNCH_TAKEN);
+				mLunchForm.answer(Forms.LunchQuestionnaire.LUNCH_TAKEN);
 				lunchMinutesProxy.setText(String.valueOf(lunchMinutes));
-				((HomeActivityListener) a).getCurrentLog().attachedForm.answer(Forms.LunchQuestionnaire.LUNCH_MINUTES);
+				mLunchForm.answer(Forms.LunchQuestionnaire.LUNCH_MINUTES);
 						
-				info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(((HomeActivityListener) a).getCurrentLog().formPath);			
-				((HomeActivityListener) a).getCurrentLog().attachedForm.save(fos);
+				info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(mLunchForm.answerPath);			
+				mLunchForm.save(fos);
 
 				if(((HomeActivityListener) a).getCurrentLog().data == null) {
 					((HomeActivityListener) a).getCurrentLog().data = new IData();
-					((HomeActivityListener) a).getCurrentLog().data.regionData = new ArrayList<IRegionData>();
+					((HomeActivityListener) a).getCurrentLog().data.userAppendedData = new ArrayList<IRegionData>();
 				}
 
-				IRegionData regionData = new IRegionData(((HomeActivityListener) a).getCurrentLog().attachedForm, ((HomeActivityListener) a).getCurrentLog().formPath);
+				//TODO - fix all this!
+				IRegionData regionData = new IRegionData();
 				
-				regionData.metadata.put(Models.IMedia.ILog.START_TIME, ((HomeActivityListener) a).getCurrentLog().startTime);
-				regionData.metadata.put(Models.IMedia.ILog.END_TIME, ((HomeActivityListener) a).getCurrentLog().endTime);
+//				regionData.metadata.put(Models.IMedia.ILog.START_TIME, ((HomeActivityListener) a).getCurrentLog().startTime);
+//				regionData.metadata.put(Models.IMedia.ILog.END_TIME, ((HomeActivityListener) a).getCurrentLog().endTime);
 				regionData.timestamp = informaCam.informaService.getCurrentTime();
-				((HomeActivityListener) a).getCurrentLog().data.regionData.add(regionData);
+				((HomeActivityListener) a).getCurrentLog().data.userAppendedData.add(regionData);
 
 				((HomeActivityListener) a).persistLog();
 
 				informaCam.stopInforma();
 
 			} catch (FileNotFoundException e) {
-				Log.e(LOG, e.toString());
-				e.printStackTrace();
-			} catch (JSONException e) {
 				Log.e(LOG, e.toString());
 				e.printStackTrace();
 			}

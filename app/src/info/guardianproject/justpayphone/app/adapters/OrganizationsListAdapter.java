@@ -59,77 +59,66 @@ public class OrganizationsListAdapter extends BaseAdapter{
 		TextView name = (TextView) convertView.findViewById(R.id.organization_name);
 		name.setText(organization.organizationName);
 		
-		try {
-			StringBuffer detailsStringBuffer = new StringBuffer();
-			final JSONObject detailsObject = (JSONObject) organization.inflateContent(organization.organizationDetails);
-			detailsStringBuffer.append(detailsObject.getString(Models.IOrganization.ADDRESS)).append(System.getProperty("line.separator"));
-			
-			detailsStringBuffer.append(detailsObject.getString(Models.IOrganization.CITY)).append(", ");
-			detailsStringBuffer.append(detailsObject.getString(Models.IOrganization.STATE)).append(" ");
-			detailsStringBuffer.append(detailsObject.getString(Models.IOrganization.ZIP)).append(System.getProperty("line.separator"));
-			
-			detailsStringBuffer.append(c.getString(R.string.ph)).append(detailsObject.getString(Models.IOrganization.PHONE)).append(System.getProperty("line.separator"));
-			detailsStringBuffer.append(c.getString(R.string.fax)).append(detailsObject.getString(Models.IOrganization.FAX)).append(System.getProperty("line.separator"));
-			
-			TextView details = (TextView) convertView.findViewById(R.id.organization_details);
-			details.setText(detailsStringBuffer.toString());
-			
-			Button launchCall = (Button) convertView.findViewById(R.id.organization_launch_call);
-			launchCall.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					try {
-						Intent intent = new Intent(Intent.ACTION_DIAL).setData(Uri.parse("tel:" + detailsObject.getString(Models.IOrganization.PHONE)));
-						c.startActivity(intent);
-					} catch (JSONException e) {
-						Log.e(LOG, e.toString());
-						e.printStackTrace();
+		StringBuffer detailsStringBuffer = new StringBuffer();
+		//TODO
+//			final JSONObject detailsObject = (JSONObject) organization.inflateContent(organization.organizationDetails);
+//			detailsStringBuffer.append(detailsObject.getString(Models.IOrganization.ADDRESS)).append(System.getProperty("line.separator"));
+//			
+//			detailsStringBuffer.append(detailsObject.getString(Models.IOrganization.)).append(", ");
+//			detailsStringBuffer.append(detailsObject.getString(Models.IOrganization.STATE)).append(" ");
+//			detailsStringBuffer.append(detailsObject.getString(Models.IOrganization.ZIP)).append(System.getProperty("line.separator"));
+//			
+//			detailsStringBuffer.append(c.getString(R.string.ph)).append(detailsObject.getString(Models.IOrganization.PHONE)).append(System.getProperty("line.separator"));
+//			detailsStringBuffer.append(c.getString(R.string.fax)).append(detailsObject.getString(Models.IOrganization.FAX)).append(System.getProperty("line.separator"));
+		
+		TextView details = (TextView) convertView.findViewById(R.id.organization_details);
+		details.setText(detailsStringBuffer.toString());
+		
+		Button launchCall = (Button) convertView.findViewById(R.id.organization_launch_call);
+		launchCall.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(Intent.ACTION_DIAL); //TODO .setData(Uri.parse("tel:" + detailsObject.getString(Models.IOrganization.PHONE)));
+				c.startActivity(intent);
+				
+			}
+		});
+		
+		Button launchMessage = (Button) convertView.findViewById(R.id.organization_launch_message);
+		launchMessage.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new TextareaPopup(c, organization) {
+					@Override
+					public void cancel() {
+						// TODO: handle form
+						super.cancel();
 					}
-					
-				}
-			});
-			
-			Button launchMessage = (Button) convertView.findViewById(R.id.organization_launch_message);
-			launchMessage.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					new TextareaPopup(c, organization) {
-						@Override
-						public void cancel() {
-							// TODO: handle form
-							super.cancel();
-						}
-					};
-				}
-			});
-			
-			Button launchRecording = (Button) convertView.findViewById(R.id.organization_launch_recording);
-			launchRecording.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					new AudioNotePopup(c) {
-						@Override
-						public void cancel() {
-							// TODO: handle form
-							super.cancel();
-						}
-					};
-				}
-			});
-			
-			Button viewWorkSummary = (Button) convertView.findViewById(R.id.organization_view_work_summary);
-			viewWorkSummary.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					new PayStubPopup(c);
-				}
-			});
-			
-			
-		} catch (JSONException e) {
-			Log.e(LOG, e.toString());
-			e.printStackTrace();
-		}
+				};
+			}
+		});
+		
+		Button launchRecording = (Button) convertView.findViewById(R.id.organization_launch_recording);
+		launchRecording.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new AudioNotePopup(c) {
+					@Override
+					public void cancel() {
+						// TODO: handle form
+						super.cancel();
+					}
+				};
+			}
+		});
+		
+		Button viewWorkSummary = (Button) convertView.findViewById(R.id.organization_view_work_summary);
+		viewWorkSummary.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new PayStubPopup(c);
+			}
+		});
 		
 		
 		

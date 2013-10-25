@@ -56,7 +56,7 @@ public class ILogGallery extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		convertView = LayoutInflater.from(informaCam.a).inflate(R.layout.adapter_ilog_gallery_parent, null);
+		convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_ilog_gallery_parent, null);
 		ILog iLog = iLogs.get(position);
 		
 		TextView date = (TextView) convertView.findViewById(R.id.ilog_date);
@@ -64,7 +64,7 @@ public class ILogGallery extends BaseAdapter {
 		
 		LinearLayout imagesAndVideo = (LinearLayout) convertView.findViewById(R.id.ilog_images_and_video);
 		for(String l : iLog.attachedMedia) {
-			ImageView iv = new ImageView(informaCam.a);
+			ImageView iv = new ImageView(parent.getContext());
 			IMedia m = informaCam.mediaManifest.getById(l);
 			byte[] bBytes = informaCam.ioService.getBytes(m.bitmapThumb, Type.IOCIPHER);
 			Bitmap b = BitmapFactory.decodeByteArray(bBytes, 0, bBytes.length);

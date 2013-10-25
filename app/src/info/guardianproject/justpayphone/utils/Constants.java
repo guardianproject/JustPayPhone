@@ -4,6 +4,13 @@ import org.witness.informacam.models.media.ILog;
 
 public class Constants {
 	
+	public interface WizardActivityListener {
+		public void onLanguageSelected(String language);
+		public void onLanguageConfirmed();
+		public void onUsernameCreated(String username, String email, String password);
+		public void onTakePhotoClicked();
+	}
+	
 	public interface HomeActivityListener {
 		public int[] getDimensions();
 		public ILog getCurrentLog();
@@ -52,6 +59,7 @@ public class Constants {
 			public static final String CHANGE_LOCALE = "changeLocale";
 			public static final String HAS_SEEN_HOME = "hasSeenHome";
 			public static final String PERSISTENT_SERVICE = "persistentService";
+			public static final String IS_SIGNING_OUT = "isSigningOut";
 		}
 	}
 	

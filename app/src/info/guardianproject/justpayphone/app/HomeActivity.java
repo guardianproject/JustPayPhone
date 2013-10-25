@@ -77,6 +77,8 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		informaCam = (InformaCam) getApplication();
+		
 		setContentView(R.layout.activity_home);
 
 		userManagementFragment = Fragment.instantiate(this, UserManagementFragment.class.getName());
@@ -100,7 +102,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	public void onResume() {
 		super.onResume();
 		
-		informaCam = InformaCam.getInstance(this);
+		informaCam.setStatusListener(this);
 		
 		String currentLocale = PreferenceManager.getDefaultSharedPreferences(this).getString(Settings.LANGUAGE, "0");
 		if(!lastLocale.equals(currentLocale)) {
