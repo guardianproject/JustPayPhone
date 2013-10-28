@@ -229,7 +229,15 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 			}
 			
 			routeByIntent();
-		}		
+		}	
+		else if (resultCode == Activity.RESULT_FIRST_USER)
+		{
+			if (route != null && data.hasExtra(Codes.Extras.CHANGE_LOCALE) && data.getBooleanExtra(Codes.Extras.CHANGE_LOCALE, false))
+			{
+				route.putExtra(Codes.Extras.CHANGE_LOCALE, true);
+			}
+			routeByIntent();
+		}
 	}
 	
 	@Override

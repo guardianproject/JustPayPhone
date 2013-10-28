@@ -64,7 +64,7 @@
 
     <Button
         android:id="@+id/wizard_commit"
-        
+        style="@style/WizardButton"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_below="@id/languagePopup"
@@ -73,4 +73,5 @@
         android:layout_marginRight="30dp"
         android:layout_marginTop="30dp"
         android:text="@string/wizard_get_started" />
+
 </RelativeLayout>

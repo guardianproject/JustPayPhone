@@ -18,4 +18,8 @@
     <color name="cream_a06">#9AF2EFDE</color>
     
     <color name="blue_dark">#FF1D1F21</color>
+    
+    <color name="wizard_button">#FFf78f20</color>
+    <color name="wizard_button_semi">#FF885927</color>
+    <color name="wizard_button_disabled">#FFA7A9AC</color>
 </resources>

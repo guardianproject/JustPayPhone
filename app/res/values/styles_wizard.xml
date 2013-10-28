@@ -29,4 +29,10 @@
     <item name="android:textSize">15sp</item>
 </style>
 
+<style name="WizardButton">
+    <item name="android:background">@drawable/wizard_button_selector</item>
+    <item name="android:textColor">@android:color/white</item>
+	<item name="android:textSize">15sp</item>
+</style>
+
 </resources>
