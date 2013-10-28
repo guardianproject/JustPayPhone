@@ -80,4 +80,12 @@
     <string name="wizard_key_is_being_made">Your key is being made, this may take a while.</string>
     <string name="wizard_key_made">Your key has been made.</string>
     <string name="wizard_original_images_should_be">Original images should be:</string>
+    
+    <string name="time_date">Sept / Oct</string>
+    <string name="time_work_hours">Work Hours</string>
+    <string name="time_lunch">Lunch</string>
+    <string name="time_span_same_month">%1$s</string>
+    <string name="time_span_months">%1$s / %2$s</string>
+    <string name="time_lunch_no_lunch">-</string>
+	<string name="time_lunch_minutes">%1$d MIN</string>
 </resources>

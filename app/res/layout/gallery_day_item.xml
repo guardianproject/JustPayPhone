@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/gallery_day"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:orientation="horizontal" >
+
+    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+        android:id="@+id/tvTimeDate"
+        style="@style/jpp_h2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.33"
+        android:gravity="center"
+        android:text="31" />
+
+    <View android:layout_width="1px" android:layout_height="match_parent" android:background="#92278F" />
+    
+    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+        android:id="@+id/tvTimeWorked"
+        style="@style/jpp_h2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.33"
+        android:gravity="center"
+        android:text="8.2" />
+
+    <View android:layout_width="1px" android:layout_height="match_parent" android:background="#92278F" />
+    
+    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+        android:id="@+id/tvTimeLunch"
+        style="@style/jpp_h5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.33"
+        android:gravity="center"
+        android:text="10 MIN" />
+
+</LinearLayout>

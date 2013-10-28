@@ -123,15 +123,6 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		btnLunch60 = rootView.findViewById(R.id.btnLunch60);
 		btnLunch60.setOnClickListener(mLunchButtonClickedListener);
 
-		lunchTakenProxy = new RadioGroup(a);
-		lunchTakenProxyYes = new RadioButton(a);
-		lunchTakenProxyNo = new RadioButton(a);
-		lunchTakenProxy.addView(lunchTakenProxyYes);
-		lunchTakenProxy.addView(lunchTakenProxyNo);
-
-		lunchMinutesProxy = new EditText(a);
-		lunchMinutesProxy.setText(a.getString(R.string.x_minutes, 0));
-
 		setCurrentMode(mCurrentMode);
 		
 		return rootView;
@@ -317,6 +308,15 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 						topRegion = log.addRegion(a, null);
 					topRegion.addForm(mLunchForm);
 
+					lunchTakenProxy = new RadioGroup(a);
+					lunchTakenProxyYes = new RadioButton(a);
+					lunchTakenProxyNo = new RadioButton(a);
+					lunchTakenProxy.addView(lunchTakenProxyYes);
+					lunchTakenProxy.addView(lunchTakenProxyNo);
+
+					lunchMinutesProxy = new EditText(a);
+					lunchMinutesProxy.setText(a.getString(R.string.x_minutes, 0));
+					
 					// attach elements to form
 					mLunchForm.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
 					mLunchForm.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
@@ -418,49 +418,59 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			else if (v == btnLunch60)
 				lunchMinutes = 60;
 			
-			try {
-				
-				if (lunchTaken)
-				{
-					lunchTakenProxyYes.setChecked(true);
-					lunchTakenProxyNo.setChecked(false);
-				}
-				else
-				{
-					lunchTakenProxyYes.setChecked(false);
-					lunchTakenProxyNo.setChecked(true);
-				}
-				mLunchForm.answer(Forms.LunchQuestionnaire.LUNCH_TAKEN);
-				lunchMinutesProxy.setText(String.valueOf(lunchMinutes));
-				mLunchForm.answer(Forms.LunchQuestionnaire.LUNCH_MINUTES);
-						
-				info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(mLunchForm.answerPath);			
-				mLunchForm.save(fos);
-
-				if(((HomeActivityListener) a).getCurrentLog().data == null) {
-					((HomeActivityListener) a).getCurrentLog().data = new IData();
-					((HomeActivityListener) a).getCurrentLog().data.userAppendedData = new ArrayList<IRegionData>();
-				}
-
-				//TODO - fix all this!
-				IRegionData regionData = new IRegionData();
-				
-//				regionData.metadata.put(Models.IMedia.ILog.START_TIME, ((HomeActivityListener) a).getCurrentLog().startTime);
-//				regionData.metadata.put(Models.IMedia.ILog.END_TIME, ((HomeActivityListener) a).getCurrentLog().endTime);
-				regionData.timestamp = informaCam.informaService.getCurrentTime();
-				((HomeActivityListener) a).getCurrentLog().data.userAppendedData.add(regionData);
-
-				((HomeActivityListener) a).persistLog();
-
-				informaCam.stopInforma();
-
-			} catch (FileNotFoundException e) {
-				Log.e(LOG, e.toString());
-				e.printStackTrace();
+			if (lunchTaken)
+			{
+				lunchTakenProxyYes.setChecked(true);
+				lunchTakenProxyNo.setChecked(false);
 			}
-
-			((HomeActivityListener) a).showLogView();
-			setCurrentMode(WorkStatusFragmentMode.Normal);
+			else
+			{
+				lunchTakenProxyYes.setChecked(false);
+				lunchTakenProxyNo.setChecked(true);
+			}
+			lunchMinutesProxy.setText(String.valueOf(lunchMinutes));
+			h.post(new Runnable()
+			{
+				@Override
+				public void run() {
+					saveLunchInformation();
+				}
+			});
 		}
 	};
+	
+	private void saveLunchInformation()
+	{
+		try {
+			mLunchForm.answer(Forms.LunchQuestionnaire.LUNCH_TAKEN);
+			mLunchForm.answer(Forms.LunchQuestionnaire.LUNCH_MINUTES);
+					
+			info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(mLunchForm.answerPath);			
+			mLunchForm.save(fos);
+
+//			if(((HomeActivityListener) a).getCurrentLog().data == null) {
+//				((HomeActivityListener) a).getCurrentLog().data = new IData();
+//				((HomeActivityListener) a).getCurrentLog().data.userAppendedData = new ArrayList<IRegionData>();
+//			}
+//
+//			//TODO - fix all this!
+//			IRegionData regionData = new IRegionData();
+//			
+////			regionData.metadata.put(Models.IMedia.ILog.START_TIME, ((HomeActivityListener) a).getCurrentLog().startTime);
+////			regionData.metadata.put(Models.IMedia.ILog.END_TIME, ((HomeActivityListener) a).getCurrentLog().endTime);
+//			regionData.timestamp = informaCam.informaService.getCurrentTime();
+//			((HomeActivityListener) a).getCurrentLog().data.userAppendedData.add(regionData);
+
+			((HomeActivityListener) a).persistLog();
+
+			informaCam.stopInforma();
+
+		} catch (FileNotFoundException e) {
+			Log.e(LOG, e.toString());
+			e.printStackTrace();
+		}
+
+		((HomeActivityListener) a).showLogView();
+		setCurrentMode(WorkStatusFragmentMode.Normal);
+	}
 }

@@ -5,6 +5,7 @@ import info.guardianproject.justpayphone.app.adapters.ILogGallery;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -14,9 +15,7 @@ import org.json.JSONTokener;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.models.media.IMedia;
-import org.witness.informacam.ui.CameraActivity;
 import org.witness.informacam.utils.Constants.Codes;
-import org.witness.informacam.utils.Constants.App.Camera;
 import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 
@@ -30,22 +29,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.LinearLayout;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class GalleryFragment extends Fragment implements OnClickListener {
+public class GalleryFragment extends Fragment implements OnClickListener, OnScrollListener {
 	View rootView;
 	Activity a;
 	InformaCam informaCam = InformaCam.getInstance();
 
 	ListView iLogList;
 
-	LinearLayout toCamera, toCamcorder;
-
-	private Intent cameraIntent = null;
-
 	Handler h = new Handler();
+	private TextView tvHeaderDate;
 
 	private final static String LOG = Constants.App.Home.LOG;
 
@@ -60,13 +58,11 @@ public class GalleryFragment extends Fragment implements OnClickListener {
 
 		rootView = li.inflate(R.layout.fragment_user_management_my_workspaces, null);
 
-		toCamera = (LinearLayout) rootView.findViewById(R.id.gallery_to_camera);
-		toCamera.setOnClickListener(this);
-
-		toCamcorder = (LinearLayout) rootView.findViewById(R.id.gallery_to_camcorder);
-		toCamcorder.setOnClickListener(this);
-
 		iLogList = (ListView) rootView.findViewById(R.id.my_workplaces_list_holder);
+		iLogList.setOnScrollListener(this);
+		
+		tvHeaderDate = (TextView) rootView.findViewById(R.id.tvTimeDate);
+		
 		return rootView;
 	}
 
@@ -79,8 +75,13 @@ public class GalleryFragment extends Fragment implements OnClickListener {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		initData();
-
+		h.post(new Runnable()
+		{
+			@Override
+			public void run() {
+				updateWorkspaces();
+			}
+		});
 	}
 
 	@SuppressWarnings("unchecked")
@@ -91,24 +92,14 @@ public class GalleryFragment extends Fragment implements OnClickListener {
 			return;
 		}
 
-		iLogList.setAdapter(new ILogGallery(iLogs));
+		iLogList.setAdapter(new ILogGallery(iLogs, a));
 	}
 
-	private void initData() {
-		updateWorkspaces();
-
-
-	}
-
-	private void launchCamcorder() {
-		cameraIntent = new Intent(a, CameraActivity.class).putExtra(Codes.Extras.CAMERA_TYPE, Camera.Type.CAMCORDER);
-		startActivityForResult(cameraIntent, Codes.Routes.IMAGE_CAPTURE);
-	}
-
-	private void launchCamera() {
-		cameraIntent = new Intent(a, CameraActivity.class).putExtra(Codes.Extras.CAMERA_TYPE, Camera.Type.CAMERA);
-		startActivityForResult(cameraIntent, Codes.Routes.IMAGE_CAPTURE);
-	}
+//	private void initData() {
+//		updateWorkspaces();
+//
+//
+//	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -146,23 +137,46 @@ public class GalleryFragment extends Fragment implements OnClickListener {
 			Toast.makeText(a, getString(R.string.you_cannot_take_a), Toast.LENGTH_LONG).show();
 			return;
 		}
-		
-		if(v == toCamera) {
-			h.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					launchCamera();
-				}
-			}, 100);
-		} else if(v == toCamcorder) {
-			h.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					launchCamcorder();
-				}
-			}, 100);
-		}
+	}
 
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {
+		ILogGallery list = (ILogGallery) view.getAdapter();
+		if (list == null || firstVisibleItem >= totalItemCount)
+			return;
+		
+		ILog first = (ILog) list.getItem(firstVisibleItem);
+		
+		if (first == null)
+			return;
+		
+		ILog last = first;
+		if (visibleItemCount > 1)
+			last = (ILog) list.getItem(firstVisibleItem + visibleItemCount - 1);
+		
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(first.startTime);
+
+		int firstMonth = cal.get(Calendar.MONTH);
+		int firstYear = cal.get(Calendar.YEAR);
+
+		cal.setTimeInMillis(last.startTime);
+		int lastMonth = cal.get(Calendar.MONTH);
+		int lastYear = cal.get(Calendar.YEAR);
+		
+		if (firstYear == lastYear && firstMonth == lastMonth)
+		{
+			tvHeaderDate.setText(this.getString(R.string.time_span_same_month, String.valueOf(firstMonth)));
+		}
+		else
+		{
+			tvHeaderDate.setText(this.getString(R.string.time_span_months, String.valueOf(firstMonth), String.valueOf(lastMonth)));
+		}
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
 	}
 
 }

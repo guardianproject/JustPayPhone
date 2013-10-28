@@ -92,7 +92,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		fragments.add(workStatusFragment);
 		fragments.add(cameraFragment);
 		fragments.add(callLawyerFragment);
-		fragments.add(userManagementFragment);
+		//fragments.add(userManagementFragment);
 		fragments.add(galleryFragment);
 
 		h = new Handler();
