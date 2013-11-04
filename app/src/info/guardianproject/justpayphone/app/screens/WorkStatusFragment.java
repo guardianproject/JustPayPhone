@@ -470,7 +470,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			e.printStackTrace();
 		}
 
-		((HomeActivityListener) a).showLogView();
+		((HomeActivityListener) a).showLogView(true);
 		setCurrentMode(WorkStatusFragmentMode.Normal);
 	}
 }

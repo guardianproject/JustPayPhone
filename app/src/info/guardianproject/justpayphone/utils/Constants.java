@@ -17,7 +17,7 @@ public class Constants {
 		public void setCurrentLog(ILog currentLog);
 		public void persistLog();
 		public boolean getInitFlag();
-		public void showLogView();
+		public void showLogView(boolean showBubble);
 		public void showNavigationDots(boolean show);
 	}
 	
@@ -61,6 +61,7 @@ public class Constants {
 			public static final String HAS_SEEN_HOME = "hasSeenHome";
 			public static final String PERSISTENT_SERVICE = "persistentService";
 			public static final String IS_SIGNING_OUT = "isSigningOut";
+			public static final String PATH_TO_FILE = "pathToFile";
 		}
 	}
 	

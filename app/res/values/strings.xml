@@ -88,4 +88,5 @@
     <string name="time_span_months">%1$s / %2$s</string>
     <string name="time_lunch_no_lunch">-</string>
 	<string name="time_lunch_minutes">%1$d MIN</string>
+	<string name="time_good_job">Good job, you worked %1$s hours today!</string>
 </resources>

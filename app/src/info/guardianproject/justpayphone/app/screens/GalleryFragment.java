@@ -2,11 +2,14 @@ package info.guardianproject.justpayphone.app.screens;
 
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.adapters.ILogGallery;
+import info.guardianproject.justpayphone.app.views.BubbleView;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +34,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,12 +48,16 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 
 	Handler h = new Handler();
 	private TextView tvHeaderDate;
+	private BubbleView bubbleView;
+	private boolean mHighlightFirstLog;
+	private SimpleDateFormat mDateFormatMonthName;
 
 	private final static String LOG = Constants.App.Home.LOG;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mDateFormatMonthName = new SimpleDateFormat("LLL", Locale.getDefault());
 	}
 
 	@Override
@@ -62,6 +70,13 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 		iLogList.setOnScrollListener(this);
 		
 		tvHeaderDate = (TextView) rootView.findViewById(R.id.tvTimeDate);
+		
+		bubbleView = (BubbleView) rootView.findViewById(R.id.bubbleView);
+		if (mHighlightFirstLog)
+			bubbleView.setVisibility(View.VISIBLE);
+		else
+			bubbleView.setVisibility(View.GONE);
+		mHighlightFirstLog = false;
 		
 		return rootView;
 	}
@@ -88,13 +103,22 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 	private void updateWorkspaces() {
 		List<ILog> iLogs = informaCam.mediaManifest.getAllByType(MimeType.LOG);
 
-		if(iLogs == null) {
+		if(iLogs == null || iLogs.size() == 0) {
 			return;
 		}
 
-		iLogList.setAdapter(new ILogGallery(iLogs, a));
+		ILogGallery adapter = new ILogGallery(iLogs, a);
+		iLogList.setAdapter(adapter);
+		
+		ILog first = iLogs.get(0);
+		bubbleView.setText(a.getString(R.string.time_good_job, adapter.getWorkDisplayString(first)));
 	}
 
+	public void setHighlightFirstLog(boolean highlight)
+	{
+		mHighlightFirstLog = highlight;
+	}
+	
 //	private void initData() {
 //		updateWorkspaces();
 //
@@ -161,22 +185,34 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 		int firstMonth = cal.get(Calendar.MONTH);
 		int firstYear = cal.get(Calendar.YEAR);
 
-		cal.setTimeInMillis(last.startTime);
-		int lastMonth = cal.get(Calendar.MONTH);
-		int lastYear = cal.get(Calendar.YEAR);
+		Calendar cal2 = Calendar.getInstance();
+		cal2.setTimeInMillis(last.startTime);
+		int lastMonth = cal2.get(Calendar.MONTH);
+		int lastYear = cal2.get(Calendar.YEAR);
+		
 		
 		if (firstYear == lastYear && firstMonth == lastMonth)
 		{
-			tvHeaderDate.setText(this.getString(R.string.time_span_same_month, String.valueOf(firstMonth)));
+			String sMonth = mDateFormatMonthName.format(cal.getTime());
+			sMonth = String.valueOf(sMonth.charAt(0)).toUpperCase(Locale.getDefault()) + sMonth.substring(1, sMonth.length());
+			tvHeaderDate.setText(this.getString(R.string.time_span_same_month, sMonth));
 		}
 		else
 		{
-			tvHeaderDate.setText(this.getString(R.string.time_span_months, String.valueOf(firstMonth), String.valueOf(lastMonth)));
+			String sMonth = mDateFormatMonthName.format(cal.getTime());
+			sMonth = String.valueOf(sMonth.charAt(0)).toUpperCase(Locale.getDefault()) + sMonth.substring(1, sMonth.length());
+			String eMonth = mDateFormatMonthName.format(cal2.getTime());
+			eMonth = String.valueOf(eMonth.charAt(0)).toUpperCase(Locale.getDefault()) + eMonth.substring(1, eMonth.length());
+			tvHeaderDate.setText(this.getString(R.string.time_span_months, sMonth, eMonth));
 		}
 	}
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		if (scrollState == OnScrollListener.SCROLL_STATE_TOUCH_SCROLL && bubbleView.getVisibility() == View.VISIBLE)
+		{
+			bubbleView.setVisibility(View.GONE);
+		}
 	}
 
 }

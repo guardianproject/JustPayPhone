@@ -20,4 +20,10 @@
         <attr name="dropdown_background" format="reference" />
         <attr name="android:divider" />
     </declare-styleable>
+    
+    <declare-styleable name="BubbleView">
+        <attr name="pointer_size" format="dimension" />
+        <attr name="bubble_color" format="color" />
+    </declare-styleable>
+    
 </resources>

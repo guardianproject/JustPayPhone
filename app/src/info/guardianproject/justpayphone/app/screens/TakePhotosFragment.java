@@ -5,6 +5,7 @@ import org.witness.informacam.utils.Constants.App;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.app.CameraActivity;
 import info.guardianproject.justpayphone.app.SelfieActivity;
 import android.app.Activity;
 import android.content.Intent;
@@ -50,7 +51,7 @@ public class TakePhotosFragment extends Fragment implements OnClickListener, Inf
 	@Override
 	public void onClick(View v) {
 		if (v == mBtnTakePhotos) {
-			Intent surfaceGrabberIntent = new Intent(a, SelfieActivity.class);
+			Intent surfaceGrabberIntent = new Intent(a, CameraActivity.class);
 			startActivityForResult(surfaceGrabberIntent, Codes.Routes.IMAGE_CAPTURE);
 		} 
 	}

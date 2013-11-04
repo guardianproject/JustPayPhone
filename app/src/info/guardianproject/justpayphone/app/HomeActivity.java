@@ -60,7 +60,8 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	private String lastLocale;
 
 	List<Fragment> fragments = new Vector<Fragment>();
-	Fragment userManagementFragment, workStatusFragment, cameraFragment, callLawyerFragment, galleryFragment;
+	Fragment userManagementFragment, workStatusFragment, cameraFragment, callLawyerFragment;
+	GalleryFragment galleryFragment;
 	Fragment currentFragment = null;
 
 	LayoutInflater li;
@@ -87,7 +88,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		workStatusFragment = Fragment.instantiate(this, WorkStatusFragment.class.getName());
 		cameraFragment = Fragment.instantiate(this, TakePhotosFragment.class.getName());
 		callLawyerFragment = Fragment.instantiate(this, CallLawyerFragment.class.getName());
-		galleryFragment = Fragment.instantiate(this, GalleryFragment.class.getName());
+		galleryFragment = (GalleryFragment) Fragment.instantiate(this, GalleryFragment.class.getName());
 
 		fragments.add(workStatusFragment);
 		fragments.add(cameraFragment);
@@ -410,7 +411,8 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	}
 
 	@Override
-	public void showLogView() {
+	public void showLogView(boolean showBubble) {
+		galleryFragment.setHighlightFirstLog(showBubble);
 		viewPager.setCurrentItem(fragments.indexOf(galleryFragment));
 	}
 

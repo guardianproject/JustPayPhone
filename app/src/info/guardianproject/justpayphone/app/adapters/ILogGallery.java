@@ -126,7 +126,7 @@ public class ILogGallery extends BaseAdapter {
 		return convertView;
 	}
 
-	private String getWorkDisplayString(ILog iLog)
+	public String getWorkDisplayString(ILog iLog)
 	{
 		long msWorked = iLog.endTime - iLog.startTime;
 		float hWorked = (msWorked / 3600000);
