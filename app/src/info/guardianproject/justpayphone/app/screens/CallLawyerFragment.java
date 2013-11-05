@@ -6,9 +6,13 @@ import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.SelfieActivity;
+import info.guardianproject.justpayphone.utils.Constants.Settings;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +57,14 @@ public class CallLawyerFragment extends Fragment implements OnClickListener, Inf
 	@Override
 	public void onClick(View v) {
 		if (v == mBtnCallLawyer) {
-			// TODO - mvp - call lawyer!
+			
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(a.getBaseContext());
+			String phoneNumber = prefs.getString(Settings.LAWYER_PHONE, null);
+			if (phoneNumber != null)
+			{
+				Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
+				startActivity(intent);
+			}
 		} 
 	}
 
