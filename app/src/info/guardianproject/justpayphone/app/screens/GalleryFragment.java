@@ -7,7 +7,11 @@ import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,6 +25,9 @@ import org.witness.informacam.models.media.IMedia;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -99,9 +106,28 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 	private void updateWorkspaces() {
 		List<ILog> iLogs = informaCam.mediaManifest.getAllByType(MimeType.LOG);
 
+		// Only list the ones that are closed
+		if (iLogs != null)
+		{
+			Collection<ILog> closedLogs = Collections2.filter(iLogs, new Predicate<ILog>() {
+				@Override
+				public boolean apply(ILog log) {
+					return log.endTime != 0;
+				}
+			});
+			iLogs = new ArrayList<ILog>(closedLogs);
+		}
+		
 		if(iLogs == null || iLogs.size() == 0) {
 			return;
 		}
+		
+		Collections.sort(iLogs, new Comparator<ILog>() {
+			@Override
+			public int compare(ILog lhs, ILog rhs) {
+				return lhs.startTime > rhs.startTime ? -1 : ((lhs==rhs || lhs.startTime == rhs.startTime) ? 0 : 1);
+			}
+		});
 
 		ILogGallery adapter = new ILogGallery(iLogs, a);
 		iLogList.setAdapter(adapter);

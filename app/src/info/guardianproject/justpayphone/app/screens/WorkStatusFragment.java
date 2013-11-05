@@ -53,10 +53,10 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 
 	private enum WorkStatusFragmentMode
 	{
-		Normal, SigningIn, Working, SigningOut, LunchForm
+		Uninitialized, Normal, SigningIn, Working, SigningOut, LunchForm
 	}
 
-	WorkStatusFragmentMode mCurrentMode = WorkStatusFragmentMode.Normal;
+	WorkStatusFragmentMode mCurrentMode = WorkStatusFragmentMode.Uninitialized;
 	
 	ProgressBar waiter;
 	View btnLunchNo, btnLunch10, btnLunch20, btnLunch30, btnLunch45, btnLunch60;
@@ -187,7 +187,13 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		Log.d(LOG, "Changing to mode: " + mode.toString());
 		
 		mCurrentMode = mode;
-		if (mCurrentMode == WorkStatusFragmentMode.Normal || mCurrentMode == WorkStatusFragmentMode.SigningIn)
+		if (mCurrentMode == WorkStatusFragmentMode.Uninitialized)
+		{
+			mWorkSignInView.setVisibility(View.GONE);
+			mWorkSignOutView.setVisibility(View.GONE);
+			mWorkLunchView.setVisibility(View.GONE);
+		}
+		else if (mCurrentMode == WorkStatusFragmentMode.Normal || mCurrentMode == WorkStatusFragmentMode.SigningIn)
 		{
 			mWorkSignInView.setVisibility(View.VISIBLE);
 			mWorkSignOutView.setVisibility(View.GONE);
@@ -235,7 +241,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		
 		// If not started, start now
 		if (log.startTime == 0)
-			log.startTime = informaCam.informaService.getCurrentTime();
+			log.startTime = currentTime;
 
 		timeWorked = (currentTime - log.startTime);
 
@@ -276,17 +282,11 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	@Override
 	public void onClick(View v) {
 		if (v == mBtnSignIn) {
-			if(((HomeActivityListener) a).getCurrentLog() == null) {
-				initLog();
-
-			} else {
-				try {
-					if(!((HomeActivityListener) a).getCurrentLog().getBoolean(Models.IMedia.ILog.IS_CLOSED)) {
-						initLog();
-						return;
-					}
-				} catch(JSONException e) {}
-				
+			
+			HomeActivityListener hal = (HomeActivityListener) a;
+			if (hal.getCurrentLog() != null && !hal.getCurrentLog().optBoolean(Models.IMedia.ILog.IS_CLOSED, false))
+			{
+				// Already log in progress
 				Toast.makeText(a, getString(R.string.you_have_already_logged), Toast.LENGTH_LONG).show();
 				return;
 			}
@@ -366,12 +366,25 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(resultCode == Activity.RESULT_OK) {
+		if (resultCode == Activity.RESULT_CANCELED) {
+			switch(requestCode) {
+			case Codes.Routes.IMAGE_CAPTURE:
+				if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
+					setCurrentMode(WorkStatusFragmentMode.Normal);
+				else if (mCurrentMode == WorkStatusFragmentMode.SigningOut)
+					setCurrentMode(WorkStatusFragmentMode.Working);
+				break;
+			}
+		}
+		else if(resultCode == Activity.RESULT_OK) {
 			switch(requestCode) {
 			case Codes.Routes.IMAGE_CAPTURE:
 				
 				if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
+				{
+					initLog();
 					setCurrentMode(WorkStatusFragmentMode.Working);
+				}
 				else if (mCurrentMode == WorkStatusFragmentMode.SigningOut)
 					setCurrentMode(WorkStatusFragmentMode.LunchForm);
 				
