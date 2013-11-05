@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:text="@string/wizard_step_1"
+        android:text="@string/wizard_step_3"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/white" />
 
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="30dp"
-        android:text="@string/wizard_create_db"
+        android:text="@string/wizard_lawyer_information"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/white" />
 
@@ -49,42 +49,14 @@
                 android:padding="10dp" >
 
                 <info.guardianproject.justpayphone.app.views.CustomFontEditText
-                    android:id="@+id/user_name"
+                    android:id="@+id/lawyer_number"
                     style="@style/WizardEdittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/name"
-                    android:inputType="text"
+                    android:hint="@string/wizard_phone_number"
+                    android:inputType="phone"
                     android:maxLength="50"
                     android:maxLines="1" />
-
-                <info.guardianproject.justpayphone.app.views.CustomFontEditText
-                    android:id="@+id/user_email"
-                    style="@style/WizardEdittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/wizard_email_optional"
-                    android:inputType="textEmailAddress"
-                    android:maxLength="200"
-                    android:maxLines="1" />
-
-                <info.guardianproject.justpayphone.app.views.CustomFontEditText
-                    android:id="@+id/user_password"
-                    style="@style/WizardEdittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/password"
-                    android:inputType="textPassword"
-                    android:maxLength="50" />
-
-                <info.guardianproject.justpayphone.app.views.CustomFontEditText
-                    android:id="@+id/user_password_again"
-                    style="@style/WizardEdittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/password_again"
-                    android:inputType="textPassword"
-                    android:maxLength="50" />
             </LinearLayout>
 
             <Button

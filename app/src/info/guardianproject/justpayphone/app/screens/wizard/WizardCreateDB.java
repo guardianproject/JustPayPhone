@@ -1,5 +1,7 @@
 package info.guardianproject.justpayphone.app.screens.wizard;
+
 import info.guardianproject.justpayphone.utils.Constants.WizardActivityListener;
+import info.guardianproject.justpayphone.utils.UIHelpers;
 import info.guardianproject.justpayphone.R;
 import android.app.Activity;
 import android.os.Bundle;
@@ -63,7 +65,7 @@ public class WizardCreateDB extends Fragment implements OnClickListener
 		{
 			if (isEverythingOk())
 			{
-				//UIHelpers.hideSoftKeyboard(a);
+				UIHelpers.hideSoftKeyboard(a);
 				if (a instanceof WizardActivityListener)
 				{
 					((WizardActivityListener) a).onUsernameCreated(alias.getText().toString(), email.getText().toString(), password.getText().toString());

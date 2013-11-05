@@ -9,6 +9,7 @@ public class Constants {
 		public void onLanguageConfirmed();
 		public void onUsernameCreated(String username, String email, String password);
 		public void onTakePhotoClicked();
+		public void onLawyerInfoSet(String phoneNumber);
 	}
 	
 	public interface HomeActivityListener {
@@ -28,6 +29,7 @@ public class Constants {
 			public final static int EN = 1;
 			public final static int ES = 2;
 		}
+		public static final String LAWYER_PHONE = "jpp_lawyer_phone";
 	}
 	
 	public static class Forms {

@@ -66,13 +66,13 @@
     <string name="wizard_welcome">Welcome!</string>
     <string name="wizard_choose_language">Choose a language:</string>
     <string name="wizard_get_started">Get started</string>
-    <string name="wizard_step_1_of_2">Step 1 of 2:</string>
+    <string name="wizard_step_1">Step 1 of 3:</string>
     <string name="wizard_create_db">Set up your secure database.</string>
     <string name="wizard_email_optional">Email (optional)</string>
     <string name="wizard_password_dont_match">Passwords do not match =(</string>
     <string name="wizard_password_wrong_format">Your password should be more than 10 characters.</string>
     <string name="wizard_ok_next">Okay, next</string>
-    <string name="wizard_step_2_of_2">Step 2 of 2:</string>
+    <string name="wizard_step_2">Step 2 of 3:</string>
     <string name="wizard_take_photo_title">Take 6 boring photos to generate your device key.</string>
     <string name="wizard_key_information">Your key will allow you to be verified, so that you can share seamlessly and securely.</string>
     <string name="wizard_take_photo">Take Photos</string>
@@ -80,6 +80,9 @@
     <string name="wizard_key_is_being_made">Your key is being made, this may take a while.</string>
     <string name="wizard_key_made">Your key has been made.</string>
     <string name="wizard_original_images_should_be">Original images should be:</string>
+    <string name="wizard_lawyer_information">Enter lawyer information</string>
+    <string name="wizard_step_3">Step 3 of 3:</string>
+	<string name="wizard_phone_number">Phone number</string>    
     
     <string name="time_date">Sept / Oct</string>
     <string name="time_work_hours">Work Hours</string>
@@ -89,4 +92,8 @@
     <string name="time_lunch_no_lunch">-</string>
 	<string name="time_lunch_minutes">%1$d MIN</string>
 	<string name="time_good_job">Good job, you worked %1$s hours today!</string>
+	
+	<string name="camera_redo">REDO</string>
+	<string name="camera_save">SAVE</string>
+	
 </resources>
