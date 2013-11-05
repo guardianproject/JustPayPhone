@@ -72,11 +72,7 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 		tvHeaderDate = (TextView) rootView.findViewById(R.id.tvTimeDate);
 		
 		bubbleView = (BubbleView) rootView.findViewById(R.id.bubbleView);
-		if (mHighlightFirstLog)
-			bubbleView.setVisibility(View.VISIBLE);
-		else
-			bubbleView.setVisibility(View.GONE);
-		mHighlightFirstLog = false;
+		bubbleView.setVisibility(View.GONE);
 		
 		return rootView;
 	}
@@ -112,6 +108,12 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 		
 		ILog first = iLogs.get(0);
 		bubbleView.setText(a.getString(R.string.time_good_job, adapter.getWorkDisplayString(first)));
+		
+		if (mHighlightFirstLog)
+			bubbleView.setVisibility(View.VISIBLE);
+		else
+			bubbleView.setVisibility(View.GONE);
+		mHighlightFirstLog = false;
 	}
 
 	public void setHighlightFirstLog(boolean highlight)

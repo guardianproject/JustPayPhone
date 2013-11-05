@@ -40,7 +40,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/ivTimeDate"
                     android:layout_centerHorizontal="true"
+                    android:gravity="center"
                     android:text="@string/time_date" />
+
             </RelativeLayout>
 
             <RelativeLayout
