@@ -128,12 +128,12 @@ public class ILogGallery extends BaseAdapter {
 
 	public String getWorkDisplayString(ILog iLog)
 	{
-		long msWorked = iLog.endTime - iLog.startTime;
+		float msWorked = iLog.endTime - iLog.startTime;
 		float hWorked = (msWorked / 3600000);
 	    if(hWorked == (int) hWorked)
 	        return String.format(Locale.getDefault(), "%d", (int)hWorked);
 	    else
-	        return String.format(Locale.getDefault(), "%.1fs", hWorked);
+	        return String.format(Locale.getDefault(), "%.1f", hWorked);
 	}
 	
 	private String getLunchDisplayString(ILog iLog)
