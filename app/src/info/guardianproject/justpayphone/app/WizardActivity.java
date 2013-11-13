@@ -144,7 +144,7 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 	@Override
 	public void onTakePhotoClicked()
 	{
-		Intent surfaceGrabberIntent = new Intent(this, SurfaceGrabberActivity.class);
+		Intent surfaceGrabberIntent = new Intent(this, WizardPhotoActivity.class);
 		startActivityForResult(surfaceGrabberIntent, Codes.Routes.IMAGE_CAPTURE);
 	}
 	

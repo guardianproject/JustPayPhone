@@ -25,6 +25,7 @@ import info.guardianproject.justpayphone.app.views.DottedProgressView;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 import info.guardianproject.justpayphone.utils.Constants.App.Home;
+import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 import info.guardianproject.justpayphone.utils.Constants.Settings;
 
 
@@ -243,6 +244,19 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 		li = LayoutInflater.from(this);
 
+		// Any flags telling us to go somewhere?
+		if (getIntent().hasExtra(Extras.GO_TO_CALL_LAWYER))
+		{
+			boolean goToLawyer = getIntent().getBooleanExtra(Extras.GO_TO_CALL_LAWYER, false);
+			if (goToLawyer)
+			{
+				Log.d(LOG, "Got instruction to go to call lawyer page.");
+				currentFragment = callLawyerFragment;
+			}
+			getIntent().removeExtra(Extras.GO_TO_CALL_LAWYER);
+		}
+		
+		
 		if(currentFragment == null) {
 			viewPager.setCurrentItem(0);
 			currentFragment = fragments.get(0);
@@ -377,7 +391,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	@Override
 	public ILog getCurrentLog() {
 		if(currentLog == null) {
-			try {
+			try {				
 				long currentTime = informaCam.informaService.getCurrentTime();
 				currentLog = new ILog(informaCam.mediaManifest.getByDay(currentTime, MimeType.LOG, 1).get(0));
 				if(currentLog.endTime != 0) {

@@ -30,6 +30,7 @@ public class Constants {
 			public final static int ES = 2;
 		}
 		public static final String LAWYER_PHONE = "jpp_lawyer_phone";
+		public static final String GENERATED_PWD = "jpp_generated_pwd";
 	}
 	
 	public static class Forms {
@@ -64,6 +65,7 @@ public class Constants {
 			public static final String PERSISTENT_SERVICE = "persistentService";
 			public static final String IS_SIGNING_OUT = "isSigningOut";
 			public static final String PATH_TO_FILE = "pathToFile";
+			public static final String GO_TO_CALL_LAWYER = "goToCallLawyerScreen";
 		}
 	}
 	

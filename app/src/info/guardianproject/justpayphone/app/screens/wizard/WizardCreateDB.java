@@ -1,10 +1,16 @@
 package info.guardianproject.justpayphone.app.screens.wizard;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
+import info.guardianproject.justpayphone.utils.Constants.Settings;
 import info.guardianproject.justpayphone.utils.Constants.WizardActivityListener;
 import info.guardianproject.justpayphone.utils.UIHelpers;
 import info.guardianproject.justpayphone.R;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -48,6 +54,12 @@ public class WizardCreateDB extends Fragment implements OnClickListener
 		commit = (Button) rootView.findViewById(R.id.wizard_commit);
 		commit.setEnabled(false);
 		commit.setOnClickListener(this);
+		
+		// Auto generate passwords!
+		String pwd = autoGeneratePassword();
+		password.setText(pwd);
+		passwordAgain.setText(pwd);
+		
 		return rootView;
 	}
 
@@ -146,4 +158,17 @@ public class WizardCreateDB extends Fragment implements OnClickListener
 		public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
 	};
+	
+	private String autoGeneratePassword()
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(a.getBaseContext());
+		String generatedPwd = prefs.getString(Settings.GENERATED_PWD, null);
+		if (generatedPwd == null)
+		{
+			SecureRandom random = new SecureRandom();
+			generatedPwd = new BigInteger(130, random).toString(32);
+			prefs.edit().putString(Settings.GENERATED_PWD, generatedPwd).commit();
+		}
+		return generatedPwd;
+	}
 }

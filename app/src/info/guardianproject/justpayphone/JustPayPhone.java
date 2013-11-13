@@ -28,16 +28,21 @@ import info.guardianproject.justpayphone.app.WizardActivity;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.App.Home;
 import info.guardianproject.justpayphone.utils.Constants.Codes;
+import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
+import info.guardianproject.justpayphone.utils.Constants.Settings;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	Intent route;
@@ -91,8 +96,9 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 						routeCode = Codes.Routes.HOME;
 						break;
 					case org.witness.informacam.utils.Constants.Codes.Status.LOCKED:
-						route = new Intent(this, LoginActivity.class);
-						routeCode = Codes.Routes.LOGIN;
+						autoLogin();
+						//route = new Intent(this, LoginActivity.class);
+						//routeCode = Codes.Routes.LOGIN;
 						break;
 					}
 
@@ -126,8 +132,16 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	
 	private void routeByIntent() {
 		if (route != null)
-		{
+		{	
 			route.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			
+			// Any flags to forward?
+			if (getIntent().hasExtra(Extras.GO_TO_CALL_LAWYER))
+			{
+				route.putExtra(Extras.GO_TO_CALL_LAWYER, getIntent().getBooleanExtra(Extras.GO_TO_CALL_LAWYER, false));
+				getIntent().removeExtra(Extras.GO_TO_CALL_LAWYER);
+			}
+			
 			if(routeCode == Codes.Routes.FINISH_SAFELY) {
 				finish();
 				startActivity(route);
@@ -214,9 +228,10 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 			routeCode = Codes.Routes.WIZARD;
 			break;
 		case org.witness.informacam.utils.Constants.Codes.Messages.Login.DO_LOGIN:
-			route = new Intent(this, LoginActivity.class);
-			routeCode = Codes.Routes.LOGIN;
-			break;
+			//route = new Intent(this, LoginActivity.class);
+			//routeCode = Codes.Routes.LOGIN;
+			autoLogin();
+			return;
 		case org.witness.informacam.utils.Constants.Codes.Messages.Home.INIT:
 			route = new Intent(this, HomeActivity.class);
 			routeCode = Codes.Routes.HOME;
@@ -236,4 +251,20 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	@Override
 	public void onInformaStart(Intent intent) {
 	}	
+	
+	private void autoLogin()
+	{
+		mHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+				String generatedPwd = prefs.getString(Settings.GENERATED_PWD, null);
+				if (generatedPwd != null && informaCam.attemptLogin(generatedPwd)) {	
+				}
+				else {
+					Toast.makeText(JustPayPhone.this, getString(R.string.we_could_not_log), Toast.LENGTH_LONG).show();
+				}
+			}
+		});
+	}
 }

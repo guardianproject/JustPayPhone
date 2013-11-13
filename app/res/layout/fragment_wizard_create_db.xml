@@ -75,7 +75,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/password"
                     android:inputType="textPassword"
-                    android:maxLength="50" />
+                    android:maxLength="50"
+                    android:visibility="gone" />
 
                 <info.guardianproject.justpayphone.app.views.CustomFontEditText
                     android:id="@+id/user_password_again"
@@ -84,7 +85,9 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/password_again"
                     android:inputType="textPassword"
-                    android:maxLength="50" />
+                    android:maxLength="50"
+                    android:visibility="gone" />
+
             </LinearLayout>
 
             <Button
