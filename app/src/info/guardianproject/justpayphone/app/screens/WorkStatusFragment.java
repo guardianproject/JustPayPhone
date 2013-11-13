@@ -244,6 +244,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			log.startTime = currentTime;
 
 		timeWorked = (currentTime - log.startTime);
+		timeAtWork.setText(TimeUtility.millisecondsToTimestamp(timeWorked));
 
 		if(!timerIsRunning) {
 			t = new Timer();
@@ -296,7 +297,11 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 
 			ILog log = ((HomeActivityListener) a).getCurrentLog();
 			log.endTime = informaCam.informaService.getCurrentTime();
-
+			try {
+				log.put(Models.IMedia.ILog.IS_CLOSED, true);
+			} catch (JSONException e) {
+			}
+			
 			for(IForm form : FormUtility.getAvailableForms()) {
 				if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
 					info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(((HomeActivityListener) a).getCurrentLog().rootFolder, "form");
@@ -476,7 +481,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 
 			((HomeActivityListener) a).persistLog();
 
-			informaCam.stopInforma();
+			//informaCam.stopInforma();
 
 		} catch (FileNotFoundException e) {
 			Log.e(LOG, e.toString());
