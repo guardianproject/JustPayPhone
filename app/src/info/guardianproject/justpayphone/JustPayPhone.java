@@ -1,45 +1,23 @@
 package  info.guardianproject.justpayphone;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.UpdateManager;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.spongycastle.openpgp.PGPException;
 import org.witness.informacam.InformaCam;
-import org.witness.informacam.crypto.KeyUtility;
-import org.witness.informacam.models.organizations.IInstalledOrganizations;
-import org.witness.informacam.models.organizations.IOrganization;
-import org.witness.informacam.models.utils.ILanguageMap;
-import org.witness.informacam.storage.FormUtility;
-import org.witness.informacam.utils.Constants.Codes.Messages.Login;
-import org.witness.informacam.utils.Constants.IManifest;
-import org.witness.informacam.utils.Constants.App.Storage.Type;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 
 import info.guardianproject.justpayphone.app.HomeActivity;
 import info.guardianproject.justpayphone.app.KillScreen;
-import info.guardianproject.justpayphone.app.LoginActivity;
 import info.guardianproject.justpayphone.app.WizardActivity;
 import info.guardianproject.justpayphone.utils.Constants;
-import info.guardianproject.justpayphone.utils.Constants.App.Home;
 import info.guardianproject.justpayphone.utils.Constants.Codes;
 import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 import info.guardianproject.justpayphone.utils.Constants.Settings;
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -47,6 +25,8 @@ import android.widget.Toast;
 public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	Intent route;
 	int routeCode;
+	
+	public static final String HOCKEY_APP_ID = "c7e856fbe9d9bb27b1572f53bd9daf90";
 	
 	private InformaCam informaCam;
 	private Handler mHandler;
@@ -67,6 +47,8 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 		if(getIntent().hasExtra(Codes.Extras.CHANGE_LOCALE) && getIntent().getBooleanExtra(Codes.Extras.CHANGE_LOCALE, false)) {
 			onInformaCamStart(getIntent());
 		}
+		
+		checkForUpdates();
 	}
 	
 	@Override
@@ -113,6 +95,7 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 		} catch(NullPointerException e) {
 			Log.e(LOG, e.toString());
 		}
+		checkForCrashes();
 	}
 	
 	@Override
@@ -267,4 +250,14 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 			}
 		});
 	}
+	
+	private void checkForCrashes() {
+		CrashManager.register(this, HOCKEY_APP_ID);
+	}
+
+	private void checkForUpdates() {
+		// Remove this for store builds!
+		UpdateManager.register(this, HOCKEY_APP_ID);
+	}
+
 }

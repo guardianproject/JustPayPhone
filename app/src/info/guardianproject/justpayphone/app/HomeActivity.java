@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.UpdateManager;
+
 import org.json.JSONException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.media.ILog;
@@ -15,6 +18,7 @@ import org.witness.informacam.utils.Constants.App.Camera;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 
+import info.guardianproject.justpayphone.JustPayPhone;
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.screens.CallLawyerFragment;
 import info.guardianproject.justpayphone.app.screens.GalleryFragment;
@@ -104,6 +108,9 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		// XXX HEY! XXX!
 		//InformaCam.getInstance().mediaManifest.media.clear();
 		//InformaCam.getInstance().mediaManifest.save();
+		
+		checkForCrashes();
+		checkForUpdates();
 	}
 
 	@Override
@@ -432,5 +439,14 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	@Override
 	public void showNavigationDots(boolean show) {
 		progressDots.setVisibility(show ? View.VISIBLE : View.GONE);
+	}
+	
+	private void checkForCrashes() {
+		CrashManager.register(this, JustPayPhone.HOCKEY_APP_ID);
+	}
+
+	private void checkForUpdates() {
+		// Remove this for store builds!
+		UpdateManager.register(this, JustPayPhone.HOCKEY_APP_ID);
 	}
 }
