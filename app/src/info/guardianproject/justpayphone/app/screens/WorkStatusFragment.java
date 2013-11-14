@@ -1,44 +1,37 @@
 package info.guardianproject.justpayphone.app.screens;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.json.JSONException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.forms.IForm;
-import org.witness.informacam.models.j3m.IData;
-import org.witness.informacam.models.j3m.IRegionData;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.models.media.IRegion;
 import org.witness.informacam.storage.FormUtility;
-import org.witness.informacam.ui.CameraActivity;
 import org.witness.informacam.utils.Constants.App;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.Models;
-import org.witness.informacam.utils.Constants.App.Camera;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 import org.witness.informacam.utils.TimeUtility;
 
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.SelfieActivity;
-import info.guardianproject.justpayphone.app.popups.KeypadPopup;
 import info.guardianproject.justpayphone.utils.Constants.Forms;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
-import android.annotation.SuppressLint;
+import info.guardianproject.odkparser.utils.QD;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -151,17 +144,33 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		if (!hasBeenInited)
 		{
 			hasBeenInited = true;
-		boolean isAtWork = false;
-		if(((HomeActivityListener) a).getCurrentLog() != null && !((HomeActivityListener) a).getCurrentLog().has(Models.IMedia.ILog.IS_CLOSED)) {
-			informaCam.informaService.associateMedia(((HomeActivityListener) a).getCurrentLog());
-			isAtWork = true;
-		} else {
-			isAtWork = false;
-		}
-		setCurrentMode(isAtWork ? WorkStatusFragmentMode.Working : WorkStatusFragmentMode.Normal);
+			if(getCurrentLog() != null)
+			{
+				if (!getCurrentLog().has(Models.IMedia.ILog.IS_CLOSED)) {
+					informaCam.informaService.associateMedia(getCurrentLog());
+					setCurrentMode(WorkStatusFragmentMode.Working);
+				}
+				else if (!containsLunchInformation(getCurrentLog()))
+				{
+					informaCam.informaService.associateMedia(getCurrentLog());
+					setCurrentMode(WorkStatusFragmentMode.LunchForm);
+				}
+				else
+				{
+					setCurrentMode(WorkStatusFragmentMode.Normal);
+				}
+			}
+			else {
+				setCurrentMode(WorkStatusFragmentMode.Normal);
+			}
 		}
 	}
-
+	
+	private ILog getCurrentLog()
+	{
+		return ((HomeActivityListener)a).getCurrentLog();
+	}
+	
 	private void initLog() {
 		ILog iLog = new ILog();
 
@@ -279,7 +288,6 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onClick(View v) {
 		if (v == mBtnSignIn) {
@@ -294,42 +302,8 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			setCurrentMode(WorkStatusFragmentMode.SigningIn);
 		}
 		else if (v == mBtnSignOut) {
-
 			ILog log = ((HomeActivityListener) a).getCurrentLog();
 			log.endTime = informaCam.informaService.getCurrentTime();
-			try {
-				log.put(Models.IMedia.ILog.IS_CLOSED, true);
-			} catch (JSONException e) {
-			}
-			
-			for(IForm form : FormUtility.getAvailableForms()) {
-				if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
-					info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(((HomeActivityListener) a).getCurrentLog().rootFolder, "form");
-
-					mLunchForm = new IForm(form, a);
-					mLunchForm.answerPath = formContent.getAbsolutePath();
-					IRegion topRegion = log.getTopLevelRegion();
-					if (topRegion == null)
-						topRegion = log.addRegion(a, null);
-					topRegion.addForm(mLunchForm);
-
-					lunchTakenProxy = new RadioGroup(a);
-					lunchTakenProxyYes = new RadioButton(a);
-					lunchTakenProxyNo = new RadioButton(a);
-					lunchTakenProxy.addView(lunchTakenProxyYes);
-					lunchTakenProxy.addView(lunchTakenProxyNo);
-
-					lunchMinutesProxy = new EditText(a);
-					lunchMinutesProxy.setText(a.getString(R.string.x_minutes, 0));
-					
-					// attach elements to form
-					mLunchForm.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
-					mLunchForm.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
-
-					break;
-				}
-			}
-
 			setCurrentMode(WorkStatusFragmentMode.SigningOut);
 		} 
 	}
@@ -391,6 +365,14 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 					setCurrentMode(WorkStatusFragmentMode.Working);
 				}
 				else if (mCurrentMode == WorkStatusFragmentMode.SigningOut)
+				{	
+					// Save the log as closed
+					try {
+						((HomeActivityListener)a).getCurrentLog().put(Models.IMedia.ILog.IS_CLOSED, true);
+					} catch (JSONException e) {
+					}
+					((HomeActivityListener) a).persistLog();
+					
 					setCurrentMode(WorkStatusFragmentMode.LunchForm);
 				
 //				Log.d(LOG, "THIS RETURNS:\n" + data.getStringExtra(Codes.Extras.RETURNED_MEDIA));
@@ -410,7 +392,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 //				} catch(JSONException e) {
 //					Log.e(LOG, e.toString());
 //					e.printStackTrace();
-//				}
+				}
 				break;
 			}
 		}
@@ -419,6 +401,21 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	private View.OnClickListener mLunchButtonClickedListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
+			
+			lunchTakenProxy = new RadioGroup(a);
+			lunchTakenProxyYes = new RadioButton(a);
+			lunchTakenProxyNo = new RadioButton(a);
+			lunchTakenProxy.addView(lunchTakenProxyYes);
+			lunchTakenProxy.addView(lunchTakenProxyNo);
+
+			lunchMinutesProxy = new EditText(a);
+			lunchMinutesProxy.setText(a.getString(R.string.x_minutes, 0));
+			
+			mLunchForm = getLunchForm(getCurrentLog(), true);
+			
+			// attach elements to form	
+			mLunchForm.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
+			mLunchForm.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
 			
 			boolean lunchTaken = true;
 			int lunchMinutes = 0;
@@ -490,5 +487,45 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 
 		((HomeActivityListener) a).showLogView(true);
 		setCurrentMode(WorkStatusFragmentMode.Normal);
+	}
+	
+	private IForm getLunchForm(ILog iLog, boolean createIfNotFound)
+	{
+		List<IForm> forms = iLog.getForms(a);
+		for(IForm form : forms) {
+			if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
+				return form;
+			}
+		}
+		
+		if (createIfNotFound)
+		{
+			for(IForm form : FormUtility.getAvailableForms()) {
+				if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
+					info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(((HomeActivityListener) a).getCurrentLog().rootFolder, "form");
+
+					IForm lunchForm = new IForm(form, a);
+					lunchForm.answerPath = formContent.getAbsolutePath();
+					IRegion topRegion = iLog.getTopLevelRegion();
+					if (topRegion == null)
+						topRegion = iLog.addRegion(a, null);
+					topRegion.addForm(lunchForm);
+					return lunchForm;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private boolean containsLunchInformation(ILog iLog)
+	{
+		IForm form = getLunchForm(iLog, false);
+		if (form != null)
+		{
+			QD qdLunch = form.getQuestionDefByTitleId(Forms.LunchQuestionnaire.LUNCH_TAKEN);
+			if (qdLunch.hasInitialValue)
+				return true;
+		}
+		return false;
 	}
 }
