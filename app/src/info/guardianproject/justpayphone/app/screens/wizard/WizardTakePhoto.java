@@ -2,19 +2,15 @@ package info.guardianproject.justpayphone.app.screens.wizard;
 
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.utils.Constants.WizardActivityListener;
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class WizardTakePhoto extends Fragment implements OnClickListener
+public class WizardTakePhoto extends WizardFragmentBase implements OnClickListener
 {
-	View rootView;
-	Activity a;
 	private Button commit;
 
 	@Override
@@ -24,21 +20,17 @@ public class WizardTakePhoto extends Fragment implements OnClickListener
 	}
 
 	@Override
+	protected int getLayout() {
+		return R.layout.fragment_wizard_take_photo;
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater li, ViewGroup container, Bundle savedInstanceState)
 	{
 		super.onCreateView(li, container, savedInstanceState);
-		rootView = li.inflate(R.layout.fragment_wizard_take_photo, null);
-		
 		commit = (Button) rootView.findViewById(R.id.wizard_commit);
 		commit.setOnClickListener(this);
 		return rootView;
-	}
-
-	@Override
-	public void onAttach(Activity a)
-	{
-		super.onAttach(a);
-		this.a = a;
 	}
 	
 	@Override

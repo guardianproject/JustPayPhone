@@ -9,6 +9,7 @@ import info.guardianproject.justpayphone.app.screens.wizard.WizardWaitForKey;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.Settings;
 import info.guardianproject.justpayphone.utils.Constants.WizardActivityListener;
+import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,7 +27,6 @@ import org.witness.informacam.crypto.KeyUtility;
 import org.witness.informacam.models.organizations.IInstalledOrganizations;
 import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.storage.FormUtility;
-import org.witness.informacam.ui.SurfaceGrabberActivity;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.InformaCamEventListener;
 import org.witness.informacam.utils.Constants.App.Storage.Type;
@@ -47,6 +47,10 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class WizardActivity extends SherlockFragmentActivity implements WizardActivityListener, InformaCamEventListener
 {
+	private static final boolean COLLECT_USER_NAME_EMAIL = false;
+	private static final boolean COLLECT_LAWYER_INFORMATION = true;
+	private static final String HARDCODED_LAWYER_NUMBER = "";
+	
 	private InformaCam informaCam;
 	private WizardWaitForKey mWaitForKeyFragment;
 	private Handler mHandler;
@@ -110,14 +114,21 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 	@Override
 	public void onLanguageConfirmed()
 	{
-		Fragment step2 = Fragment.instantiate(this, WizardCreateDB.class.getName());
+		if (COLLECT_USER_NAME_EMAIL)
+		{
+			Fragment step2 = Fragment.instantiate(this, WizardCreateDB.class.getName(), createWizardStepArgumentBundle(1));
 
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_left, R.anim.slide_out_to_right);
-		ft.replace(R.id.wizard_holder, step2);
-		ft.addToBackStack(null);
-		ft.setTransitionStyle(2);
-		ft.commit();
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_left, R.anim.slide_out_to_right);
+			ft.replace(R.id.wizard_holder, step2);
+			ft.addToBackStack(null);
+			ft.setTransitionStyle(2);
+			ft.commit();
+		}
+		else
+		{
+			onUsernameCreated("", "", WizardCreateDB.autoGeneratePassword(this.getBaseContext()));
+		}
 	}
 
 	@Override
@@ -128,7 +139,7 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 			informaCam.user.put(IUser.EMAIL, email);
 			informaCam.user.put(IUser.PASSWORD, password);
 			
-			Fragment step3 = Fragment.instantiate(this, WizardTakePhoto.class.getName());
+			Fragment step3 = Fragment.instantiate(this, WizardTakePhoto.class.getName(), createWizardStepArgumentBundle(1 + (COLLECT_USER_NAME_EMAIL ? 1 : 0)));
 
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_left, R.anim.slide_out_to_right);
@@ -155,13 +166,20 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 			switch(requestCode) {
 			case Codes.Routes.IMAGE_CAPTURE:
 				
-				Fragment step4 = Fragment.instantiate(this, WizardLawyerInformation.class.getName());
+				if (COLLECT_LAWYER_INFORMATION)
+				{
+					Fragment step4 = Fragment.instantiate(this, WizardLawyerInformation.class.getName(), createWizardStepArgumentBundle(2 + (COLLECT_USER_NAME_EMAIL ? 1 : 0)));
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_left, R.anim.slide_out_to_right);
-				ft.replace(R.id.wizard_holder, step4);
-				ft.addToBackStack(null);
-				ft.commit();
+					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+					ft.setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_left, R.anim.slide_out_to_right);
+					ft.replace(R.id.wizard_holder, step4);
+					ft.addToBackStack(null);
+					ft.commit();
+				}
+				else
+				{
+					onLawyerInfoSet(HARDCODED_LAWYER_NUMBER);
+				}
 				break;
 			}
 		}
@@ -305,5 +323,16 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 			Log.e(LOG, e.toString());
 			e.printStackTrace();
 		}
+	}
+	
+	private Bundle createWizardStepArgumentBundle(int currentStep)
+	{
+		int totalSteps = 1 + (COLLECT_USER_NAME_EMAIL ? 1 : 0) + (COLLECT_LAWYER_INFORMATION ? 1 : 0);
+		Bundle args = new Bundle();
+		if (totalSteps > 1)
+			args.putString(Extras.WIZARD_STEP, getString(R.string.wizard_step_n_of_n, currentStep, totalSteps));
+		else
+			args.putString(Extras.WIZARD_STEP, ""); // "Step 1 of 1" looks kind of ridiculous
+		return args;
 	}
 }

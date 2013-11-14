@@ -7,11 +7,10 @@ import info.guardianproject.justpayphone.utils.Constants.Settings;
 import info.guardianproject.justpayphone.utils.Constants.WizardActivityListener;
 import info.guardianproject.justpayphone.utils.UIHelpers;
 import info.guardianproject.justpayphone.R;
-import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -21,10 +20,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class WizardCreateDB extends Fragment implements OnClickListener
+public class WizardCreateDB extends WizardFragmentBase implements OnClickListener
 {
-	View rootView;
-	Activity a;
 	private Button commit;
 	private EditText alias, email, password, passwordAgain;
 
@@ -35,10 +32,14 @@ public class WizardCreateDB extends Fragment implements OnClickListener
 	}
 
 	@Override
+	protected int getLayout() {
+		return R.layout.fragment_wizard_create_db;
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater li, ViewGroup container, Bundle savedInstanceState)
 	{
 		super.onCreateView(li, container, savedInstanceState);
-		rootView = li.inflate(R.layout.fragment_wizard_create_db, null);
 		
 		alias = (EditText) rootView.findViewById(R.id.user_name);
 		alias.addTextChangedListener(readAlias);
@@ -56,18 +57,11 @@ public class WizardCreateDB extends Fragment implements OnClickListener
 		commit.setOnClickListener(this);
 		
 		// Auto generate passwords!
-		String pwd = autoGeneratePassword();
+		String pwd = autoGeneratePassword(a.getBaseContext());
 		password.setText(pwd);
 		passwordAgain.setText(pwd);
 		
 		return rootView;
-	}
-
-	@Override
-	public void onAttach(Activity a)
-	{
-		super.onAttach(a);
-		this.a = a;
 	}
 
 	@Override
@@ -159,9 +153,9 @@ public class WizardCreateDB extends Fragment implements OnClickListener
 
 	};
 	
-	private String autoGeneratePassword()
+	public static String autoGeneratePassword(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(a.getBaseContext());
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String generatedPwd = prefs.getString(Settings.GENERATED_PWD, null);
 		if (generatedPwd == null)
 		{

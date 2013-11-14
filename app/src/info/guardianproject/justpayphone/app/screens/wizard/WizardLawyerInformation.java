@@ -2,9 +2,7 @@ package info.guardianproject.justpayphone.app.screens.wizard;
 import info.guardianproject.justpayphone.utils.Constants.WizardActivityListener;
 import info.guardianproject.justpayphone.utils.UIHelpers;
 import info.guardianproject.justpayphone.R;
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -14,10 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class WizardLawyerInformation extends Fragment implements OnClickListener
+public class WizardLawyerInformation extends WizardFragmentBase implements OnClickListener
 {
-	View rootView;
-	Activity a;
 	private Button commit;
 	private EditText number;
 
@@ -28,11 +24,15 @@ public class WizardLawyerInformation extends Fragment implements OnClickListener
 	}
 
 	@Override
+	protected int getLayout() {
+		return R.layout.fragment_wizard_lawyer_information;
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater li, ViewGroup container, Bundle savedInstanceState)
 	{
 		super.onCreateView(li, container, savedInstanceState);
-		rootView = li.inflate(R.layout.fragment_wizard_lawyer_information, null);
-		
+
 		number = (EditText) rootView.findViewById(R.id.lawyer_number);
 		number.addTextChangedListener(readNumber);
 		
@@ -40,13 +40,6 @@ public class WizardLawyerInformation extends Fragment implements OnClickListener
 		commit.setEnabled(false);
 		commit.setOnClickListener(this);
 		return rootView;
-	}
-
-	@Override
-	public void onAttach(Activity a)
-	{
-		super.onAttach(a);
-		this.a = a;
 	}
 
 	@Override

@@ -8,13 +8,11 @@ import info.guardianproject.justpayphone.utils.Constants.WizardActivityListener;
 import java.util.Locale;
 
 import org.witness.informacam.utils.Constants.Codes;
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,11 +23,8 @@ import android.widget.ListAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class WizardSelectLanguage extends Fragment implements OnClickListener, OnSelectionChangedListener
+public class WizardSelectLanguage extends WizardFragmentBase implements OnClickListener, OnSelectionChangedListener
 {
-	View rootView;
-	Activity a;
-
 	Spinner languageChoices;
 	Button commit;
 
@@ -48,10 +43,14 @@ public class WizardSelectLanguage extends Fragment implements OnClickListener, O
 	}
 
 	@Override
+	protected int getLayout() {
+		return R.layout.fragment_wizard_select_language;
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater li, ViewGroup container, Bundle savedInstanceState)
 	{
 		super.onCreateView(li, container, savedInstanceState);
-		rootView = li.inflate(R.layout.fragment_wizard_select_language, null);
 
 		mDropdownLanguage = (DropdownSpinner) rootView.findViewById(R.id.languagePopup);
 		mCodes = getResources().getStringArray(R.array.locales);
@@ -96,13 +95,6 @@ public class WizardSelectLanguage extends Fragment implements OnClickListener, O
 			}
 		}		
 		return false;
-	}
-	
-	@Override
-	public void onAttach(Activity a)
-	{
-		super.onAttach(a);
-		this.a = a;
 	}
 
 	private class LanguageListAdapter extends ArrayAdapter<String>
