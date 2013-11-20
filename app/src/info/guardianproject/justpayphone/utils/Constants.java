@@ -4,12 +4,22 @@ import org.witness.informacam.models.media.ILog;
 
 public class Constants {
 	
+	public interface WizardActivityListener {
+		public void onLanguageSelected(String language);
+		public void onLanguageConfirmed();
+		public void onUsernameCreated(String username, String email, String password);
+		public void onTakePhotoClicked();
+		public void onLawyerInfoSet(String phoneNumber);
+	}
+	
 	public interface HomeActivityListener {
 		public int[] getDimensions();
 		public ILog getCurrentLog();
 		public void setCurrentLog(ILog currentLog);
 		public void persistLog();
 		public boolean getInitFlag();
+		public void showLogView(boolean showBubble);
+		public void showNavigationDots(boolean show);
 	}
 	
 	public static class Settings {
@@ -19,6 +29,8 @@ public class Constants {
 			public final static int EN = 1;
 			public final static int ES = 2;
 		}
+		public static final String LAWYER_PHONE = "jpp_lawyer_phone";
+		public static final String GENERATED_PWD = "jpp_generated_pwd";
 	}
 	
 	public static class Forms {
@@ -51,6 +63,10 @@ public class Constants {
 			public static final String CHANGE_LOCALE = "changeLocale";
 			public static final String HAS_SEEN_HOME = "hasSeenHome";
 			public static final String PERSISTENT_SERVICE = "persistentService";
+			public static final String IS_SIGNING_OUT = "isSigningOut";
+			public static final String PATH_TO_FILE = "pathToFile";
+			public static final String WIZARD_STEP = "wizardStep";
+			public static final String GO_TO_CALL_LAWYER = "goToCallLawyerScreen";
 		}
 	}
 	

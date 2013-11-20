@@ -1,73 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/info.guardianproject.justpayphone"
     android:id="@+id/user_management_my_workplaces_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:background="#6C2841"
+    android:orientation="vertical"
+    android:paddingBottom="108dp" >
 
-    <TextView
-        android:id="@+id/gallery_label"
-        style="@style/h1"
+    <TableLayout
+        android:id="@+id/tableHeader"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/my_gallery" />
+        android:layout_height="124dp"
+        android:stretchColumns="0,1,2"
+        >
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <RelativeLayout
+                android:id="@+id/btnTimeDate"
+                android:layout_width="match_parent"
+                android:layout_height="124dp"
+                android:gravity="center" >
+
+                <ImageView
+                    android:id="@+id/ivTimeDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/ic_time_date" />
+
+                <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                    android:id="@+id/tvTimeDate"
+                    style="@style/jpp_h5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/ivTimeDate"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:text="@string/time_date" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/btnTimeWorked"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center" >
+
+                <ImageView
+                    android:id="@+id/ivTimeWorked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/ic_time_worked" />
+
+                <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                    android:id="@+id/tvTimeWorked"
+                    style="@style/jpp_h5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ivTimeWorked"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/time_work_hours" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/btnTimeLunch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center" >
+
+                <ImageView
+                    android:id="@+id/ivTimeLunch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/ic_time_lunch" />
+
+                <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                    android:id="@+id/tvTimeLunch"
+                    style="@style/jpp_h5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ivTimeLunch"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/time_lunch" />
+            </RelativeLayout>
+        </TableRow>
+    </TableLayout>
 
     <ListView
         android:id="@+id/my_workplaces_list_holder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/gallery_to_cameras"
-        android:layout_below="@+id/gallery_label" />
+        android:layout_below="@id/tableHeader"
+        android:divider="@null" />
 
-    <LinearLayout
-        android:id="@+id/gallery_to_cameras"
-        android:layout_width="wrap_content"
+    <info.guardianproject.justpayphone.app.views.BubbleView
+        android:id="@+id/bubbleView"
+        style="@style/jpp_h2"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:orientation="horizontal" >
-
-        <LinearLayout
-            android:id="@+id/gallery_to_camera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dip"
-            android:background="@drawable/extras_button_c_selector"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="4dip" >
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_camera" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/camera" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/gallery_to_camcorder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dip"
-            android:background="@drawable/extras_button_c_selector"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="4dip" >
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_video" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/camcorder" />
-        </LinearLayout>
-    </LinearLayout>
+        android:layout_alignTop="@id/my_workplaces_list_holder"
+        android:layout_marginTop="50dp"
+        android:background="@color/cream"
+        android:gravity="center"
+        android:paddingBottom="20dp"
+        android:paddingTop="40dp"
+        android:text="BubbleView"
+        android:textColor="@color/brown"
+        app:pointer_size="40dp" 
+        app:bubble_color="@color/cream"
+        />
 
 </RelativeLayout>

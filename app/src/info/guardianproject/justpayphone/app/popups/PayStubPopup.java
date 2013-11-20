@@ -55,6 +55,8 @@ public class PayStubPopup extends Popup implements OnClickListener {
 			workSummary = new JPPWorkSummary(new ILog(informaCam.mediaManifest.getByDay(currentTime, MimeType.LOG, 1).get(0)));
 		
 			setData();
+		} catch (IndexOutOfBoundsException e) {
+			showNoDataForDay();
 		} catch(NullPointerException e) {
 			showNoDataForDay();
 		}

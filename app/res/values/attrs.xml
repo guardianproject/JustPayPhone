@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:app="http://schemas.android.com/apk/res/info.guardianproject.justpayphone"> 
+
+    <attr name="asset_font" format="string" />
+    
+    <declare-styleable name="DottedProgressView">
+        <attr name="dot_distance" format="dimension" />
+        <attr name="dot_radius" format="dimension" />
+        <attr name="dot_color" format="color" />
+        <attr name="dot_rim_color" format="color" />
+        <attr name="dot_color_current" format="color" />
+        <attr name="dot_rim_color_current" format="color" />
+        <attr name="dot_total" format="integer" />
+    	<attr name="dot_current" format="integer" />
+    	<attr name="hide_if_only_one" format="boolean" defaultValue="true" />
+    	<attr name="android:gravity" />
+    </declare-styleable>
+    
+    <declare-styleable name="DropdownSpinner">
+        <attr name="dropdown_background" format="reference" />
+        <attr name="android:divider" />
+    </declare-styleable>
+    
+    <declare-styleable name="BubbleView">
+        <attr name="pointer_size" format="dimension" />
+        <attr name="bubble_color" format="color" />
+    </declare-styleable>
+    
+</resources>

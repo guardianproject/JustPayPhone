@@ -2,146 +2,259 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:background="#EC4136"
+    android:orientation="vertical"
+    android:weightSum="1" >
 
     <LinearLayout
+        android:id="@+id/llTopHalf"
         android:layout_width="match_parent"
-        android:layout_height="60dip"
-        android:layout_gravity="center_vertical"
-        android:layout_marginBottom="10dip"
-        android:orientation="horizontal"
-        android:weightSum="1" >
-
-        <ImageView
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_weight="0.15"
-            android:scaleType="centerInside"
-            android:src="@drawable/jpp_meal_icon" />
-
-        <TextView
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dip"
-            android:layout_weight="0.85"
-            android:gravity="center_vertical"
-            android:text="@string/did_you_stop_working" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/lunch_taken_choice_root"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1" >
-
-        <Button
-            android:id="@+id/lunch_taken_yes"
-            style="@style/jpp_button_b"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/yes" />
-
-        <Button
-            android:id="@+id/lunch_taken_no"
-            style="@style/jpp_button_b"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/no" />
-    </LinearLayout>
-
-    <RadioGroup
-        android:visibility="gone"
-        android:id="@+id/lunch_taken_proxy"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="30dip"
-        android:orientation="horizontal"
-        android:weightSum="1" >
-
-        <RadioButton
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5" />
-
-        <RadioButton
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5" />
-    </RadioGroup>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dip"
-        android:layout_gravity="center_vertical"
-        android:layout_marginBottom="10dip"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:weightSum="1" >
-
-        <ImageView
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_weight="0.15"
-            android:scaleType="centerInside"
-            android:src="@drawable/jpp_clock_icon" />
-
-        <TextView
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dip"
-            android:layout_weight="0.85"
-            android:gravity="center_vertical"
-            android:text="@string/how_many_minutes_did" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/lunch_minutes_choice_root"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0.5"
         android:orientation="vertical" >
 
-        <Button
-            style="@style/jpp_button_b"
+        <info.guardianproject.justpayphone.app.views.CustomFontTextView
+            style="@style/jpp_h2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/x_minutes" />
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="30dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/how_long_was_your_lunch_break" />
 
-        <Button
-            style="@style/jpp_button_b"
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/x_minutes" />
-
-        <Button
-            style="@style/jpp_button_b"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/x_minutes" />
-
-        <Button
-            style="@style/jpp_button_b"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/other_amount" />
+            android:layout_marginBottom="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:background="@drawable/black_border"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_pic_lunch" />
     </LinearLayout>
 
-    <EditText
-        android:visibility="gone"
-        android:id="@+id/lunch_minutes_proxy"
+    <ScrollView
+        android:id="@+id/svButtons"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dip"
-        android:editable="false" />
+        android:layout_height="match_parent"
+        android:layout_weight="0.5" >
 
-    <Button
-        android:id="@+id/odk_commit"
-        style="@style/jpp_button_a"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dip"
-        android:text="@string/ok" />
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="36dp"
+            android:stretchColumns="0,1,2" >
+
+            <TableRow
+                android:id="@+id/tableRow1"
+                android:background="@color/cream"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <RelativeLayout
+                    android:id="@+id/btnLunchNo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="1px"
+                    android:layout_marginTop="1px"
+                    android:background="@drawable/lunch_button_selector" >
+
+                    <ImageView
+                        android:id="@+id/ivLunchNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/ic_lunch_no" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunchNo"
+                        style="@style/lunch_h4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/ivLunchNo"
+                        android:layout_centerHorizontal="true"
+                        android:text="@string/lunch_no_lunch" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/btnLunch10"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="1px"
+                    android:layout_marginTop="1px"
+                    android:background="@drawable/lunch_button_selector" >
+
+                    <ImageView
+                        android:id="@+id/ivLunch10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/ic_lunch_10" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunch10"
+                        style="@style/jpp_h2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/ivLunch10"
+                        android:layout_centerHorizontal="true"
+                        android:text="10" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunch10min"
+                        style="@style/lunch_h4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvLunch10"
+                        android:layout_centerHorizontal="true"
+                        android:text="@string/lunch_min" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/btnLunch20"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1px"
+                    android:background="@drawable/lunch_button_selector" >
+
+                    <ImageView
+                        android:id="@+id/ivLunch20"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/ic_lunch_20" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunch20"
+                        style="@style/jpp_h2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/ivLunch20"
+                        android:layout_centerHorizontal="true"
+                        android:text="20" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunch20min"
+                        style="@style/lunch_h4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvLunch20"
+                        android:layout_centerHorizontal="true"
+                        android:text="@string/lunch_min" />
+                </RelativeLayout>
+            </TableRow>
+
+            <TableRow
+                android:id="@+id/tableRow2"
+                android:background="@color/cream"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <RelativeLayout
+                    android:id="@+id/btnLunch30"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="1px"
+                    android:layout_marginRight="1px"
+                    android:layout_marginTop="1px"
+                    android:background="@drawable/lunch_button_selector" >
+
+                    <ImageView
+                        android:id="@+id/ivLunch30"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/ic_lunch_30" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunch30"
+                        style="@style/jpp_h2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/ivLunch30"
+                        android:layout_centerHorizontal="true"
+                        android:text="30" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunch30min"
+                        style="@style/lunch_h4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvLunch30"
+                        android:layout_centerHorizontal="true"
+                        android:text="@string/lunch_min" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/btnLunch45"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="1px"
+                    android:layout_marginRight="1px"
+                    android:layout_marginTop="1px"
+                    android:background="@drawable/lunch_button_selector" >
+
+                    <ImageView
+                        android:id="@+id/ivLunch45"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/ic_lunch_45" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunch45"
+                        style="@style/jpp_h2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/ivLunch45"
+                        android:layout_centerHorizontal="true"
+                        android:text="45" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunch45min"
+                        style="@style/lunch_h4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvLunch45"
+                        android:layout_centerHorizontal="true"
+                        android:text="@string/lunch_min" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/btnLunch60"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="1px"
+                    android:layout_marginTop="1px"
+                    android:background="@drawable/lunch_button_selector" >
+
+                    <ImageView
+                        android:id="@+id/ivLunch60"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/ic_lunch_60" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunch60"
+                        style="@style/jpp_h2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/ivLunch60"
+                        android:layout_centerHorizontal="true"
+                        android:text="60" />
+
+                    <info.guardianproject.justpayphone.app.views.CustomFontTextView
+                        android:id="@+id/tvLunch60min"
+                        style="@style/lunch_h4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvLunch60"
+                        android:layout_centerHorizontal="true"
+                        android:text="@string/lunch_min" />
+                </RelativeLayout>
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -38,17 +38,18 @@ public class JPPWorkSummary extends Model {
 	}
 
 	public void setTimeForLunch() {
-		if(iLog != null) {
-			try {
-				timeForLunch = iLog.data.regionData.get(0).metadata.getInt(Forms.LunchQuestionnaire.LUNCH_MINUTES);
-			} catch (JSONException e) {
-				Log.e(LOG, e.toString());
-				e.printStackTrace();
-			} catch(NullPointerException e) {
-				Log.e(LOG, e.toString());
-				e.printStackTrace();
-			}
-		}
+		//TODO
+//		if(iLog != null) {
+//			try {
+//				timeForLunch = iLog.data.regionData.get(0).metadata.getInt(Forms.LunchQuestionnaire.LUNCH_MINUTES);
+//			} catch (JSONException e) {
+//				Log.e(LOG, e.toString());
+//				e.printStackTrace();
+//			} catch(NullPointerException e) {
+//				Log.e(LOG, e.toString());
+//				e.printStackTrace();
+//			}
+//		}
 	}
 
 	public void setWeeklyTotal() {
