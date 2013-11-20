@@ -24,13 +24,19 @@ import org.json.JSONTokener;
 import org.spongycastle.openpgp.PGPException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.crypto.KeyUtility;
+import org.witness.informacam.models.notifications.INotification;
 import org.witness.informacam.models.organizations.IInstalledOrganizations;
 import org.witness.informacam.models.organizations.IOrganization;
+import org.witness.informacam.models.transport.ITransportStub;
 import org.witness.informacam.storage.FormUtility;
+import org.witness.informacam.transport.TransportUtility;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.InformaCamEventListener;
+import org.witness.informacam.utils.Constants.Logger;
+import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.App.Storage.Type;
 import org.witness.informacam.utils.Constants.Models.IUser;
+import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -264,7 +270,6 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 							}
 							
 							installOrganization();
-							FormUtility.installIncludedForms(WizardActivity.this);
 							
 							// Tell others we are done!
 							Bundle data = new Bundle();
@@ -284,37 +289,24 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 	private void installOrganization() {
 		Log.d(LOG, "OK WIZARD COMPLETED!");
 		try {
-			if(getAssets().list("includedOrganizations").length > 0) {
-				List<IOrganization> includedOrganizations = new ArrayList<IOrganization>();
-				for(String organizationManifest : getAssets().list("includedOrganizations")) {
-					IOrganization organization = new IOrganization();
-					organization.inflate((JSONObject) new JSONTokener(
-							new String(
-									informaCam.ioService.getBytes(
-											("includedOrganizations/" + organizationManifest), 
-											Type.APPLICATION_ASSET)
-									)
-							).nextValue());
+			for(String s : informaCam.getAssets().list("includedOrganizations")) {
+				
+				InputStream ictdIS = informaCam.ioService.getStream("includedOrganizations/" + s, Type.APPLICATION_ASSET);
+				
+				byte[] ictdBytes = new byte[ictdIS.available()];
+				ictdIS.read(ictdBytes);
+				Logger.d(LOG, "NEW ICTD:\n" + new String(ictdBytes));
+				
+				IOrganization organization = informaCam.installICTD((JSONObject) new JSONTokener(new String(ictdBytes)).nextValue(), null, this);
+				if(organization != null && !informaCam.user.isInOfflineMode) {
+					INotification notification = new INotification(getResources().getString(R.string.key_sent), getResources().getString(R.string.you_have_sent_your_credentials_to_x, organization.organizationName), Models.INotification.Type.NEW_KEY);
+					notification.taskComplete = false;
+					informaCam.addNotification(notification, null);
 					
-					InputStream is = getResources().openRawResource(R.raw.glsp);
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					int size = 0;
-					byte[] buf = new byte[1024];
-					while((size = is.read(buf, 0, buf.length)) >= 0) {
-						baos.write(buf, 0, size);
-					}
-					is.close();
-					
-					info.guardianproject.iocipher.File publicKey = new info.guardianproject.iocipher.File("glsp.asc");
-					informaCam.ioService.saveBlob(baos.toByteArray(), publicKey);
-					
-					organization.publicKey = publicKey.getAbsolutePath();
-					includedOrganizations.add(organization);
+					ITransportStub transportStub = new ITransportStub(organization, notification);
+					transportStub.setAsset(IUser.PUBLIC_CREDENTIALS, IUser.PUBLIC_CREDENTIALS, MimeType.ZIP);
+					TransportUtility.initTransport(transportStub);
 				}
-
-				IInstalledOrganizations installedOrganizations = new IInstalledOrganizations();
-				installedOrganizations.organizations = includedOrganizations;
-				informaCam.saveState(installedOrganizations);
 			}
 		} catch(IOException e) {
 			Log.e(LOG, e.toString());
