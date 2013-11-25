@@ -1,19 +1,14 @@
 package info.guardianproject.justpayphone.utils;
 
-import org.witness.informacam.intake.BatchCompleteJob;
 import org.witness.informacam.intake.Intake;
 import org.witness.informacam.models.j3m.IDCIMEntry;
 import org.witness.informacam.utils.BackgroundProcessor;
+import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.Logger;
 
 import android.content.Intent;
 
 public class SelfieIntake extends Intake {
-	long timeOffset;
-	String[] cacheFiles;
-	String logParent;
-	IDCIMEntry entry;
-	
 	public SelfieIntake() {
 		super();
 	}
@@ -23,8 +18,12 @@ public class SelfieIntake extends Intake {
 		Logger.d(LOG, "onHandleIntent called");
 
 		queue = new BackgroundProcessor();
-		queue.setOnBatchComplete(new BatchCompleteJob(queue));
 		new Thread(queue).start();
+		
+		long timeOffset = intent.getLongExtra(Codes.Extras.TIME_OFFSET, 0L);
+		String[] cacheFiles = intent.getStringArrayExtra(Codes.Extras.INFORMA_CACHE);
+		String logParent = intent.getStringExtra(Codes.Extras.MEDIA_PARENT);
+		IDCIMEntry entry = (IDCIMEntry) intent.getSerializableExtra(Codes.Extras.RETURNED_MEDIA);
 		
 		queue.add(new SelfieEntryJob(queue, entry, logParent, cacheFiles, timeOffset));
 		queue.numProcessing++;
