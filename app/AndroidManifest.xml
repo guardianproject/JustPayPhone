@@ -158,6 +158,10 @@
             android:enabled="true"
             android:exported="false" />
         <service
+            android:name="info.guardianproject.justpayphone.utils.SelfieIntake"
+            android:enabled="true"
+            android:exported="false" />
+        <service
             android:name="info.guardianproject.cacheword.CacheWordService"
             android:enabled="true"
             android:exported="false" />

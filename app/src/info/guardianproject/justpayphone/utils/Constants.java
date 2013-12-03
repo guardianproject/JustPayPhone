@@ -65,6 +65,7 @@ public class Constants {
 			public static final String PERSISTENT_SERVICE = "persistentService";
 			public static final String IS_SIGNING_OUT = "isSigningOut";
 			public static final String PATH_TO_FILE = "pathToFile";
+			public static final String FILE_PREFIX = "filePrefix";
 			public static final String WIZARD_STEP = "wizardStep";
 			public static final String GO_TO_CALL_LAWYER = "goToCallLawyerScreen";
 		}

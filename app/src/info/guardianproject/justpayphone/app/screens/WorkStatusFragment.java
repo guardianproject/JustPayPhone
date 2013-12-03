@@ -221,6 +221,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		}
 		else if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
 		{
+			initLog(); // Create the log (need this for parent of selfie)
 			getSelfie(true);
 		}
 		else if (mCurrentMode == WorkStatusFragmentMode.Working)
@@ -293,7 +294,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		if (v == mBtnSignIn) {
 			
 			HomeActivityListener hal = (HomeActivityListener) a;
-			if (hal.getCurrentLog() != null && hal.getCurrentLog().optBoolean(Models.IMedia.ILog.IS_CLOSED, false))
+			if (hal.getCurrentLog() != null && hal.getCurrentLog().startTime != 0 && hal.getCurrentLog().optBoolean(Models.IMedia.ILog.IS_CLOSED, false))
 			{
 				// Already log in progress
 				Toast.makeText(a, getString(R.string.you_have_already_logged), Toast.LENGTH_LONG).show();
@@ -339,6 +340,11 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		Intent surfaceGrabberIntent = new Intent(a, SelfieActivity.class);
 		if (!signingIn)
 			surfaceGrabberIntent.putExtra(info.guardianproject.justpayphone.utils.Constants.Codes.Extras.IS_SIGNING_OUT, true);
+		surfaceGrabberIntent.putExtra(Codes.Extras.MEDIA_PARENT, getCurrentLog()._id);
+
+		String filePrefix = (signingIn ? "sign_in" : "sign_out");
+		surfaceGrabberIntent.putExtra(info.guardianproject.justpayphone.utils.Constants.Codes.Extras.FILE_PREFIX, filePrefix);
+			
 		startActivityForResult(surfaceGrabberIntent, Codes.Routes.IMAGE_CAPTURE);
 	}
 
@@ -361,7 +367,6 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 				
 				if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
 				{
-					initLog();
 					setCurrentMode(WorkStatusFragmentMode.Working);
 				}
 				else if (mCurrentMode == WorkStatusFragmentMode.SigningOut)
