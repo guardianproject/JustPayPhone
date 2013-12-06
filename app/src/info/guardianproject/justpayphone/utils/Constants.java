@@ -1,5 +1,6 @@
 package info.guardianproject.justpayphone.utils;
 
+import org.witness.informacam.models.forms.IForm;
 import org.witness.informacam.models.media.ILog;
 
 public class Constants {
@@ -16,6 +17,9 @@ public class Constants {
 		public int[] getDimensions();
 		public ILog getCurrentLog();
 		public void setCurrentLog(ILog currentLog);
+		public IForm getLunchForm(ILog log, boolean createIfNotFound);
+		public boolean containsLunchInformation(ILog log);
+		public void checkAndSendLogIfComplete(ILog log);
 		public void persistLog();
 		public boolean getInitFlag();
 		public void showLogView(boolean showBubble);
@@ -65,9 +69,17 @@ public class Constants {
 			public static final String PERSISTENT_SERVICE = "persistentService";
 			public static final String IS_SIGNING_OUT = "isSigningOut";
 			public static final String PATH_TO_FILE = "pathToFile";
-			public static final String FILE_PREFIX = "filePrefix";
 			public static final String WIZARD_STEP = "wizardStep";
 			public static final String GO_TO_CALL_LAWYER = "goToCallLawyerScreen";
+		}
+	}
+	
+	public class Models {
+		public class IMedia {
+			public class ILog {
+				public final static String SIGN_IN_FILE = "signInFile";
+				public final static String SIGN_OUT_FILE = "signOutFile";
+			}
 		}
 	}
 	
