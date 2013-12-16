@@ -31,10 +31,6 @@ public class SelfieEntryJob extends EntryJob {
 	protected void onStop() {
 		super.onStop();
 		
-		// Remove the temp file
-		File file = new File(mTempFile);
-		file.delete();
-		
 		Bundle data = new Bundle();
 		data.putInt(Codes.Extras.MESSAGE_CODE, Codes.Messages.DCIM.ADD);
 		data.putString(Codes.Extras.MEDIA_PARENT, mParentId);
@@ -46,6 +42,10 @@ public class SelfieEntryJob extends EntryJob {
 		if (mListener != null) {
 			mListener.onUpdate(message);
 		}
+		
+		// Remove the temp file
+		File file = new File(mTempFile);
+		file.delete();
 	}
 
 	@Override

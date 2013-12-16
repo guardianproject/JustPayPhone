@@ -501,36 +501,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			return false;
 		}
 		
-		InformaCam informaCam;
-		File tempFile = new File(filePath);
-				
-		informaCam = InformaCam.getInstance();
-		long timeOffset = informaCam.informaService.getTimeOffset();
-			
-		IDCIMEntry entry = new IDCIMEntry();
-		entry.fileName = tempFile.getAbsolutePath();
-		entry.timeCaptured = System.currentTimeMillis()
-						+ timeOffset;
-		entry.uri = Uri.fromFile(tempFile).toString();
-		entry.name = tempFile.getName();
-		entry.authority = ContentResolver.SCHEME_FILE;
-		entry.mediaType = Models.IMedia.MimeType.IMAGE;
-					
-		// inflate exif values
-		entry.exif = new IExif();
-
-		// make a new entry job
-		Intent selfieIntake = new Intent(informaCam, SelfieIntake.class);
-
-		// put extras: timeOffset, caches, logId, entry
-		List<String> cacheFiles = informaCam.informaService.getCacheFiles();
-		selfieIntake.putExtra(Codes.Extras.INFORMA_CACHE, cacheFiles.toArray(new String[cacheFiles.size()]));
-		selfieIntake.putExtra(Codes.Extras.TIME_OFFSET, timeOffset);
-		selfieIntake.putExtra(Codes.Extras.MEDIA_PARENT, getCurrentLog()._id);
-		selfieIntake.putExtra(Codes.Extras.RETURNED_MEDIA, entry);
-
-		InformaCam.getInstance().startService(selfieIntake);
+		SelfieIntake.processFile(filePath, getCurrentLog()._id);
 		return true;
-
 	}
 }
