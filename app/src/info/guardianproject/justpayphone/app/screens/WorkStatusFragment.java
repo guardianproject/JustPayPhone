@@ -303,12 +303,13 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		if (v == mBtnSignIn) {
 			
 			HomeActivityListener hal = (HomeActivityListener) a;
-			if (hal.getCurrentLog() != null && hal.getCurrentLog().startTime != 0 && hal.getCurrentLog().optBoolean(Models.IMedia.ILog.IS_CLOSED, false))
-			{
-				// Already log in progress
-				Toast.makeText(a, getString(R.string.you_have_already_logged), Toast.LENGTH_LONG).show();
-				return;
-			}
+// Uncomment this to only allow one log per day!
+//			if (hal.getCurrentLog() != null && hal.getCurrentLog().startTime != 0 && hal.getCurrentLog().optBoolean(Models.IMedia.ILog.IS_CLOSED, false))
+//			{
+//				// Already log in progress
+//				Toast.makeText(a, getString(R.string.you_have_already_logged), Toast.LENGTH_LONG).show();
+//				return;
+//			}
 			setCurrentMode(WorkStatusFragmentMode.SigningIn);
 		}
 		else if (v == mBtnSignOut) {
