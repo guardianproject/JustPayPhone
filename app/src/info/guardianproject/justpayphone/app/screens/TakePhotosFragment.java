@@ -9,6 +9,8 @@ import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.CameraActivity;
 import info.guardianproject.justpayphone.app.SelfieActivity;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
+import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
+import info.guardianproject.justpayphone.utils.SelfieIntake;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -85,6 +87,10 @@ public class TakePhotosFragment extends Fragment implements OnClickListener, Inf
 		if(resultCode == Activity.RESULT_OK) {
 			switch(requestCode) {
 			case Codes.Routes.IMAGE_CAPTURE:
+
+				String filePath = data.getStringExtra(Extras.PATH_TO_FILE);
+				SelfieIntake.processFile(filePath, ((HomeActivityListener) a).getCurrentLog()._id);
+				
 				break;
 			}
 		}

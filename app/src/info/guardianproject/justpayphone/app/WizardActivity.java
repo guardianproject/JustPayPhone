@@ -144,6 +144,7 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 			informaCam.user.put(IUser.ALIAS, username);
 			informaCam.user.put(IUser.EMAIL, email);
 			informaCam.user.put(IUser.PASSWORD, password);
+			informaCam.user.isInOfflineMode = false;
 			
 			Fragment step3 = Fragment.instantiate(this, WizardTakePhoto.class.getName(), createWizardStepArgumentBundle(1 + (COLLECT_USER_NAME_EMAIL ? 1 : 0)));
 
@@ -306,6 +307,8 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 					ITransportStub transportStub = new ITransportStub(organization, notification);
 					transportStub.setAsset(IUser.PUBLIC_CREDENTIALS, IUser.PUBLIC_CREDENTIALS, MimeType.ZIP);
 					TransportUtility.initTransport(transportStub);
+				} else {
+					Logger.d(LOG, "USER IS PROBABLY IN OFFLINE MODE");
 				}
 			}
 		} catch(IOException e) {

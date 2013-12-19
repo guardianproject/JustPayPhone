@@ -1,5 +1,7 @@
 package info.guardianproject.justpayphone.app;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -10,9 +12,14 @@ import net.hockeyapp.android.UpdateManager;
 
 import org.json.JSONException;
 import org.witness.informacam.InformaCam;
+import org.witness.informacam.models.forms.IForm;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.models.media.IMedia;
+import org.witness.informacam.models.media.IRegion;
+import org.witness.informacam.models.notifications.INotification;
+import org.witness.informacam.storage.FormUtility;
 import org.witness.informacam.utils.Constants.Codes;
+import org.witness.informacam.utils.Constants.InformaCamEventListener;
 import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.App.Camera;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
@@ -30,15 +37,21 @@ import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 import info.guardianproject.justpayphone.utils.Constants.App.Home;
 import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
+import info.guardianproject.justpayphone.utils.Constants.Forms;
 import info.guardianproject.justpayphone.utils.Constants.Settings;
+import info.guardianproject.odkparser.utils.QD;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.os.MessageQueue.IdleHandler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -54,13 +67,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TabHost;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.TextView;
 
-public class HomeActivity extends FragmentActivity implements HomeActivityListener, InformaCamStatusListener {
+public class HomeActivity extends FragmentActivity implements HomeActivityListener, InformaCamStatusListener, InformaCamEventListener {
 	private final static String LOG = Constants.App.Home.LOG;
 	private String lastLocale;
 
@@ -118,6 +127,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		super.onResume();
 		
 		informaCam.setStatusListener(this);
+		informaCam.setEventListener(this);
 		
 		String currentLocale = PreferenceManager.getDefaultSharedPreferences(this).getString(Settings.LANGUAGE, "0");
 		if(!lastLocale.equals(currentLocale)) {
@@ -398,7 +408,14 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	@Override
 	public ILog getCurrentLog() {
 		if(currentLog == null) {
-			try {				
+			try {	
+				// Debug code to delete all old logs on startup
+//				@SuppressWarnings("unchecked")
+//				List<IMedia> media = informaCam.mediaManifest.getAllByType(MimeType.LOG);
+//				for (IMedia m : media)
+//				{
+//					informaCam.mediaManifest.removeMediaItem(m);
+//				}
 				long currentTime = informaCam.informaService.getCurrentTime();
 				currentLog = new ILog(informaCam.mediaManifest.getByDay(currentTime, MimeType.LOG, 1).get(0));
 				if(currentLog.endTime != 0) {
@@ -448,5 +465,172 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	private void checkForUpdates() {
 		// Remove this for store builds!
 		UpdateManager.register(this, JustPayPhone.HOCKEY_APP_ID);
+	}
+
+	@Override
+	public void onUpdate(Message message) {
+		int code = message.getData().getInt(Codes.Extras.MESSAGE_CODE);
+		if (code == Codes.Messages.DCIM.ADD)
+		{
+			String logId = message.getData().getString(Codes.Extras.MEDIA_PARENT);
+			String filePath = message.getData().getString(info.guardianproject.justpayphone.utils.Constants.Codes.Extras.PATH_TO_FILE);
+			if (logId != null && filePath != null)
+			{
+				ILog log = (ILog) informaCam.mediaManifest.getById(logId);
+				if (log != null)
+				{
+					h.post(new Runnable()
+					{
+						private ILog log;
+						private String filePath;
+
+						public Runnable init(ILog log, String filePath)
+						{
+							this.log = log;
+							this.filePath = filePath;
+							return this;
+						}
+						
+						@Override
+						public void run() {
+							String signInFile = log.optString(info.guardianproject.justpayphone.utils.Constants.Models.IMedia.ILog.SIGN_IN_FILE, null);
+							String signOutFile = log.optString(info.guardianproject.justpayphone.utils.Constants.Models.IMedia.ILog.SIGN_OUT_FILE, null);
+							
+							if (signInFile != null && signInFile.equals(filePath))
+								log.remove(info.guardianproject.justpayphone.utils.Constants.Models.IMedia.ILog.SIGN_IN_FILE);
+							else if (signOutFile != null && signOutFile.equals(filePath))
+								log.remove(info.guardianproject.justpayphone.utils.Constants.Models.IMedia.ILog.SIGN_OUT_FILE);
+							log.save();
+							checkAndSendLogIfComplete(log);
+						}
+						
+					}.init(log, filePath));
+				}
+			}
+		}
+	}
+	
+	public IForm getLunchForm(ILog iLog, boolean createIfNotFound)
+	{
+		List<IForm> forms = iLog.getForms(this);
+		for(IForm form : forms) {
+			if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
+				return form;
+			}
+		}
+		
+		if (createIfNotFound)
+		{
+			for(IForm form : FormUtility.getAvailableForms()) {
+				if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
+					info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(getCurrentLog().rootFolder, "form");
+
+					IForm lunchForm = new IForm(form, this);
+					lunchForm.answerPath = formContent.getAbsolutePath();
+					IRegion topRegion = iLog.getTopLevelRegion();
+					if (topRegion == null)
+						topRegion = iLog.addRegion(this, null);
+					topRegion.addForm(lunchForm);
+					return lunchForm;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public boolean containsLunchInformation(ILog iLog)
+	{
+		IForm form = getLunchForm(iLog, false);
+		if (form != null)
+		{
+			QD qdLunch = form.getQuestionDefByTitleId(Forms.LunchQuestionnaire.LUNCH_TAKEN);
+			if (qdLunch.hasInitialValue)
+				return true;
+		}
+		return false;
+	}
+	
+	public void checkAndSendLogIfComplete(ILog log)
+	{
+		Log.d(LOG, "Checking log " + (log == null ? "null" : log._id) + " for completion");
+		if (log != null && log.startTime != 0 && log.endTime != 0)
+		{
+			Log.d(LOG, "Log " + log._id + ": start and end set");
+			boolean isClosed = log.optBoolean(Models.IMedia.ILog.IS_CLOSED, false);
+			String signInFile = log.optString(info.guardianproject.justpayphone.utils.Constants.Models.IMedia.ILog.SIGN_IN_FILE, null);
+			String signOutFile = log.optString(info.guardianproject.justpayphone.utils.Constants.Models.IMedia.ILog.SIGN_OUT_FILE, null);
+			if (isClosed && signInFile == null && signOutFile == null)
+			{
+				Log.d(LOG, "Log " + log._id + ": is closed and all files processed");
+				if (containsLunchInformation(log))
+				{
+					Log.d(LOG, "Log " + log._id + ": lunch information stored");				
+					new Thread(new Runnable() {
+						ILog log;
+
+						public Runnable init(ILog log)
+						{
+							this.log = log;
+							return this;
+						}
+						
+						@SuppressLint("HandlerLeak")
+						@Override
+						public void run() {
+							Looper.prepare();
+							
+							Handler handler = new Handler() {
+								
+								private INotification mNotification;
+
+								@Override
+								public void handleMessage(Message msg) {
+									super.handleMessage(msg);
+									if (msg.what == 0)
+									{
+										try
+										{
+											if (log.export(HomeActivity.this, h, informaCam.installedOrganizations.getByName("GLSP"), false))
+											{
+												// Find the notification to wait on
+												List<INotification> notifications = new ArrayList<INotification>(informaCam.notificationsManifest.sortBy(Models.INotificationManifest.Sort.DATE_DESC));
+												if (notifications != null)
+												{
+													for (INotification notification : notifications)
+													{
+														if (notification.mediaId != null && notification.mediaId.equals(log._id))
+														{
+															mNotification = notification;
+															this.sendEmptyMessageDelayed(1, 1000);
+														}
+													}
+												};
+											}
+										} catch (FileNotFoundException e) {
+											e.printStackTrace();
+										}
+									}
+									else if (msg.what == 1)
+									{
+										// Wait for completion.
+										if (!mNotification.taskComplete && !mNotification.canRetry)
+										{
+											this.sendEmptyMessageDelayed(1, 1000);
+										}
+										else
+										{
+											Looper.myLooper().quit();
+										}
+									}
+								}
+							};
+							
+							handler.sendEmptyMessage(0);
+							Looper.loop();
+						}
+					}.init(log)).start();
+				}
+			}
+		}
 	}
 }

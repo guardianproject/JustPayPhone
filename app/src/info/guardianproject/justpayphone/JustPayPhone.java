@@ -197,7 +197,7 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 		
 		switch(code) {
 		case org.witness.informacam.utils.Constants.Codes.Messages.Wizard.INIT:
-			informaCam.user.isInOfflineMode = true;
+			//informaCam.user.isInOfflineMode = true;
 			
 			route = new Intent(this, WizardActivity.class);
 			

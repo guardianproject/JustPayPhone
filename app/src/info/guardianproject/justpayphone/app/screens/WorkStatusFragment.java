@@ -1,6 +1,8 @@
 package info.guardianproject.justpayphone.app.screens;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -8,6 +10,8 @@ import java.util.TimerTask;
 import org.json.JSONException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.forms.IForm;
+import org.witness.informacam.models.j3m.IDCIMEntry;
+import org.witness.informacam.models.j3m.IExif;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.models.media.IRegion;
 import org.witness.informacam.storage.FormUtility;
@@ -19,11 +23,16 @@ import org.witness.informacam.utils.TimeUtility;
 
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.SelfieActivity;
+import info.guardianproject.justpayphone.utils.Constants;
+import info.guardianproject.justpayphone.utils.SelfieIntake;
 import info.guardianproject.justpayphone.utils.Constants.Forms;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
+import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 import info.guardianproject.odkparser.utils.QD;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -141,7 +150,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		if (waiter != null)
 			waiter.setVisibility(View.GONE);
 		
-		if (!hasBeenInited)
+		if (!hasBeenInited && a != null)
 		{
 			hasBeenInited = true;
 			if(getCurrentLog() != null)
@@ -150,7 +159,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 					informaCam.informaService.associateMedia(getCurrentLog());
 					setCurrentMode(WorkStatusFragmentMode.Working);
 				}
-				else if (!containsLunchInformation(getCurrentLog()))
+				else if (!((HomeActivityListener)a).containsLunchInformation(getCurrentLog()))
 				{
 					informaCam.informaService.associateMedia(getCurrentLog());
 					setCurrentMode(WorkStatusFragmentMode.LunchForm);
@@ -221,6 +230,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		}
 		else if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
 		{
+			initLog(); // Create the log (need this for parent of selfie)
 			getSelfie(true);
 		}
 		else if (mCurrentMode == WorkStatusFragmentMode.Working)
@@ -293,12 +303,13 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		if (v == mBtnSignIn) {
 			
 			HomeActivityListener hal = (HomeActivityListener) a;
-			if (hal.getCurrentLog() != null && hal.getCurrentLog().optBoolean(Models.IMedia.ILog.IS_CLOSED, false))
-			{
-				// Already log in progress
-				Toast.makeText(a, getString(R.string.you_have_already_logged), Toast.LENGTH_LONG).show();
-				return;
-			}
+// Uncomment this to only allow one log per day!
+//			if (hal.getCurrentLog() != null && hal.getCurrentLog().startTime != 0 && hal.getCurrentLog().optBoolean(Models.IMedia.ILog.IS_CLOSED, false))
+//			{
+//				// Already log in progress
+//				Toast.makeText(a, getString(R.string.you_have_already_logged), Toast.LENGTH_LONG).show();
+//				return;
+//			}
 			setCurrentMode(WorkStatusFragmentMode.SigningIn);
 		}
 		else if (v == mBtnSignOut) {
@@ -339,6 +350,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		Intent surfaceGrabberIntent = new Intent(a, SelfieActivity.class);
 		if (!signingIn)
 			surfaceGrabberIntent.putExtra(info.guardianproject.justpayphone.utils.Constants.Codes.Extras.IS_SIGNING_OUT, true);
+		surfaceGrabberIntent.putExtra(Codes.Extras.MEDIA_PARENT, getCurrentLog()._id);
 		startActivityForResult(surfaceGrabberIntent, Codes.Routes.IMAGE_CAPTURE);
 	}
 
@@ -358,40 +370,32 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		else if(resultCode == Activity.RESULT_OK) {
 			switch(requestCode) {
 			case Codes.Routes.IMAGE_CAPTURE:
+
+				String filePath = data.getStringExtra(Extras.PATH_TO_FILE);
 				
 				if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
 				{
-					initLog();
-					setCurrentMode(WorkStatusFragmentMode.Working);
+					boolean startedProcessing = storeAndProcessSelfie(Constants.Models.IMedia.ILog.SIGN_IN_FILE, filePath);
+					if (startedProcessing)
+					{
+						((HomeActivityListener) a).persistLog();
+						setCurrentMode(WorkStatusFragmentMode.Working);
+					}
 				}
 				else if (mCurrentMode == WorkStatusFragmentMode.SigningOut)
 				{	
-					// Save the log as closed
-					try {
-						((HomeActivityListener)a).getCurrentLog().put(Models.IMedia.ILog.IS_CLOSED, true);
-					} catch (JSONException e) {
-					}
-					((HomeActivityListener) a).persistLog();
+					boolean startedProcessing = storeAndProcessSelfie(Constants.Models.IMedia.ILog.SIGN_OUT_FILE, filePath);
+					if (startedProcessing)
+					{
+						// Save the log as closed
+						try {
+							((HomeActivityListener)a).getCurrentLog().put(Models.IMedia.ILog.IS_CLOSED, true);
+						} catch (JSONException e) {
+						}
+						((HomeActivityListener) a).persistLog();
 					
-					setCurrentMode(WorkStatusFragmentMode.LunchForm);
-				
-//				Log.d(LOG, "THIS RETURNS:\n" + data.getStringExtra(Codes.Extras.RETURNED_MEDIA));
-//				try {
-//					JSONArray returnedMedia = ((JSONObject) new JSONTokener(data.getStringExtra(Codes.Extras.RETURNED_MEDIA)).nextValue()).getJSONArray("dcimEntries");
-//
-//					// add to current log's attached media
-//					IMedia m = new IMedia();
-//					m.inflate(returnedMedia.getJSONObject(0));
-//						
-//					((HomeActivityListener) a).getCurrentLog().attachedMedia.add(m._id);
-//					((HomeActivityListener) a).persistLog();
-//						
-//					// update UI
-//					//updateWorkspaces();
-//						
-//				} catch(JSONException e) {
-//					Log.e(LOG, e.toString());
-//					e.printStackTrace();
+						setCurrentMode(WorkStatusFragmentMode.LunchForm);
+					}
 				}
 				break;
 			}
@@ -411,7 +415,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			lunchMinutesProxy = new EditText(a);
 			lunchMinutesProxy.setText(a.getString(R.string.x_minutes, 0));
 			
-			mLunchForm = getLunchForm(getCurrentLog(), true);
+			mLunchForm = ((HomeActivityListener)a).getLunchForm(getCurrentLog(), true);
 			
 			// attach elements to form	
 			mLunchForm.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
@@ -477,7 +481,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 //			((HomeActivityListener) a).getCurrentLog().data.userAppendedData.add(regionData);
 
 			((HomeActivityListener) a).persistLog();
-
+			((HomeActivityListener) a).checkAndSendLogIfComplete(getCurrentLog());
 			//informaCam.stopInforma();
 
 		} catch (FileNotFoundException e) {
@@ -488,44 +492,17 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		((HomeActivityListener) a).showLogView(true);
 		setCurrentMode(WorkStatusFragmentMode.Normal);
 	}
-	
-	private IForm getLunchForm(ILog iLog, boolean createIfNotFound)
+		
+	private boolean storeAndProcessSelfie(String name, final String filePath)
 	{
-		List<IForm> forms = iLog.getForms(a);
-		for(IForm form : forms) {
-			if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
-				return form;
-			}
+		try {
+			getCurrentLog().put(name, filePath);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return false;
 		}
 		
-		if (createIfNotFound)
-		{
-			for(IForm form : FormUtility.getAvailableForms()) {
-				if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
-					info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(((HomeActivityListener) a).getCurrentLog().rootFolder, "form");
-
-					IForm lunchForm = new IForm(form, a);
-					lunchForm.answerPath = formContent.getAbsolutePath();
-					IRegion topRegion = iLog.getTopLevelRegion();
-					if (topRegion == null)
-						topRegion = iLog.addRegion(a, null);
-					topRegion.addForm(lunchForm);
-					return lunchForm;
-				}
-			}
-		}
-		return null;
-	}
-	
-	private boolean containsLunchInformation(ILog iLog)
-	{
-		IForm form = getLunchForm(iLog, false);
-		if (form != null)
-		{
-			QD qdLunch = form.getQuestionDefByTitleId(Forms.LunchQuestionnaire.LUNCH_TAKEN);
-			if (qdLunch.hasInitialValue)
-				return true;
-		}
-		return false;
+		SelfieIntake.processFile(filePath, getCurrentLog()._id);
+		return true;
 	}
 }
