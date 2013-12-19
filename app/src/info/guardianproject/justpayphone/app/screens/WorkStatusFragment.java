@@ -150,7 +150,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 		if (waiter != null)
 			waiter.setVisibility(View.GONE);
 		
-		if (!hasBeenInited)
+		if (!hasBeenInited && a != null)
 		{
 			hasBeenInited = true;
 			if(getCurrentLog() != null)

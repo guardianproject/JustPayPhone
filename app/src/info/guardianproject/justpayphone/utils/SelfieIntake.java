@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import org.witness.informacam.InformaCam;
+import org.witness.informacam.intake.BatchCompleteJob;
 import org.witness.informacam.intake.Intake;
 import org.witness.informacam.models.j3m.IDCIMEntry;
 import org.witness.informacam.models.j3m.IExif;
@@ -26,6 +27,7 @@ public class SelfieIntake extends Intake {
 		Logger.d(LOG, "onHandleIntent called");
 
 		queue = new BackgroundProcessor();
+		queue.setOnBatchComplete(new BatchCompleteJob(queue));
 		new Thread(queue).start();
 		
 		long timeOffset = intent.getLongExtra(Codes.Extras.TIME_OFFSET, 0L);
@@ -71,5 +73,5 @@ public class SelfieIntake extends Intake {
 		selfieIntake.putExtra(Codes.Extras.RETURNED_MEDIA, entry);
 
 		informaCam.startService(selfieIntake);
-	}
+	}	
 }
