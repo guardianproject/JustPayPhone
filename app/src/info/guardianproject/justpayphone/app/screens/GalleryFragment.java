@@ -36,7 +36,9 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AbsListView;
@@ -46,7 +48,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class GalleryFragment extends Fragment implements OnClickListener, OnScrollListener {
+public class GalleryFragment extends Fragment implements OnClickListener, OnScrollListener, OnTouchListener {
 	View rootView;
 	Activity a;
 	InformaCam informaCam = InformaCam.getInstance();
@@ -75,11 +77,13 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 
 		iLogList = (ListView) rootView.findViewById(R.id.my_workplaces_list_holder);
 		iLogList.setOnScrollListener(this);
-		
+		iLogList.setOnTouchListener(this);
 		tvHeaderDate = (TextView) rootView.findViewById(R.id.tvTimeDate);
 		
 		bubbleView = (BubbleView) rootView.findViewById(R.id.bubbleView);
 		bubbleView.setVisibility(View.GONE);
+		bubbleView.setOnTouchListener(this);
+		rootView.setOnTouchListener(this);
 		
 		return rootView;
 	}
@@ -93,6 +97,11 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		updateList();
+	}
+	
+	public void updateList()
+	{
 		h.post(new Runnable()
 		{
 			@Override
@@ -139,7 +148,6 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 			bubbleView.setVisibility(View.VISIBLE);
 		else
 			bubbleView.setVisibility(View.GONE);
-		mHighlightFirstLog = false;
 	}
 
 	public void setHighlightFirstLog(boolean highlight)
@@ -243,4 +251,16 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 		}
 	}
 
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		if (event.getAction() == MotionEvent.ACTION_DOWN && mHighlightFirstLog)
+		{
+			mHighlightFirstLog = false;
+			bubbleView.setVisibility(View.GONE);
+		}
+		return false;
+	}
+
+	
+	
 }
