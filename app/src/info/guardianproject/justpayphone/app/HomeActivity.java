@@ -20,6 +20,7 @@ import org.witness.informacam.models.notifications.INotification;
 import org.witness.informacam.storage.FormUtility;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.InformaCamEventListener;
+import org.witness.informacam.utils.Constants.ListAdapterListener;
 import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.App.Camera;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
@@ -564,73 +565,108 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 				Log.d(LOG, "Log " + log._id + ": is closed and all files processed");
 				if (containsLunchInformation(log))
 				{
-					Log.d(LOG, "Log " + log._id + ": lunch information stored");				
-					new Thread(new Runnable() {
-						ILog log;
-
-						public Runnable init(ILog log)
-						{
-							this.log = log;
-							return this;
-						}
-						
-						@SuppressLint("HandlerLeak")
-						@Override
-						public void run() {
-							Looper.prepare();
-							
-							Handler handler = new Handler() {
-								
-								private INotification mNotification;
-
-								@Override
-								public void handleMessage(Message msg) {
-									super.handleMessage(msg);
-									if (msg.what == 0)
-									{
-										try
-										{
-											if (log.export(HomeActivity.this, h, informaCam.installedOrganizations.getByName("GLSP"), false))
-											{
-												// Find the notification to wait on
-												List<INotification> notifications = new ArrayList<INotification>(informaCam.notificationsManifest.sortBy(Models.INotificationManifest.Sort.DATE_DESC));
-												if (notifications != null)
-												{
-													for (INotification notification : notifications)
-													{
-														if (notification.mediaId != null && notification.mediaId.equals(log._id))
-														{
-															mNotification = notification;
-															this.sendEmptyMessageDelayed(1, 1000);
-														}
-													}
-												};
-											}
-										} catch (FileNotFoundException e) {
-											e.printStackTrace();
-										}
-									}
-									else if (msg.what == 1)
-									{
-										// Wait for completion.
-										if (!mNotification.taskComplete && !mNotification.canRetry)
-										{
-											this.sendEmptyMessageDelayed(1, 1000);
-										}
-										else
-										{
-											Looper.myLooper().quit();
-										}
-									}
-								}
-							};
-							
-							handler.sendEmptyMessage(0);
-							Looper.loop();
-						}
-					}.init(log)).start();
+					Log.d(LOG, "Log " + log._id + ": lunch information stored");
+					sendLog(log);
 				}
 			}
 		}
+	}
+	
+	public void sendLog(ILog log) {
+		new Thread(new Runnable() {
+			ILog log;
+
+			public Runnable init(ILog log) {
+				this.log = log;
+				return this;
+			}
+
+			@SuppressLint("HandlerLeak")
+			@Override
+			public void run() {
+				Looper.prepare();
+
+				Handler handler = new Handler() {
+
+					private INotification mPreviousTry;
+					private INotification mNotification;
+
+					@Override
+					public void handleMessage(Message msg) {
+						super.handleMessage(msg);
+						if (msg.what == 0) {
+							try {
+								mPreviousTry = findNotification();
+								if (log.export(HomeActivity.this, h,
+										informaCam.installedOrganizations
+												.getByName("GLSP"), false)) {
+									this.sendEmptyMessageDelayed(1, 1000);
+								}
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+							}
+						} else if (msg.what == 1) {
+							// Wait for completion.
+							INotification n = getNotification();
+							if (n == null || (!n.taskComplete && !n.canRetry)) {
+								this.sendEmptyMessageDelayed(1, 1000);
+							} else {
+								// Update the list!
+								h.post(new Runnable() {
+									@Override
+									public void run() {
+										galleryFragment.updateList();
+									}
+								});
+
+								Looper.myLooper().quit();
+							}
+						}
+					}
+
+					private INotification getNotification() {
+						if (mNotification == null) {
+							// Find the notification to wait on
+							List<INotification> notifications = new ArrayList<INotification>(
+									informaCam.notificationsManifest
+											.sortBy(Models.INotificationManifest.Sort.DATE_DESC));
+							if (notifications != null) {
+								for (INotification notification : notifications) {
+									if (notification.mediaId != null
+											&& notification.mediaId
+													.equals(log._id)) {
+										if (mPreviousTry == null
+												|| !mPreviousTry._id
+														.equals(notification._id))
+											mNotification = notification;
+										break;
+									}
+								}
+							}
+						}
+						return mNotification;
+					}
+
+					private INotification findNotification() {
+						// Find the notification to wait on
+						List<INotification> notifications = new ArrayList<INotification>(
+								informaCam.notificationsManifest
+										.sortBy(Models.INotificationManifest.Sort.DATE_DESC));
+						if (notifications != null) {
+							for (INotification notification : notifications) {
+								if (notification.mediaId != null
+										&& notification.mediaId.equals(log._id)) {
+									return notification;
+								}
+							}
+						}
+						return null;
+					}
+				};
+
+				handler.sendEmptyMessage(0);
+				Looper.loop();
+			}
+		}.init(log)).start();
 	}
 }

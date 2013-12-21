@@ -7,8 +7,10 @@ import info.guardianproject.justpayphone.utils.Constants.Forms;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 import info.guardianproject.odkparser.utils.QD;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -18,13 +20,16 @@ import org.witness.informacam.models.forms.IForm;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.models.media.IMedia;
 import org.witness.informacam.models.media.IRegion;
+import org.witness.informacam.models.notifications.INotification;
 import org.witness.informacam.storage.FormUtility;
+import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.App.Storage.Type;
 import org.witness.informacam.utils.TimeUtility;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,10 +41,12 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ILogGallery extends BaseAdapter {
 	InformaCam informaCam;
 	List<ILog> iLogs;
+	ArrayList<ILog> retrySend;
 	Activity a;
 	private RadioGroup lunchTakenProxy;
 	private RadioButton lunchTakenProxyYes;
@@ -60,6 +67,29 @@ public class ILogGallery extends BaseAdapter {
 		lunchTakenProxy.addView(lunchTakenProxyNo);
 		lunchMinutesProxy = new EditText(a);
 		lunchMinutesProxy.setText(a.getString(R.string.x_minutes, 0));
+		
+		// TODO - add this to a separate thread!
+		retrySend = new ArrayList<ILog>();
+		List<INotification> notifications = new ArrayList<INotification>(informaCam.notificationsManifest.sortBy(Models.INotificationManifest.Sort.DATE_DESC));
+		HashMap<String, INotification> mediaIdMap = new HashMap<String, INotification>();
+		if (notifications != null)
+		{
+			for (INotification notification : notifications)
+			{
+				if (!TextUtils.isEmpty(notification.mediaId) && !mediaIdMap.containsKey(notification.mediaId))
+					mediaIdMap.put(notification.mediaId, notification);
+			}
+			
+			for (ILog log : iLogs)
+			{
+				if (mediaIdMap.containsKey(log._id))
+				{
+					INotification n = mediaIdMap.get(log._id);
+					if (n.canRetry)
+						retrySend.add(log);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -112,6 +142,17 @@ public class ILogGallery extends BaseAdapter {
 	
 		TextView tv = (TextView) convertView.findViewById(R.id.tvTimeDate);
 		
+		if (retrySend.contains(iLog))
+		{
+			tv.setBackgroundColor(a.getResources().getColor(R.color.send_failed_background));
+			tv.setOnClickListener(new LogClickedListener(iLog));
+		}
+		else
+		{
+			tv.setBackgroundResource(0);
+			tv.setOnClickListener(null);
+		}
+		
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(iLog.startTime);
 		
@@ -157,4 +198,26 @@ public class ILogGallery extends BaseAdapter {
 		return lunchTaken;
 	}
 	
+	private class LogClickedListener implements View.OnClickListener
+	{
+		private ILog mLog;
+
+		public LogClickedListener(ILog log)
+		{
+			mLog = log;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			if (a != null && a instanceof HomeActivityListener)
+			{
+				if (retrySend.contains(mLog))
+					retrySend.remove(mLog);
+				ILogGallery.this.notifyDataSetChanged();
+				Toast.makeText(a, "Sending...", Toast.LENGTH_LONG).show();
+				((HomeActivityListener)a).sendLog(mLog);
+			}
+		}
+		
+	}
 }

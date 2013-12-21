@@ -22,4 +22,6 @@
     <color name="wizard_button">#FFf78f20</color>
     <color name="wizard_button_semi">#FF885927</color>
     <color name="wizard_button_disabled">#FFA7A9AC</color>
+    
+    <color name="send_failed_background">#FFFFE43A</color>
 </resources>

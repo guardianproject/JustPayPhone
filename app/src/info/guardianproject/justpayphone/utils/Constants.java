@@ -20,6 +20,7 @@ public class Constants {
 		public IForm getLunchForm(ILog log, boolean createIfNotFound);
 		public boolean containsLunchInformation(ILog log);
 		public void checkAndSendLogIfComplete(ILog log);
+		public void sendLog(ILog log);
 		public void persistLog();
 		public boolean getInitFlag();
 		public void showLogView(boolean showBubble);
