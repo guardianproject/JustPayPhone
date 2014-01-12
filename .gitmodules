@@ -1,6 +1,7 @@
 [submodule "external/InformaCam"]
 	path = external/InformaCam
 	url = https://github.com/guardianproject/InformaCam.git
+	ignore = dirty
 [submodule "external/ActionBarSherlock"]
 	path = external/ActionBarSherlock
 	url = https://github.com/JakeWharton/ActionBarSherlock.git

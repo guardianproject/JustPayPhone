@@ -1,22 +1,16 @@
 package info.guardianproject.justpayphone.app.screens;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.json.JSONException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.forms.IForm;
-import org.witness.informacam.models.j3m.IDCIMEntry;
-import org.witness.informacam.models.j3m.IExif;
 import org.witness.informacam.models.media.ILog;
-import org.witness.informacam.models.media.IRegion;
-import org.witness.informacam.storage.FormUtility;
 import org.witness.informacam.utils.Constants.App;
 import org.witness.informacam.utils.Constants.Codes;
+import org.witness.informacam.utils.Constants.Logger;
 import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 import org.witness.informacam.utils.TimeUtility;
@@ -28,11 +22,8 @@ import info.guardianproject.justpayphone.utils.SelfieIntake;
 import info.guardianproject.justpayphone.utils.Constants.Forms;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
-import info.guardianproject.odkparser.utils.QD;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -47,7 +38,6 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class WorkStatusFragment extends Fragment implements OnClickListener, InformaCamStatusListener {
 	View rootView;
@@ -249,6 +239,9 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			mWorkSignInView.setVisibility(View.GONE);
 			mWorkSignOutView.setVisibility(View.GONE);
 			mWorkLunchView.setVisibility(View.VISIBLE);
+			
+			Logger.d(LOG, "I'M PRETTY SURE I STOP INFORMA NOW>>>");
+			informaCam.informaService.stopAllSuckers();
 		}
 	}
 	
@@ -326,19 +319,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	public void onInformaCamStop(Intent intent) {}
 
 	@Override
-	public void onInformaStop(Intent intent) {
-//		if(((HomeActivityListener) a).getCurrentLog() != null) {
-//			Log.d(LOG, "LOG IS NOW: " + ((HomeActivityListener) a).getCurrentLog().asJson().toString());
-//			((HomeActivityListener) a).getCurrentLog().export(new Handler() {
-//				@Override
-//				public void handleMessage(Message msg) {
-//					Log.d(LOG, "MSG DATA: " + msg.getData().toString());
-//				}
-//			}, null, true);
-//
-//			((HomeActivityListener) a).setCurrentLog(null);
-//		}
-	}
+	public void onInformaStop(Intent intent) {}
 
 	@Override
 	public void onInformaStart(Intent intent) {
@@ -347,23 +328,42 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	
 	private void getSelfie(boolean signingIn)
 	{
+		informaCam.informaService.startAllSuckers();
+		
 		Intent surfaceGrabberIntent = new Intent(a, SelfieActivity.class);
 		if (!signingIn)
 			surfaceGrabberIntent.putExtra(info.guardianproject.justpayphone.utils.Constants.Codes.Extras.IS_SIGNING_OUT, true);
 		surfaceGrabberIntent.putExtra(Codes.Extras.MEDIA_PARENT, getCurrentLog()._id);
 		startActivityForResult(surfaceGrabberIntent, Codes.Routes.IMAGE_CAPTURE);
 	}
+	
+	private void manageCron() {
+		// attach/remove cron job
+		if(this.mCurrentMode == WorkStatusFragmentMode.SigningIn) {
+			// XXX: you can set the cron interval by passing a value (in minutes).  ie: informaCam.startCron(2);
+			// by default, the interval is 45 minutes.
+			informaCam.startCron();
+		} else if(mCurrentMode == WorkStatusFragmentMode.SigningOut) {
+			informaCam.stopCron();
+		}
+	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		
+		informaCam.informaService.stopAllSuckers();
+		manageCron();
+		
 		if (resultCode == Activity.RESULT_CANCELED) {
 			switch(requestCode) {
 			case Codes.Routes.IMAGE_CAPTURE:
 				if (mCurrentMode == WorkStatusFragmentMode.SigningIn)
 					setCurrentMode(WorkStatusFragmentMode.Normal);
+				
 				else if (mCurrentMode == WorkStatusFragmentMode.SigningOut)
 					setCurrentMode(WorkStatusFragmentMode.Working);
+
 				break;
 			}
 		}
@@ -397,6 +397,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 						setCurrentMode(WorkStatusFragmentMode.LunchForm);
 					}
 				}
+				
 				break;
 			}
 		}

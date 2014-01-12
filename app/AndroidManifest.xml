@@ -154,6 +154,10 @@
             android:enabled="true"
             android:exported="false" />
         <service
+            android:name="org.witness.informacam.informa.Cron"
+            android:enabled="true"
+            android:exported="false" />
+        <service
             android:name="org.witness.informacam.intake.Intake"
             android:enabled="true"
             android:exported="false" />
