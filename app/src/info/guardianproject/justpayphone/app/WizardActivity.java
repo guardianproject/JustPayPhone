@@ -38,7 +38,10 @@ import org.witness.informacam.utils.Constants.App.Storage.Type;
 import org.witness.informacam.utils.Constants.Models.IUser;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -48,6 +51,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
@@ -133,8 +137,22 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 		}
 		else
 		{
-			onUsernameCreated("", "", WizardCreateDB.autoGeneratePassword(this.getBaseContext()));
+			onUsernameCreated(getTelephoneNumber(), getEmailAddress(), WizardCreateDB.autoGeneratePassword(this.getBaseContext()));
 		}
+	}
+	
+	private String getTelephoneNumber() {
+		TelephonyManager tm = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+		String phone_number = tm.getLine1Number();
+		
+		return phone_number == null ? "" : phone_number;
+	}
+	
+	private String getEmailAddress() {
+		Account account = AccountManager.get(this).getAccounts()[0];
+		String email_address = account.name;
+		
+		return email_address == null ? "" : email_address;
 	}
 
 	@Override
