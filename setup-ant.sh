@@ -12,6 +12,5 @@ cp external/InformaCam/libs/android-support-v4.jar external/InformaCam/external/
 cp external/InformaCam/libs/android-support-v4.jar external/InformaCam/external/CacheWord/cachewordlib/libs/android-support-v4.jar
 cp external/InformaCam/libs/android-support-v4.jar external/ActionBarSherlock/actionbarsherlock/libs/android-support-v4.jar
 
-cp external/InformaCam/libs/iocipher.jar
-cp external/InformaCam/external/CacheWord/cachewordlib/libs/iocipher.jar
+cp external/InformaCam/libs/iocipher.jar external/InformaCam/external/CacheWord/cachewordlib/libs/iocipher.jar
 
