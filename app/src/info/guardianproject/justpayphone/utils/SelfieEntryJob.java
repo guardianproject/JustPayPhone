@@ -23,7 +23,7 @@ public class SelfieEntryJob extends EntryJob {
 
 	public SelfieEntryJob(BackgroundProcessor backgroundProcessor, IDCIMEntry entry, String parentId, String[] informaCache, long timeOffset) {
 		super(backgroundProcessor, entry, parentId, informaCache, timeOffset);
-		mTempFile = entry.fileName;
+		mTempFile = entry.fileAsset.path;
 		mParentId = parentId;
 	}
 	

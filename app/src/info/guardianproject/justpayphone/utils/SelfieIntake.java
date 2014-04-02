@@ -8,6 +8,7 @@ import org.witness.informacam.intake.BatchCompleteJob;
 import org.witness.informacam.intake.Intake;
 import org.witness.informacam.models.j3m.IDCIMEntry;
 import org.witness.informacam.models.j3m.IExif;
+import org.witness.informacam.models.media.IAsset;
 import org.witness.informacam.utils.BackgroundProcessor;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.Logger;
@@ -38,8 +39,6 @@ public class SelfieIntake extends Intake {
 		queue.add(new SelfieEntryJob(queue, entry, logParent, cacheFiles, timeOffset));
 		queue.numProcessing++;
 		queue.stop();
-		
-		
 	}
 	
 	public static void processFile(String filePath, String parent)
@@ -51,11 +50,14 @@ public class SelfieIntake extends Intake {
 		long timeOffset = informaCam.informaService.getTimeOffset();
 			
 		IDCIMEntry entry = new IDCIMEntry();
-		entry.fileName = tempFile.getAbsolutePath();
+		IAsset fileAsset = new IAsset(tempFile.getAbsolutePath());
+		fileAsset.name = tempFile.getName();
+		
+		entry.fileAsset = fileAsset;
 		entry.timeCaptured = System.currentTimeMillis()
 						+ timeOffset;
 		entry.uri = Uri.fromFile(tempFile).toString();
-		entry.name = tempFile.getName();
+		
 		entry.authority = ContentResolver.SCHEME_FILE;
 		entry.mediaType = Models.IMedia.MimeType.IMAGE;
 					
