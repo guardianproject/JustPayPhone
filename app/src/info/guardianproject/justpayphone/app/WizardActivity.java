@@ -323,7 +323,7 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 					informaCam.addNotification(notification, null);
 					
 					ITransportStub transportStub = new ITransportStub(organization, notification);
-					transportStub.setAsset(IUser.PUBLIC_CREDENTIALS, IUser.PUBLIC_CREDENTIALS, MimeType.ZIP);
+					transportStub.setAsset(IUser.PUBLIC_CREDENTIALS, IUser.PUBLIC_CREDENTIALS, MimeType.ZIP, Type.IOCIPHER);
 					TransportUtility.initTransport(transportStub);
 				} else {
 					Logger.d(LOG, "USER IS PROBABLY IN OFFLINE MODE");
