@@ -1,7 +1,5 @@
 package info.guardianproject.justpayphone.utils;
 
-import java.io.File;
-
 import org.witness.informacam.intake.EntryJob;
 import org.witness.informacam.models.j3m.IDCIMEntry;
 import org.witness.informacam.utils.BackgroundProcessor;
@@ -42,10 +40,6 @@ public class SelfieEntryJob extends EntryJob {
 		if (mListener != null) {
 			mListener.onUpdate(message);
 		}
-		
-		// Remove the temp file
-		File file = new File(mTempFile);
-		file.delete();
 	}
 
 	@Override

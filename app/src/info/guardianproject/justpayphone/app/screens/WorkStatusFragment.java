@@ -482,7 +482,18 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 //			((HomeActivityListener) a).getCurrentLog().data.userAppendedData.add(regionData);
 
 			((HomeActivityListener) a).persistLog();
-			((HomeActivityListener) a).checkAndSendLogIfComplete(getCurrentLog());
+			Logger.d(LOG, "FIRST, LET'S WAIT 15 SECONDS BEFORE SENDING OFF");
+			(new Handler()).postDelayed(new Runnable() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					Logger.d(LOG, "NOW I WILL SEND LOG OFF");
+					((HomeActivityListener) a).checkAndSendLogIfComplete(getCurrentLog());
+				}
+				
+			}, 1000 * 15);
+			
 			//informaCam.stopInforma();
 
 		} catch (FileNotFoundException e) {

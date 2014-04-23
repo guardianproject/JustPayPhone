@@ -6,7 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
+
+import org.witness.informacam.InformaCam;
+import org.witness.informacam.storage.IOUtility;
 import org.witness.informacam.ui.SurfaceGrabberActivity;
+import org.witness.informacam.utils.Constants.App;
+import org.witness.informacam.utils.Constants.Logger;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.hardware.Camera;
@@ -15,7 +21,8 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 public class SelfieActivity extends SurfaceGrabberActivity {
-
+	private final static String LOG = App.LOG;
+	
 	public SelfieActivity() {
 		super();
 	}
@@ -41,16 +48,12 @@ public class SelfieActivity extends SurfaceGrabberActivity {
 	}
 
 	@Override
-	public void onPictureTaken(final byte[] data, Camera camera) {
-		
-		File outputDir = getCacheDir(); // context being the Activity pointer
+	public void onPictureTaken(final byte[] data, Camera camera) {		
 		File tempFile;
 		try {
-			tempFile = File.createTempFile("selfie", ".jpg", outputDir);
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tempFile));
-			bos.write(data);
-			bos.flush();
-			bos.close();
+			tempFile = new File(IOUtility.buildPublicPath(new String[] { System.currentTimeMillis() + "_selfie.jpg" }));
+			InformaCam.getInstance().ioService.saveBlob(data, tempFile, true);
+			Logger.d(LOG, "NEW SELFIE AT : " + tempFile.getAbsolutePath());
 			setResult(Activity.RESULT_OK, new Intent().putExtra(Extras.PATH_TO_FILE, tempFile.getAbsolutePath()));
 			finish();
 		} catch (IOException e) {

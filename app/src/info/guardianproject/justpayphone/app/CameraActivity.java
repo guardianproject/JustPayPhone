@@ -10,7 +10,11 @@ import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.utils.Constants.Codes;
 import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 
+import org.witness.informacam.InformaCam;
+import org.witness.informacam.storage.IOUtility;
 import org.witness.informacam.ui.SurfaceGrabberActivity;
+import org.witness.informacam.utils.Constants.App;
+import org.witness.informacam.utils.Constants.Logger;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -28,6 +32,8 @@ public class CameraActivity extends SurfaceGrabberActivity {
 	private View mBtnRedo;
 	private byte[] mData;
 	private View mBtnTake;
+	
+	private final static String LOG = App.LOG;
 
 	public CameraActivity() {
 		super();
@@ -77,14 +83,11 @@ public class CameraActivity extends SurfaceGrabberActivity {
 		{
 			if (mData != null)
 			{
-				File outputDir = getCacheDir(); // context being the Activity pointer
 				File tempFile;
 				try {
-					tempFile = File.createTempFile("image", ".jpg", outputDir);
-					BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tempFile));
-					bos.write(mData);
-					bos.flush();
-					bos.close();
+					tempFile = new File(IOUtility.buildPublicPath(new String[] { System.currentTimeMillis() + "_img.jpg" }));
+					InformaCam.getInstance().ioService.saveBlob(mData, tempFile, true);
+					Logger.d(LOG, "NEW IMAGE AT : " + tempFile.getAbsolutePath());
 					setResult(Activity.RESULT_OK, new Intent().putExtra(Extras.PATH_TO_FILE, tempFile.getAbsolutePath()));
 				} catch (IOException e) {
 					e.printStackTrace();
