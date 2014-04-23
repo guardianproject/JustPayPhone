@@ -295,8 +295,8 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	public void onClick(View v) {
 		if (v == mBtnSignIn) {
 			
-			HomeActivityListener hal = (HomeActivityListener) a;
 // Uncomment this to only allow one log per day!
+//			HomeActivityListener hal = (HomeActivityListener) a;
 //			if (hal.getCurrentLog() != null && hal.getCurrentLog().startTime != 0 && hal.getCurrentLog().optBoolean(Models.IMedia.ILog.IS_CLOSED, false))
 //			{
 //				// Already log in progress
