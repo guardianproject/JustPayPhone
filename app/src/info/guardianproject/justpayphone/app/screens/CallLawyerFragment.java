@@ -2,8 +2,10 @@ package info.guardianproject.justpayphone.app.screens;
 
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.utils.Constants.App;
+import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.app.popups.ExportAllPopup;
 import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 import info.guardianproject.justpayphone.utils.Constants.Settings;
 import android.app.Activity;
@@ -12,6 +14,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.telephony.PhoneStateListener;
@@ -29,6 +32,7 @@ public class CallLawyerFragment extends Fragment implements OnClickListener, Inf
 	InformaCam informaCam = null;
 	private View mBtnAdmin;
 	private View mBtnCallLawyer;
+	private View mBtnExportPaystubs;
 	private EndCallListener mCallListener;
 	
 	private final static String LOG = App.LOG;
@@ -48,6 +52,8 @@ public class CallLawyerFragment extends Fragment implements OnClickListener, Inf
 		mBtnAdmin.setOnClickListener(this);
 		mBtnCallLawyer = rootView.findViewById(R.id.btnCallLawyer);
 		mBtnCallLawyer.setOnClickListener(this);
+		mBtnExportPaystubs = rootView.findViewById(R.id.btnExportPaystubs);
+		mBtnExportPaystubs.setOnClickListener(this);
 		return rootView;
 	}
 
@@ -72,7 +78,18 @@ public class CallLawyerFragment extends Fragment implements OnClickListener, Inf
 				Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
 				startActivity(intent);
 			}
-		} 
+		} else if (v == mBtnExportPaystubs) {
+			informaCam.informaService.flushCache();
+			
+			@SuppressWarnings("unchecked")
+			final ExportAllPopup eap = new ExportAllPopup(a, informaCam.mediaManifest.getAllByType(MimeType.LOG));
+			(new Handler()).postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					eap.init(true);
+				}
+			}, 300);
+		}
 	}
 
 	@Override
