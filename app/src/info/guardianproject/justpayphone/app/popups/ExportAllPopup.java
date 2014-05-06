@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.media.ILog;
+import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.Logger;
 
@@ -52,15 +53,20 @@ public class ExportAllPopup extends Popup {
 	
 	public void init(boolean share) {
 		int observationsExported = 0;
+		IOrganization org = InformaCam.getInstance().installedOrganizations.getByName("GLSP");
 		
 		for(ILog iLog : ExportAllPopup.this.observations) {
+			
 			try {
-				iLog.export(a, h, InformaCam.getInstance().installedOrganizations.getByName("GLSP"), share);
+				iLog.export(a, h, org, share);
 			} catch(FileNotFoundException e) {
 				Logger.e(LOG, e);
 			}
 			
 			observationsExported++;
+			
+			
+			inProgressBar.setProgress(observationsExported * 100);
 			
 			if(observationsExported == ExportAllPopup.this.observations.size()) {
 				Bundle b = new Bundle();
