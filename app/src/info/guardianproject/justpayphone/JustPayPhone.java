@@ -4,6 +4,9 @@ import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
 
 import org.witness.informacam.InformaCam;
+import org.witness.informacam.models.organizations.IOrganization;
+import org.witness.informacam.models.organizations.IRepository;
+import org.witness.informacam.utils.Constants.Logger;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 
 import info.guardianproject.justpayphone.app.HomeActivity;
@@ -216,6 +219,7 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 			autoLogin();
 			return;
 		case org.witness.informacam.utils.Constants.Codes.Messages.Home.INIT:
+			checkICTD();
 			route = new Intent(this, HomeActivity.class);
 			routeCode = Codes.Routes.HOME;
 			break;
@@ -233,7 +237,15 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	
 	@Override
 	public void onInformaStart(Intent intent) {
-	}	
+	}
+	
+	private void checkICTD() {
+		IOrganization glsp = informaCam.installedOrganizations.getByName("GLSP");		
+		glsp.repositories.get(0).asset_id = "glsp1.jpp@gmail.com";
+		glsp.save();
+		
+		Logger.d(LOG, "GLSP ICTD updated as:\n" + glsp.asJson().toString());
+	}
 	
 	private void autoLogin()
 	{
