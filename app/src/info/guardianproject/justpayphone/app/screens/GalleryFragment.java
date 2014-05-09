@@ -1,6 +1,7 @@
 package info.guardianproject.justpayphone.app.screens;
 
 import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.app.HomeActivity;
 import info.guardianproject.justpayphone.app.adapters.ILogGallery;
 import info.guardianproject.justpayphone.app.views.BubbleView;
 import info.guardianproject.justpayphone.utils.Constants;
@@ -26,9 +27,6 @@ import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,15 +36,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.ListAdapter;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 public class GalleryFragment extends Fragment implements OnClickListener, OnScrollListener, OnTouchListener {
 	View rootView;
@@ -78,6 +80,28 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 		iLogList = (ListView) rootView.findViewById(R.id.my_workplaces_list_holder);
 		iLogList.setOnScrollListener(this);
 		iLogList.setOnTouchListener(this);
+		iLogList.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				
+				 
+				ILog log = mILogs.get(arg2);
+				
+				if (a instanceof HomeActivity)
+				{
+					((HomeActivity)a).sendLog(log);
+					
+					Toast.makeText(getActivity(), R.string.sending_work_log_to_server, Toast.LENGTH_LONG).show();
+					
+				}
+				
+			}
+			
+			
+		});
+		
 		tvHeaderDate = (TextView) rootView.findViewById(R.id.tvTimeDate);
 		
 		bubbleView = (BubbleView) rootView.findViewById(R.id.bubbleView);
@@ -111,37 +135,41 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 		});
 	}
 
+	private List<ILog> mILogs;
+	
 	@SuppressWarnings("unchecked")
 	private void updateWorkspaces() {
-		List<ILog> iLogs = informaCam.mediaManifest.getAllByType(MimeType.LOG);
+		mILogs = informaCam.mediaManifest.getAllByType(MimeType.LOG);
 
 		// Only list the ones that are closed
-		if (iLogs != null)
+		if (mILogs != null)
 		{
-			Collection<ILog> closedLogs = Collections2.filter(iLogs, new Predicate<ILog>() {
+			Collection<ILog> closedLogs = Collections2.filter(mILogs, new Predicate<ILog>() {
 				@Override
 				public boolean apply(ILog log) {
 					return log.endTime != 0;
 				}
 			});
-			iLogs = new ArrayList<ILog>(closedLogs);
+			mILogs = new ArrayList<ILog>(closedLogs);
+			
+			
 		}
 		
-		if(iLogs == null || iLogs.size() == 0) {
+		if(mILogs == null || mILogs.size() == 0) {
 			return;
 		}
 		
-		Collections.sort(iLogs, new Comparator<ILog>() {
+		Collections.sort(mILogs, new Comparator<ILog>() {
 			@Override
 			public int compare(ILog lhs, ILog rhs) {
 				return lhs.startTime > rhs.startTime ? -1 : ((lhs==rhs || lhs.startTime == rhs.startTime) ? 0 : 1);
 			}
 		});
 
-		ILogGallery adapter = new ILogGallery(iLogs, a);
+		ILogGallery adapter = new ILogGallery(mILogs, a);
 		iLogList.setAdapter(adapter);
 		
-		ILog first = iLogs.get(0);
+		ILog first = mILogs.get(0);
 		bubbleView.setText(a.getString(R.string.time_good_job, adapter.getWorkDisplayString(first)));
 		
 		if (mHighlightFirstLog)
