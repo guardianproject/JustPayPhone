@@ -93,5 +93,6 @@
 	
 	<string name="camera_redo">REDO</string>
 	<string name="camera_save">SAVE</string>
+	<string name="sending_work_log_to_server">Sending work log to server</string>
 	
 </resources>
