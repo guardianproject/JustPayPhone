@@ -1,6 +1,24 @@
 package info.guardianproject.justpayphone.app;
 
+
+import info.guardianproject.justpayphone.JustPayPhone;
+import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.app.screens.CallLawyerFragment;
+import info.guardianproject.justpayphone.app.screens.GalleryFragment;
+import info.guardianproject.justpayphone.app.screens.TakePhotosFragment;
+import info.guardianproject.justpayphone.app.screens.UserManagementFragment;
+import info.guardianproject.justpayphone.app.screens.WorkStatusFragment;
+import info.guardianproject.justpayphone.app.views.DottedProgressView;
+import info.guardianproject.justpayphone.utils.Constants;
+import info.guardianproject.justpayphone.utils.Constants.App.Home;
+import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
+import info.guardianproject.justpayphone.utils.Constants.Forms;
+import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
+import info.guardianproject.justpayphone.utils.Constants.Settings;
+import info.guardianproject.odkparser.utils.QD;
+
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,35 +32,22 @@ import org.json.JSONException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.forms.IForm;
 import org.witness.informacam.models.media.ILog;
-import org.witness.informacam.models.media.IMedia;
 import org.witness.informacam.models.media.IRegion;
 import org.witness.informacam.models.notifications.INotification;
 import org.witness.informacam.storage.FormUtility;
+import org.witness.informacam.utils.Constants.App.Camera;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.InformaCamEventListener;
-import org.witness.informacam.utils.Constants.ListAdapterListener;
 import org.witness.informacam.utils.Constants.Models;
-import org.witness.informacam.utils.Constants.App.Camera;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 
-import info.guardianproject.justpayphone.JustPayPhone;
-import info.guardianproject.justpayphone.R;
-import info.guardianproject.justpayphone.app.screens.CallLawyerFragment;
-import info.guardianproject.justpayphone.app.screens.GalleryFragment;
-import info.guardianproject.justpayphone.app.screens.TakePhotosFragment;
-import info.guardianproject.justpayphone.app.screens.UserManagementFragment;
-import info.guardianproject.justpayphone.app.screens.WorkStatusFragment;
-import info.guardianproject.justpayphone.app.views.DottedProgressView;
-import info.guardianproject.justpayphone.utils.Constants;
-import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
-import info.guardianproject.justpayphone.utils.Constants.App.Home;
-import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
-import info.guardianproject.justpayphone.utils.Constants.Forms;
-import info.guardianproject.justpayphone.utils.Constants.Settings;
-import info.guardianproject.odkparser.utils.QD;
-
-
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -52,7 +57,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.MessageQueue.IdleHandler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -69,6 +73,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TabHost;
+import android.widget.Toast;
+
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 
 public class HomeActivity extends FragmentActivity implements HomeActivityListener, InformaCamStatusListener, InformaCamEventListener {
 	private final static String LOG = Constants.App.Home.LOG;
@@ -121,7 +130,84 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		
 		checkForCrashes();
 		checkForUpdates();
+		
+		checkGoogleAuth ();
 	}
+	
+	private void checkGoogleAuth ()
+	{
+		
+		new AsyncTask ()
+		{
+
+			@Override
+			protected Object doInBackground(Object... params) {
+				AccountManager am = AccountManager.get(HomeActivity.this);
+				Account[] accounts = AccountManager.get(HomeActivity.this).getAccountsByType("com.google");
+				
+				if (accounts.length > 0)
+				{
+						
+						
+						am.getAuthToken(accounts[0], Models.ITransportStub.GoogleDrive.SCOPE, null, HomeActivity.this, new AccountManagerCallback<Bundle> () {
+
+							@Override
+							public void run(AccountManagerFuture<Bundle> result) {
+					            try {
+									final String token = result.getResult().getString(AccountManager.KEY_AUTHTOKEN);
+								} catch (OperationCanceledException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (AuthenticatorException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+							}
+							
+							
+						}, null);
+						
+						//String scope = Models.ITransportStub.GoogleDrive.SCOPE;
+						//GoogleAuthUtil.getToken(HomeActivity.this, accounts[0].name, scope,new Bundle());
+				
+				}
+				else
+				{
+					//todo show an error
+				}
+				return null;
+			}
+			
+		}.execute();
+		
+		
+
+
+	}
+	
+	int REQUEST_CODE_RECOVER_FROM_AUTH_ERROR = 9999;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_RECOVER_FROM_AUTH_ERROR) {
+        	 if (resultCode == RESULT_OK) {
+        		 checkGoogleAuth ();
+                 return;
+             }
+             if (resultCode == RESULT_CANCELED) {
+                 Toast.makeText(this, "User rejected authorization.", Toast.LENGTH_SHORT).show();
+                 return;
+             }
+
+            
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 
 	@Override
 	public void onResume() {
