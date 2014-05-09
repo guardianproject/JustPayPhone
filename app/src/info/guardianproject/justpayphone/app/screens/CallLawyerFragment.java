@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
+
 public class CallLawyerFragment extends Fragment implements OnClickListener, InformaCamStatusListener {
 	View rootView;
 	Activity a;

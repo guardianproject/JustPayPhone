@@ -7,15 +7,12 @@ import info.guardianproject.justpayphone.app.screens.wizard.WizardSelectLanguage
 import info.guardianproject.justpayphone.app.screens.wizard.WizardTakePhoto;
 import info.guardianproject.justpayphone.app.screens.wizard.WizardWaitForKey;
 import info.guardianproject.justpayphone.utils.Constants;
+import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 import info.guardianproject.justpayphone.utils.Constants.Settings;
 import info.guardianproject.justpayphone.utils.Constants.WizardActivityListener;
-import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import org.json.JSONException;
@@ -25,18 +22,16 @@ import org.spongycastle.openpgp.PGPException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.crypto.KeyUtility;
 import org.witness.informacam.models.notifications.INotification;
-import org.witness.informacam.models.organizations.IInstalledOrganizations;
 import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.models.transport.ITransportStub;
-import org.witness.informacam.storage.FormUtility;
 import org.witness.informacam.transport.TransportUtility;
+import org.witness.informacam.utils.Constants.App.Storage.Type;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.InformaCamEventListener;
 import org.witness.informacam.utils.Constants.Logger;
 import org.witness.informacam.utils.Constants.Models;
-import org.witness.informacam.utils.Constants.App.Storage.Type;
-import org.witness.informacam.utils.Constants.Models.IUser;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
+import org.witness.informacam.utils.Constants.Models.IUser;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -50,12 +45,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public class WizardActivity extends SherlockFragmentActivity implements WizardActivityListener, InformaCamEventListener
+public class WizardActivity extends FragmentActivity implements WizardActivityListener, InformaCamEventListener
 {
 	private static final boolean COLLECT_USER_NAME_EMAIL = false;
 	private static final boolean COLLECT_LAWYER_INFORMATION = true;

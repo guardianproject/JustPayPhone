@@ -2,7 +2,7 @@
 <resources
     xmlns:app="http://schemas.android.com/apk/res/org.witness.informa.app"
     >
-<style name="WizardTheme" parent="Theme.Sherlock.Light.NoActionBar">
+<style name="WizardTheme" parent="@android:Theme.Holo.Light.NoActionBar">
 <!-- 	<item name="actionBarStyle">@style/EditorActionBar</item> -->
 <!-- 	<item name="android:actionBarStyle">@style/EditorActionBar</item> -->
 <!-- 	<item name="actionModeBackground">@drawable/actionbar_actionmode_background</item> -->
