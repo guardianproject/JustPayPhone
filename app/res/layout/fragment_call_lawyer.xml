@@ -44,6 +44,16 @@
             android:drawableTop="@drawable/ic_btn_call"
             android:minHeight="100dp"
             android:text="@string/call_lawyer" />
+        
+        <info.guardianproject.justpayphone.app.views.CustomFontButton
+            android:id="@+id/btnExportPaystubs"
+            style="@style/jpp_action_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableTop="@drawable/ic_notes"
+            android:minHeight="100dp"
+            android:text="@string/export_paystubs" />
 
     </LinearLayout>
 
