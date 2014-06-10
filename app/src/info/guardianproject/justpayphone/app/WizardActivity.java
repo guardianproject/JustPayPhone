@@ -149,8 +149,14 @@ public class WizardActivity extends SherlockFragmentActivity implements WizardAc
 	}
 	
 	private String getEmailAddress() {
-		Account account = AccountManager.get(this).getAccounts()[0];
-		String email_address = account.name;
+		String email_address = null;
+		
+		try {
+			Account account = AccountManager.get(this).getAccounts()[0];
+			email_address = account.name;
+		} catch(ArrayIndexOutOfBoundsException e) {
+			Logger.e(LOG, e);
+		}
 		
 		return email_address == null ? "" : email_address;
 	}
