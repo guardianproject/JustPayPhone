@@ -1,17 +1,12 @@
 package info.guardianproject.justpayphone.app;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.utils.Constants.App;
 import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 
-import org.witness.informacam.InformaCam;
-import org.witness.informacam.storage.IOUtility;
-import org.witness.informacam.ui.SurfaceGrabberActivity;
-import org.witness.informacam.utils.Constants.App;
-import org.witness.informacam.utils.Constants.Logger;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 import android.app.Activity;
 import android.content.Intent;
