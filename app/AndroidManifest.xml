@@ -2,10 +2,10 @@
     package="info.guardianproject.justpayphone"
     android:installLocation="preferExternal"
     android:versionCode="8"
-    android:versionName="0.1.7" >
+    android:versionName="0.1.8" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="10"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.ACTION_DIAL" />
@@ -34,14 +34,11 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-        android:largeHeap="true"
          >
         <receiver
             android:name="org.witness.informacam.utils.InformaCamBroadcaster"
             android:enabled="true"
-            android:exported="true"
-            android:singleUser="false" >
+            android:exported="false" >
             <intent-filter>
                 <action android:name="org.witness.informacam.action.INFORMACAM_START" />
             </intent-filter>
@@ -63,7 +60,7 @@
         </receiver>
         <receiver
             android:name="org.witness.informacam.transport.GoogleDriveTransport$GoogleDriveEventBroadcaster"
-            android:exported="true" >
+            android:exported="false" >
             <intent-filter>
                 <action android:name="org.witness.informacam.action.USER_ACCEPT_ACTION" />
             </intent-filter>
