@@ -28,10 +28,13 @@ import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -91,9 +94,8 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 				
 				if (a instanceof HomeActivity)
 				{
-					((HomeActivity)a).sendLog(log);
+					showShareDialog(log);
 					
-					Toast.makeText(getActivity(), R.string.sending_work_log_to_server, Toast.LENGTH_LONG).show();
 					
 				}
 				
@@ -110,6 +112,28 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 		rootView.setOnTouchListener(this);
 		
 		return rootView;
+	}
+	
+	private void showShareDialog (final ILog log)
+	{
+		new AlertDialog.Builder(a)
+	    .setTitle("Share Log")
+	    .setPositiveButton("Upload to Server", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	        	((HomeActivity)a).sendLog(log,false);
+	    		
+	    		Toast.makeText(getActivity(), R.string.sending_work_log_to_server, Toast.LENGTH_LONG).show();
+	        }
+	    }).setNegativeButton("Share via Email", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	            
+	        	((HomeActivity)a).sendLog(log,true);
+	    		
+	        	
+	        }
+	    }).show();
+		
+		
 	}
 
 	@Override

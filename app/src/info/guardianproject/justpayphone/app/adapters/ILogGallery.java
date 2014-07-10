@@ -1,6 +1,7 @@
 package info.guardianproject.justpayphone.app.adapters;
 
 import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.app.HomeActivity;
 import info.guardianproject.justpayphone.models.JPPWorkSummary;
 import info.guardianproject.justpayphone.utils.Constants.App;
 import info.guardianproject.justpayphone.utils.Constants.Forms;
@@ -27,6 +28,8 @@ import org.witness.informacam.utils.Constants.App.Storage.Type;
 import org.witness.informacam.utils.TimeUtility;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
@@ -214,8 +217,23 @@ public class ILogGallery extends BaseAdapter {
 				if (retrySend.contains(mLog))
 					retrySend.remove(mLog);
 				ILogGallery.this.notifyDataSetChanged();
-				Toast.makeText(a, "Sending...", Toast.LENGTH_LONG).show();
-				((HomeActivityListener)a).sendLog(mLog);
+				
+				new AlertDialog.Builder(a)
+			    .setTitle("Share Log")
+			    .setPositiveButton("Upload to Server", new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int whichButton) {
+			        	((HomeActivityListener)a).sendLog(mLog,false);
+			    		
+			        }
+			    }).setNegativeButton("Share via Email", new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int whichButton) {
+			            
+			        	((HomeActivityListener)a).sendLog(mLog,true);
+			        	
+			        }
+			    }).show();
+				
+				
 			}
 		}
 		

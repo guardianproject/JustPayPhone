@@ -17,6 +17,7 @@ import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 import info.guardianproject.justpayphone.utils.Constants.Settings;
 import info.guardianproject.odkparser.utils.QD;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -72,12 +74,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.TabHost;
 import android.widget.Toast;
-
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableAuthException;
 
 public class HomeActivity extends FragmentActivity implements HomeActivityListener, InformaCamStatusListener, InformaCamEventListener {
 	private final static String LOG = Constants.App.Home.LOG;
@@ -102,8 +101,11 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
 		informaCam = (InformaCam) getApplication();
 		
 		setContentView(R.layout.activity_home);
@@ -120,7 +122,31 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		//fragments.add(userManagementFragment);
 		fragments.add(galleryFragment);
 
-		h = new Handler();
+		h = new Handler() {
+
+			@Override
+			public void handleMessage(Message msg) {
+				Bundle b = msg.getData();
+				
+				String fileExport = null;
+				
+				if ((fileExport = b.getString("file")) != null)
+				{
+					
+					//this is the callback from the send/share export command
+					
+					Intent intent = new Intent()
+					.setAction(Intent.ACTION_SEND)
+					.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(fileExport)))
+					.setType("*/*");
+				
+					Intent intentShare = Intent.createChooser(intent, getString(R.string.send));
+					startActivity(intentShare);
+					
+				}
+			}
+			
+		};
 
 		lastLocale = PreferenceManager.getDefaultSharedPreferences(this).getString(Settings.LANGUAGE, "0");
 
@@ -652,13 +678,13 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 				if (containsLunchInformation(log))
 				{
 					Log.d(LOG, "Log " + log._id + ": lunch information stored");
-					sendLog(log);
+					sendLog(log,false);
 				}
 			}
 		}
 	}
 	
-	public void sendLog(ILog log) {
+	public void sendLog(ILog log, final boolean doLocalShare) {
 		new Thread(new Runnable() {
 			ILog log;
 
@@ -685,8 +711,9 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 								mPreviousTry = findNotification();
 								if (log.export(HomeActivity.this, h,
 										informaCam.installedOrganizations
-												.getByName("GLSP"), false)) {
+												.getByName("GLSP"), doLocalShare)) {
 									this.sendEmptyMessageDelayed(1, 1000);
+									
 								}
 							} catch (FileNotFoundException e) {
 								e.printStackTrace();
@@ -755,4 +782,6 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 			}
 		}.init(log)).start();
 	}
+	
+	
 }
