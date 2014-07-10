@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/ic_launcher" />
 
     <info.guardianproject.justpayphone.app.views.CustomFontTextView
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/ivLogo"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="@string/wizard_welcome"
         android:textColor="@android:color/white" />
 
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/textView1"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="10dp"
         android:text="@string/wizard_choose_language"
         android:textColor="@android:color/white" />
 
