@@ -32,9 +32,11 @@ import net.hockeyapp.android.UpdateManager;
 import org.json.JSONException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.forms.IForm;
+import org.witness.informacam.models.media.IAsset;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.models.media.IRegion;
 import org.witness.informacam.models.notifications.INotification;
+import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.storage.FormUtility;
 import org.witness.informacam.utils.Constants.App.Camera;
 import org.witness.informacam.utils.Constants.Codes;
@@ -128,22 +130,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 			public void handleMessage(Message msg) {
 				Bundle b = msg.getData();
 				
-				String fileExport = null;
-				
-				if ((fileExport = b.getString("file")) != null)
-				{
-					
-					//this is the callback from the send/share export command
-					
-					Intent intent = new Intent()
-					.setAction(Intent.ACTION_SEND)
-					.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(fileExport)))
-					.setType("*/*");
-				
-					Intent intentShare = Intent.createChooser(intent, getString(R.string.send));
-					startActivity(intentShare);
-					
-				}
+			
 			}
 			
 		};
@@ -163,11 +150,11 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	private void checkGoogleAuth ()
 	{
 		
-		new AsyncTask ()
+		new AsyncTask <Void, Void, Void>()
 		{
 
 			@Override
-			protected Object doInBackground(Object... params) {
+			protected Void doInBackground(Void... params) {
 				AccountManager am = AccountManager.get(HomeActivity.this);
 				Account[] accounts = AccountManager.get(HomeActivity.this).getAccountsByType("com.google");
 				
@@ -709,9 +696,11 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 						if (msg.what == 0) {
 							try {
 								mPreviousTry = findNotification();
-								if (log.export(HomeActivity.this, h,
-										informaCam.installedOrganizations
-												.getByName("GLSP"), doLocalShare)) {
+								
+								IOrganization org = informaCam.installedOrganizations.getByName("GLSP");								
+								IAsset exportAsset = log.export(HomeActivity.this, h, org, doLocalShare);
+								
+								if (exportAsset != null) {
 									this.sendEmptyMessageDelayed(1, 1000);
 									
 								}
