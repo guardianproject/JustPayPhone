@@ -190,12 +190,13 @@ public class ILogGallery extends BaseAdapter {
 				form.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
 				form.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
 				
-				if (this.lunchTakenProxyYes.isChecked())
-				{
+				//if (this.lunchTakenProxyYes.isChecked())
+				//{
 					Integer lunchMinutes = Integer.valueOf(lunchMinutesProxy.getText().toString());
 					lunchTaken = a.getString(R.string.time_lunch_minutes, lunchMinutes);
-				}
-				break;
+					//break;
+			//	}
+				
 			}
 		}
 		return lunchTaken;
