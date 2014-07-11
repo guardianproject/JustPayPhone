@@ -151,7 +151,7 @@ public class WizardActivity extends FragmentActivity implements WizardActivityLi
 		if (tm != null)
 		{			
 			String phone_number = tm.getLine1Number();		
-			return phone_number == null ? "" : phone_number;
+			return phone_number;
 		}
 		else
 			return null;
