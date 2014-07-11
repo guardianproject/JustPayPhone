@@ -482,7 +482,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 //			((HomeActivityListener) a).getCurrentLog().data.userAppendedData.add(regionData);
 
 			((HomeActivityListener) a).persistLog();
-			Logger.d(LOG, "FIRST, LET'S WAIT 15 SECONDS BEFORE SENDING OFF");
+		//	Logger.d(LOG, "FIRST, LET'S WAIT 15 SECONDS BEFORE SENDING OFF");
 			(new Handler()).postDelayed(new Runnable() {
 
 				@Override
