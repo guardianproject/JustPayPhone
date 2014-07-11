@@ -3,6 +3,7 @@ package info.guardianproject.justpayphone.app.screens;
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.HomeActivity;
 import info.guardianproject.justpayphone.app.adapters.ILogGallery;
+import info.guardianproject.justpayphone.app.popups.ExportAllPopup;
 import info.guardianproject.justpayphone.app.views.BubbleView;
 import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
@@ -31,6 +32,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -114,25 +116,48 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 		return rootView;
 	}
 	
-	private void showShareDialog (final ILog log)
+	private void showShareDialog (final ILog iLog)
 	{
+
 		new AlertDialog.Builder(a)
 	    .setTitle("Share Log")
 	    .setPositiveButton("Upload to Server", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int whichButton) {
-	        	((HomeActivity)a).sendLog(log,false);
+	        	
+	        	new ShareTask(iLog).execute(false);
 	    		
-	    		Toast.makeText(getActivity(), R.string.sending_work_log_to_server, Toast.LENGTH_LONG).show();
 	        }
 	    }).setNegativeButton("Share via Email", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int whichButton) {
 	            
-	        	((HomeActivity)a).sendLog(log,true);
-	    		
+	    		new ShareTask(iLog).execute(true);
 	        	
 	        }
 	    }).show();
 		
+		
+	}
+	
+	class ShareTask extends AsyncTask<Boolean, Void, String>
+	{
+		ExportAllPopup eap;
+		ILog iLog;
+		
+		public ShareTask(ILog iLog)
+		{
+			super();
+			
+			this.eap = new ExportAllPopup(a, informaCam.mediaManifest.getAllByType(MimeType.LOG));
+			this.iLog = iLog;
+		}
+		
+		@Override
+		protected String doInBackground(Boolean... localShare) {
+
+        	eap.init(localShare[0], iLog);
+
+			return null;
+		}
 		
 	}
 
