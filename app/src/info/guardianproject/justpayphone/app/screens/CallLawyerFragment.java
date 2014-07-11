@@ -1,25 +1,27 @@
 package info.guardianproject.justpayphone.app.screens;
 
-import org.witness.informacam.InformaCam;
-import org.witness.informacam.utils.Constants.App;
-import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
-import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.app.popups.ExportAllPopup;
 import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 import info.guardianproject.justpayphone.utils.Constants.Settings;
+
+import org.witness.informacam.InformaCam;
+import org.witness.informacam.utils.Constants.App;
+import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
+import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -81,18 +83,25 @@ public class CallLawyerFragment extends Fragment implements OnClickListener, Inf
 			}
 		} else if (v == mBtnExportPaystubs) {
 			informaCam.informaService.flushCache();
-			
-			@SuppressWarnings("unchecked")
 			final ExportAllPopup eap = new ExportAllPopup(a, informaCam.mediaManifest.getAllByType(MimeType.LOG));
-			(new Handler()).postDelayed(new Runnable() {
+
+			new AsyncTask<Void, Void, Void>()
+			{
+
 				@Override
-				public void run() {
+				protected Void doInBackground(Void... arg0) {
 					eap.init(true);
+
+					return null;
 				}
-			}, 300);
+				
+			}.execute();
+			
 		}
 	}
 
+	
+	
 	@Override
 	public void onResume() {
 		super.onResume();
