@@ -94,7 +94,7 @@
 	
 	<string name="camera_redo">REDO</string>
 	<string name="camera_save">SAVE</string>
-	<string name="exporting_your_paystubs">Exporting your paystubs\u2026</string>
+	<string name="exporting_your_paystubs">Exporting your work log\u2026</string>
 	<string name="sending_work_log_to_server">Sending work log to server</string>
 	
 </resources>
