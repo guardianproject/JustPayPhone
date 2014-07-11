@@ -132,28 +132,40 @@ public class WizardActivity extends FragmentActivity implements WizardActivityLi
 		}
 		else
 		{
-			onUsernameCreated(getTelephoneNumber(), getEmailAddress(), WizardCreateDB.autoGeneratePassword(this.getBaseContext()));
+			String alias = getTelephoneNumber();
+			
+			String email = getEmailAddress();
+			
+			if (email == null)
+				email = alias;
+			
+			if (alias == null)
+				alias = email;
+			
+			onUsernameCreated(alias, email, WizardCreateDB.autoGeneratePassword(this.getBaseContext()));
 		}
 	}
 	
-	private String getTelephoneNumber() {
+	private String getTelephoneNumber() {		
 		TelephonyManager tm = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-		String phone_number = tm.getLine1Number();
-		
-		return phone_number == null ? "" : phone_number;
+		if (tm != null)
+		{			
+			String phone_number = tm.getLine1Number();		
+			return phone_number == null ? "" : phone_number;
+		}
+		else
+			return null;
 	}
 	
 	private String getEmailAddress() {
-		String email_address = null;
-		
-		try {
-			Account account = AccountManager.get(this).getAccounts()[0];
-			email_address = account.name;
-		} catch(ArrayIndexOutOfBoundsException e) {
-			Logger.e(LOG, e);
+
+		Account[] accounts = AccountManager.get(this).getAccounts();
+		if (accounts.length > 0)
+		{
+			return accounts[0].name;				
 		}
 		
-		return email_address == null ? "" : email_address;
+		return null;
 	}
 
 	@Override
