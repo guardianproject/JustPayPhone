@@ -52,11 +52,12 @@ public class SelfieActivity extends SurfaceGrabberActivity {
 		File tempFile;
 		try {
 			// Setting post rotate to 90
-			Matrix mtx = new Matrix();
-			mtx.postRotate(90);
+			Matrix matrix = new Matrix();
+			matrix.postRotate(-90);
 			
 			Bitmap bmpCamera = BitmapFactory.decodeByteArray(data, 0,data.length);
-			
+			bmpCamera = Bitmap.createBitmap(bmpCamera , 0, 0, bmpCamera .getWidth(), bmpCamera .getHeight(), matrix, true);
+
 			tempFile = new File(IOUtility.buildPublicPath(new String[] { System.currentTimeMillis() + "_selfie.jpg" }));
 			bmpCamera.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(tempFile));
 			

@@ -18,6 +18,9 @@ import org.witness.informacam.utils.Constants.Logger;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Size;
@@ -83,11 +86,18 @@ public class CameraActivity extends SurfaceGrabberActivity {
 		{
 			if (mData != null)
 			{
+				Matrix matrix = new Matrix();
+				matrix.postRotate(-90);
+				
+				Bitmap bmpCamera = BitmapFactory.decodeByteArray(mData, 0,mData.length);
+				bmpCamera = Bitmap.createBitmap(bmpCamera , 0, 0, bmpCamera .getWidth(), bmpCamera .getHeight(), matrix, true);
+				
 				File tempFile;
 				try {
 					tempFile = new File(IOUtility.buildPublicPath(new String[] { System.currentTimeMillis() + "_img.jpg" }));
-					InformaCam.getInstance().ioService.saveBlob(mData, tempFile, true);
-					Logger.d(LOG, "NEW IMAGE AT : " + tempFile.getAbsolutePath());
+					bmpCamera.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(tempFile));
+
+				//	Logger.d(LOG, "NEW IMAGE AT : " + tempFile.getAbsolutePath());
 					setResult(Activity.RESULT_OK, new Intent().putExtra(Extras.PATH_TO_FILE, tempFile.getAbsolutePath()));
 				} catch (IOException e) {
 					e.printStackTrace();
