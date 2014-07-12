@@ -124,13 +124,13 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 	    .setPositiveButton("Upload to Server", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int whichButton) {
 	        	
-	        	new ShareTask(iLog).execute(false);
+	        	new ShareTask(iLog,false);
 	    		
 	        }
 	    }).setNegativeButton("Share via Email", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int whichButton) {
 	            
-	    		new ShareTask(iLog).execute(true);
+	    		new ShareTask(iLog,true);
 	        	
 	        }
 	    }).show();
@@ -138,25 +138,28 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 		
 	}
 	
-	class ShareTask extends AsyncTask<Boolean, Void, String>
+	class ShareTask implements Runnable
 	{
 		ExportAllPopup eap;
 		ILog iLog;
+		boolean localShare;
 		
-		public ShareTask(ILog iLog)
+		public ShareTask(ILog iLog, boolean localShare)
 		{
 			super();
 			
 			this.eap = new ExportAllPopup(a, informaCam.mediaManifest.getAllByType(MimeType.LOG));
 			this.iLog = iLog;
+			this.localShare = localShare;
+			
+			new Thread(this).start();
 		}
 		
-		@Override
-		protected String doInBackground(Boolean... localShare) {
+		public void run ()
+		{
 
-        	eap.init(localShare[0], iLog);
+        	eap.init(localShare, iLog);
 
-			return null;
 		}
 		
 	}

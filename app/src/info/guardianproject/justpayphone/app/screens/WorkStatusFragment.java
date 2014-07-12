@@ -240,7 +240,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 			mWorkSignOutView.setVisibility(View.GONE);
 			mWorkLunchView.setVisibility(View.VISIBLE);
 			
-			Logger.d(LOG, "I'M PRETTY SURE I STOP INFORMA NOW>>>");
+		//	Logger.d(LOG, "I'M PRETTY SURE I STOP INFORMA NOW>>>");
 			informaCam.informaService.stopAllSuckers();
 		}
 	}

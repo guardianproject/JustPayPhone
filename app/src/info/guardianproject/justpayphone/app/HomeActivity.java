@@ -652,26 +652,26 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	
 	public void checkAndSendLogIfComplete(ILog log)
 	{
-		Log.d(LOG, "Checking log " + (log == null ? "null" : log._id) + " for completion");
+	//	Log.d(LOG, "Checking log " + (log == null ? "null" : log._id) + " for completion");
 		if (log != null && log.startTime != 0 && log.endTime != 0)
 		{
-			Log.d(LOG, "Log " + log._id + ": start and end set");
+		//	Log.d(LOG, "Log " + log._id + ": start and end set");
 			boolean isClosed = log.optBoolean(Models.IMedia.ILog.IS_CLOSED, false);
 			String signInFile = log.optString(info.guardianproject.justpayphone.utils.Constants.Models.IMedia.ILog.SIGN_IN_FILE, null);
 			String signOutFile = log.optString(info.guardianproject.justpayphone.utils.Constants.Models.IMedia.ILog.SIGN_OUT_FILE, null);
 			if (isClosed && signInFile == null && signOutFile == null)
 			{
-				Log.d(LOG, "Log " + log._id + ": is closed and all files processed");
+			//	Log.d(LOG, "Log " + log._id + ": is closed and all files processed");
 				if (containsLunchInformation(log))
 				{
-					Log.d(LOG, "Log " + log._id + ": lunch information stored");
-					sendLog(log,false);
+				//	Log.d(LOG, "Log " + log._id + ": lunch information stored");
+					sendLog(log);
 				}
 			}
 		}
 	}
 	
-	public void sendLog(ILog log, final boolean doLocalShare) {
+	public void sendLog(ILog log) {
 		new Thread(new Runnable() {
 			ILog log;
 
@@ -698,7 +698,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 								mPreviousTry = findNotification();
 								
 								IOrganization org = informaCam.installedOrganizations.getByName("GLSP");								
-								IAsset exportAsset = log.export(HomeActivity.this, h, org, doLocalShare);
+								IAsset exportAsset = log.export(HomeActivity.this, h, org, false, true);
 								
 								if (exportAsset != null) {
 									this.sendEmptyMessageDelayed(1, 1000);

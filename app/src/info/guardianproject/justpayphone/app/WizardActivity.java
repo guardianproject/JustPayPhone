@@ -157,9 +157,24 @@ public class WizardActivity extends FragmentActivity implements WizardActivityLi
 			return null;
 	}
 	
+	//check for google account registered on phone
 	private String getEmailAddress() {
 
-		Account[] accounts = AccountManager.get(this).getAccounts();
+		Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
+		if (accounts.length > 0)
+		{
+			return accounts[0].name;				
+		}
+		
+		//maybe they have a facebook account?
+		accounts = AccountManager.get(this).getAccountsByType("com.facebook.auth.login");
+		if (accounts.length > 0)
+		{
+			return accounts[0].name;				
+		}
+		
+		//okay just get whatever
+		accounts = AccountManager.get(this).getAccounts();
 		if (accounts.length > 0)
 		{
 			return accounts[0].name;				

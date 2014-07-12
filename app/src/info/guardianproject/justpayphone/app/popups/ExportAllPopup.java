@@ -23,6 +23,9 @@ import android.widget.ProgressBar;
 
 public class ExportAllPopup extends Popup {
 	ProgressBar inProgressBar;
+	
+	private boolean mIsBatchExport = false;
+	
 	Handler h = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -35,21 +38,27 @@ public class ExportAllPopup extends Popup {
 				ExportAllPopup.this.cancel();
 			}
 			
-			String fileExport = null;
-			
-			if ((fileExport = b.getString("file")) != null)
+			if (!mIsBatchExport)
 			{
+				String fileExport = null;
 				
-				//this is the callback from the send/share export command
-				
-				Intent intent = new Intent()
-				.setAction(Intent.ACTION_SEND)
-				.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(fileExport)))
-				.setType("*/*");
-			
-				Intent intentShare = Intent.createChooser(intent, a.getString(R.string.send));
-				a.startActivity(intentShare);
-				
+				if ((fileExport = b.getString("file")) != null)
+				{
+					ExportAllPopup.this.cancel();
+					//this is the callback from the send/share export command
+					boolean localShare = b.getBoolean("localShare");
+					
+					if (localShare)
+					{
+						Intent intent = new Intent()
+						.setAction(Intent.ACTION_SEND)
+						.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(fileExport)))
+						.setType("*/*");
+					
+						Intent intentShare = Intent.createChooser(intent, a.getString(R.string.send));
+						a.startActivity(intentShare);
+					}
+				}
 			}
 		}
 	};
@@ -73,14 +82,18 @@ public class ExportAllPopup extends Popup {
 	
 	public void init(boolean localShare) {
 		int observationsExported = 0;
+		mIsBatchExport = true;
 		
 		//TODO keep the org null for now, as we don't want encryption on this export
-		IOrganization org = null;//InformaCam.getInstance().installedOrganizations.getByName("GLSP");
+		IOrganization org = null;
+		
+		if (!localShare)
+			org = InformaCam.getInstance().installedOrganizations.getByName("GLSP");
 		
 		for(ILog iLog : ExportAllPopup.this.observations) {
 			
 			try {
-				iLog.export(a, h, org, localShare);
+				iLog.export(a, h, org, localShare,!localShare);
 			} catch(FileNotFoundException e) {
 				Logger.e(LOG, e);
 			}
@@ -102,30 +115,24 @@ public class ExportAllPopup extends Popup {
 	}
 	
 	public void init(boolean localShare, ILog iLog) {
-		int observationsExported = 0;
 		
-		//TODO keep the org null for now, as we don't want encryption on this export
-		IOrganization org = null;//InformaCam.getInstance().installedOrganizations.getByName("GLSP");
+		inProgressBar.setMax(100);
+		
+		mIsBatchExport = false;
+		
+		IOrganization org = null;
+		
+		if (!localShare)
+			org = InformaCam.getInstance().installedOrganizations.getByName("GLSP");
 		
 		try {
-			iLog.export(a, h, org, localShare);
+			iLog.export(a, h, org, localShare, !localShare);
 		} catch(FileNotFoundException e) {
 			Logger.e(LOG, e);
 		}
 		
-		observationsExported++;
+		inProgressBar.setProgress(100);
 		
-		inProgressBar.setProgress(observationsExported * 100);
-		
-		if(observationsExported == ExportAllPopup.this.observations.size()) {
-			Bundle b = new Bundle();
-			b.putBoolean(Codes.Keys.BATCH_EXPORT_FINISHED, true);
-			
-			Message msg = new Message();
-			msg.setData(b);
-			
-			h.sendMessage(msg);
-		}
 		
 	}
 }

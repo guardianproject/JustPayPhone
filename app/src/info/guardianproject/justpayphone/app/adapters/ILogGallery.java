@@ -116,27 +116,7 @@ public class ILogGallery extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-//		convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_ilog_gallery_parent, null);
-//		ILog iLog = iLogs.get(position);
-//		
-//		TextView date = (TextView) convertView.findViewById(R.id.ilog_date);
-//		date.setText(TimeUtility.millisecondsToDayOnly(iLog.startTime));
-//		
-//		LinearLayout imagesAndVideo = (LinearLayout) convertView.findViewById(R.id.ilog_images_and_video);
-//		for(String l : iLog.attachedMedia) {
-//			ImageView iv = new ImageView(parent.getContext());
-//			IMedia m = informaCam.mediaManifest.getById(l);
-//			byte[] bBytes = informaCam.ioService.getBytes(m.bitmapThumb, Type.IOCIPHER);
-//			Bitmap b = BitmapFactory.decodeByteArray(bBytes, 0, bBytes.length);
-//			
-//			LinearLayout.LayoutParams lp = new LayoutParams(90, 90);
-//			lp.setMargins(0, 0, 10, 0);
-//			
-//			iv.setLayoutParams(lp);
-//			iv.setImageBitmap(b);
-//			
-//			imagesAndVideo.addView(iv);
-//		}
+
 		
 		if (convertView == null)
 			convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_day_item, parent, false);
@@ -148,12 +128,10 @@ public class ILogGallery extends BaseAdapter {
 		if (retrySend.contains(iLog))
 		{
 			tv.setBackgroundColor(a.getResources().getColor(R.color.send_failed_background));
-			tv.setOnClickListener(new LogClickedListener(iLog));
 		}
 		else
 		{
 			tv.setBackgroundResource(0);
-			tv.setOnClickListener(null);
 		}
 		
 		Calendar cal = Calendar.getInstance();
@@ -190,53 +168,13 @@ public class ILogGallery extends BaseAdapter {
 				form.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
 				form.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
 				
-				//if (this.lunchTakenProxyYes.isChecked())
-				//{
-					Integer lunchMinutes = Integer.valueOf(lunchMinutesProxy.getText().toString());
-					lunchTaken = a.getString(R.string.time_lunch_minutes, lunchMinutes);
-					//break;
-			//	}
+				Integer lunchMinutes = Integer.valueOf(lunchMinutesProxy.getText().toString());
+				lunchTaken = a.getString(R.string.time_lunch_minutes, lunchMinutes);
+			
 				
 			}
 		}
 		return lunchTaken;
 	}
 	
-	private class LogClickedListener implements View.OnClickListener
-	{
-		private ILog mLog;
-
-		public LogClickedListener(ILog log)
-		{
-			mLog = log;
-		}
-		
-		@Override
-		public void onClick(View v) {
-			if (a != null && a instanceof HomeActivityListener)
-			{
-				if (retrySend.contains(mLog))
-					retrySend.remove(mLog);
-				ILogGallery.this.notifyDataSetChanged();
-				
-				new AlertDialog.Builder(a)
-			    .setTitle("Share Log")
-			    .setPositiveButton("Upload to Server", new DialogInterface.OnClickListener() {
-			        public void onClick(DialogInterface dialog, int whichButton) {
-			        	((HomeActivityListener)a).sendLog(mLog,false);
-			    		
-			        }
-			    }).setNegativeButton("Share via Email", new DialogInterface.OnClickListener() {
-			        public void onClick(DialogInterface dialog, int whichButton) {
-			            
-			        	((HomeActivityListener)a).sendLog(mLog,true);
-			        	
-			        }
-			    }).show();
-				
-				
-			}
-		}
-		
-	}
 }
