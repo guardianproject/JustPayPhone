@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.witness.informacam.InformaCam;
 import org.witness.informacam.storage.IOUtility;
 import org.witness.informacam.ui.SurfaceGrabberActivity;
 
@@ -15,6 +14,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.os.Bundle;
@@ -51,7 +51,12 @@ public class SelfieActivity extends SurfaceGrabberActivity {
 	public void onPictureTaken(final byte[] data, Camera camera) {		
 		File tempFile;
 		try {
+			// Setting post rotate to 90
+			Matrix mtx = new Matrix();
+			mtx.postRotate(90);
+			
 			Bitmap bmpCamera = BitmapFactory.decodeByteArray(data, 0,data.length);
+			
 			tempFile = new File(IOUtility.buildPublicPath(new String[] { System.currentTimeMillis() + "_selfie.jpg" }));
 			bmpCamera.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(tempFile));
 			
