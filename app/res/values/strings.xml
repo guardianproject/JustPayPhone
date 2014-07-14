@@ -6,7 +6,7 @@
 	<string name="at_work_x">at work:\n%1$s</string>
 	<string name="just_pay_phone_logo">JUST\nPAY\nPHONE</string>
 	<string name="where_i_work">Where I Work</string>
-	<string name="my_attorney">My Lawyer</string>
+	<string name="my_attorney">My Emergency Contact</string>
 	<string name="x_location">Location: %1$f, %2$f</string>
 	<plurals name="x_days_worked">
 	    <item quantity="one">%1$d day worked here.</item>
@@ -14,9 +14,9 @@
 	</plurals>
 	<string name="ph">ph. </string>
 	<string name="fax">fax. </string>
-	<string name="call_my_lawyer">Call my lawyer</string>
-	<string name="write_a_message_to">Write a message to my lawyer</string>
-	<string name="record_a_message_for">Record a message for my lawyer</string>
+	<string name="call_my_lawyer">Call my contact</string>
+	<string name="write_a_message_to">Write a message to my contact</string>
+	<string name="record_a_message_for">Record a message for my contact</string>
 	<string name="how_long_was_your_lunch_break">How long was your lunch break?</string>
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
@@ -57,7 +57,7 @@
     <string name="take_your_photo_to_clock_in">Take your photo to clock in</string>
     <string name="take_your_photo_to_clock_out">Take your photo to clock out</string>
     <string name="take_photos">TAKE PHOTOS</string>
-    <string name="call_lawyer">CALL LAWYER</string>
+    <string name="call_lawyer">CALL CONTACT</string>
     <string name="export_paystubs">EXPORT PAYSTUBS</string>
     <string name="admin">ADMIN</string>
     
@@ -80,7 +80,7 @@
     <string name="wizard_key_is_being_made">Your key is being made, this may take a while.</string>
     <string name="wizard_key_made">Your key has been made.</string>
     <string name="wizard_original_images_should_be">Original images should be:</string>
-    <string name="wizard_lawyer_information">Enter lawyer information</string>
+    <string name="wizard_lawyer_information">Enter emergency contact information</string>
 	<string name="wizard_phone_number">Phone number</string>    
     
     <string name="time_date">Sept / Oct</string>
