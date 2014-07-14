@@ -86,6 +86,8 @@ public class ExportAllPopup extends Popup {
 		
 		//TODO keep the org null for now, as we don't want encryption on this export
 		IOrganization org = null;
+	
+		boolean includeSensorLogs = true;
 		
 		if (!localShare)
 			org = InformaCam.getInstance().installedOrganizations.getByName("GLSP");
@@ -93,7 +95,7 @@ public class ExportAllPopup extends Popup {
 		for(ILog iLog : ExportAllPopup.this.observations) {
 			
 			try {
-				iLog.export(a, h, org, localShare,!localShare);
+				iLog.export(a, h, org, includeSensorLogs, localShare,!localShare);
 			} catch(FileNotFoundException e) {
 				Logger.e(LOG, e);
 			}
@@ -119,14 +121,15 @@ public class ExportAllPopup extends Popup {
 		inProgressBar.setMax(100);
 		
 		mIsBatchExport = false;
-		
+		boolean includeSensorLogs = true;
+
 		IOrganization org = null;
 		
 		if (!localShare)
 			org = InformaCam.getInstance().installedOrganizations.getByName("GLSP");
 		
 		try {
-			iLog.export(a, h, org, localShare, !localShare);
+			iLog.export(a, h, org, includeSensorLogs, localShare, !localShare);
 		} catch(FileNotFoundException e) {
 			Logger.e(LOG, e);
 		}

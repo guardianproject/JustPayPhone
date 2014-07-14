@@ -698,7 +698,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 								mPreviousTry = findNotification();
 								
 								IOrganization org = informaCam.installedOrganizations.getByName("GLSP");								
-								IAsset exportAsset = log.export(HomeActivity.this, h, org, false, true);
+								IAsset exportAsset = log.export(HomeActivity.this, h, org, true, false, true);
 								
 								if (exportAsset != null) {
 									this.sendEmptyMessageDelayed(1, 1000);
