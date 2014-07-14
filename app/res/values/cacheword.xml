@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Notification Settings -->
-    <bool name="cacheword_use_notification_default">true</bool>
+    <bool name="cacheword_use_notification_default">false</bool>
 
     <!-- To configure the notification icon create a drawable resource named:
            cacheword_notification_icon
