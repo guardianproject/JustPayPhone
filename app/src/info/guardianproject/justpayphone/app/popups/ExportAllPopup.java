@@ -1,12 +1,16 @@
 package info.guardianproject.justpayphone.app.popups;
 
 import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.utils.Constants.Forms;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.witness.informacam.InformaCam;
+import org.witness.informacam.models.forms.IForm;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.utils.Constants.Codes;
@@ -18,13 +22,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 
 public class ExportAllPopup extends Popup {
 	ProgressBar inProgressBar;
 	
 	private boolean mIsBatchExport = false;
+	private ILog mLastLog = null;
 	
 	Handler h = new Handler() {
 		@Override
@@ -53,7 +58,52 @@ public class ExportAllPopup extends Popup {
 						Intent intent = new Intent()
 						.setAction(Intent.ACTION_SEND)
 						.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(fileExport)))
-						.setType("*/*");
+						.setType("message/rfc822");
+						
+						if (mLastLog != null)
+						{
+							InformaCam informaCam = InformaCam.getInstance();
+
+							StringBuffer sbLog = new StringBuffer ();
+							
+							sbLog.append("From: " ).append(informaCam.user.alias).append(" (").append(informaCam.user.email).append(")").append("\n\n");
+							sbLog.append("Public Key: " ).append(informaCam.user.pgpKeyFingerprint).append("\n\n");
+							sbLog.append("Device Unique Id: ").append(mLastLog.genealogy.createdOnDevice).append("\n\n");
+							
+							sbLog.append("Log Start: ").append(DateFormat.getDateTimeInstance().format(new Date(mLastLog.startTime))).append("\n\n");
+							sbLog.append("Log End: ").append(DateFormat.getDateTimeInstance().format(new Date(mLastLog.endTime))).append("\n\n");
+							
+							String geo = mLastLog.getSimpleLocationString();
+							if (geo != null)
+							{
+								sbLog.append("GPS Location: ").append(geo).append("\n\n");
+							}
+							
+							float msWorked = mLastLog.endTime - mLastLog.startTime;
+							float hWorked = (msWorked / 3600000f);
+							
+							sbLog.append("Hours Worked: ").append(hWorked).append("\n\n");
+							
+							List<IForm> forms = mLastLog.getForms(a);
+							
+							for(IForm form : forms) {
+								if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
+									
+									EditText lunchMinutesProxy = new EditText(a);
+									form.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
+									
+									
+									Integer lunchMinutes = Integer.valueOf(lunchMinutesProxy.getText().toString());
+								
+									sbLog.append("Lunch Minutes: ").append(lunchMinutes).append("\n\n");
+									break;
+								}
+							}
+							
+							intent.putExtra(Intent.EXTRA_SUBJECT, "JustPay Work Log: " + DateFormat.getDateTimeInstance().format(new Date(mLastLog.startTime)));
+							intent.putExtra(Intent.EXTRA_TEXT   , sbLog.toString());
+							
+						}
 					
 						Intent intentShare = Intent.createChooser(intent, a.getString(R.string.send));
 						a.startActivity(intentShare);
@@ -117,6 +167,8 @@ public class ExportAllPopup extends Popup {
 	}
 	
 	public void init(boolean localShare, ILog iLog) {
+		
+		mLastLog = iLog;
 		
 		inProgressBar.setMax(100);
 		
