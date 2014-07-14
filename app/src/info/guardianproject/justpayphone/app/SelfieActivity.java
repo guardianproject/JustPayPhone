@@ -55,11 +55,13 @@ public class SelfieActivity extends SurfaceGrabberActivity {
 			Matrix matrix = new Matrix();
 			matrix.postRotate(-90);
 			
+			int selfieQualityCompression = 75;
+			
 			Bitmap bmpCamera = BitmapFactory.decodeByteArray(data, 0,data.length);
 			bmpCamera = Bitmap.createBitmap(bmpCamera , 0, 0, bmpCamera .getWidth(), bmpCamera .getHeight(), matrix, true);
 
 			tempFile = new File(IOUtility.buildPublicPath(new String[] { System.currentTimeMillis() + "_selfie.jpg" }));
-			bmpCamera.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(tempFile));
+			bmpCamera.compress(Bitmap.CompressFormat.JPEG, selfieQualityCompression, new FileOutputStream(tempFile));
 			
 			//InformaCam.getInstance().ioService.saveBlob(data, tempFile, true);
 		//	Logger.d(LOG, "NEW SELFIE AT : " + tempFile.getAbsolutePath());
