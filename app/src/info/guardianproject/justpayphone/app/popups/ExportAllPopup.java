@@ -4,7 +4,7 @@ import info.guardianproject.justpayphone.R;
 import info.guardianproject.justpayphone.utils.Constants.Forms;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -106,6 +106,28 @@ public class ExportAllPopup extends Popup {
 										break;
 									}
 								}
+							}
+							catch (Exception e)
+							{
+								Logger.e(LOG,e);
+							}
+							
+							String message = sbLog.toString();
+							
+							try
+							{
+								byte[] sig = informaCam.signatureService.signData(message.getBytes());
+							
+							
+								sbLog = new StringBuffer();
+								sbLog.append("-----BEGIN PGP SIGNED MESSAGE-----\n");
+								sbLog.append("Hash: SHA1\n\n");
+								sbLog.append(message);
+								
+								String sigString = new String(sig);
+								
+								sbLog.append(sigString.replace("PGP MESSAGE", "PGP SIGNATURE"));
+								
 							}
 							catch (Exception e)
 							{
