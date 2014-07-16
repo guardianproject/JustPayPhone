@@ -58,7 +58,7 @@
     <string name="take_your_photo_to_clock_out">Take your photo to clock out</string>
     <string name="take_photos">TAKE PHOTOS</string>
     <string name="call_lawyer">CALL CONTACT</string>
-    <string name="export_paystubs">EXPORT PAYSTUBS</string>
+    <string name="export_paystubs">EXPORT ALL LOGS</string>
     <string name="admin">ADMIN</string>
     
     <string name="lunch_no_lunch">No\nLunch</string>
