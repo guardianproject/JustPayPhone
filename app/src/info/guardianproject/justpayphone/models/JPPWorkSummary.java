@@ -1,13 +1,8 @@
 package info.guardianproject.justpayphone.models;
 
-import info.guardianproject.justpayphone.utils.Constants.Forms;
-
-import org.json.JSONException;
 import org.witness.informacam.models.Model;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.utils.TimeUtility;
-
-import android.util.Log;
 
 public class JPPWorkSummary extends Model {
 	public ILog iLog = null;

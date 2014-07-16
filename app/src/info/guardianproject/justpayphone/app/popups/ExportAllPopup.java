@@ -66,9 +66,14 @@ public class ExportAllPopup extends Popup {
 
 							StringBuffer sbLog = new StringBuffer ();
 							
+							
+							
 							sbLog.append("From: " ).append(informaCam.user.alias).append(" (").append(informaCam.user.email).append(")").append("\n\n");
-							sbLog.append("Public Key: " ).append(informaCam.user.pgpKeyFingerprint).append("\n\n");
+							//sbLog.append("Public Key: " ).append(informaCam.user.pgpKeyFingerprint).append("\n\n");
 							sbLog.append("Device Unique Id: ").append(mLastLog.genealogy.createdOnDevice).append("\n\n");
+							
+							if (mLastLog.data != null && mLastLog.intakeData != null)
+								sbLog.append("Log Unique Id: ").append(mLastLog.data.intakeData.signature).append("\n\n");
 							
 							sbLog.append("Log Start: ").append(DateFormat.getDateTimeInstance().format(new Date(mLastLog.startTime))).append("\n\n");
 							sbLog.append("Log End: ").append(DateFormat.getDateTimeInstance().format(new Date(mLastLog.endTime))).append("\n\n");
@@ -84,20 +89,27 @@ public class ExportAllPopup extends Popup {
 							
 							sbLog.append("Hours Worked: ").append(hWorked).append("\n\n");
 							
-							List<IForm> forms = mLastLog.getForms(a);
-							
-							for(IForm form : forms) {
-								if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
-									
-									EditText lunchMinutesProxy = new EditText(a);
-									form.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
-									
-									
-									Integer lunchMinutes = Integer.valueOf(lunchMinutesProxy.getText().toString());
+							try
+							{
+								List<IForm> forms = mLastLog.getForms(a);
 								
-									sbLog.append("Lunch Minutes: ").append(lunchMinutes).append("\n\n");
-									break;
+								for(IForm form : forms) {
+									if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
+										
+										EditText lunchMinutesProxy = new EditText(a);
+										form.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
+										
+										
+										Integer lunchMinutes = Integer.valueOf(lunchMinutesProxy.getText().toString());
+									
+										sbLog.append("Lunch Minutes: ").append(lunchMinutes).append("\n\n");
+										break;
+									}
 								}
+							}
+							catch (Exception e)
+							{
+								Logger.e(LOG,e);
 							}
 							
 							intent.putExtra(Intent.EXTRA_SUBJECT, "JustPay Work Log: " + DateFormat.getDateTimeInstance().format(new Date(mLastLog.startTime)));
@@ -146,7 +158,7 @@ public class ExportAllPopup extends Popup {
 			
 			try {
 				iLog.export(a, h, org, includeSensorLogs, localShare,!localShare);
-			} catch(FileNotFoundException e) {
+			} catch(Exception e) {
 				Logger.e(LOG, e);
 			}
 			
@@ -182,7 +194,7 @@ public class ExportAllPopup extends Popup {
 		
 		try {
 			iLog.export(a, h, org, includeSensorLogs, localShare, !localShare);
-		} catch(FileNotFoundException e) {
+		} catch(Exception e) {
 			Logger.e(LOG, e);
 		}
 		

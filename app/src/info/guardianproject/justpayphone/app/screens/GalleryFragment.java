@@ -17,11 +17,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.witness.informacam.InformaCam;
+import org.witness.informacam.json.JSONArray;
+import org.witness.informacam.json.JSONException;
+import org.witness.informacam.json.JSONObject;
+import org.witness.informacam.json.JSONTokener;
 import org.witness.informacam.models.media.ILog;
 import org.witness.informacam.models.media.IMedia;
 import org.witness.informacam.utils.Constants.Codes;
@@ -32,11 +32,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -261,7 +259,7 @@ public class GalleryFragment extends Fragment implements OnClickListener, OnScro
 					// update UI
 					updateWorkspaces();
 					
-				} catch(JSONException e) {
+				} catch(Exception e) {
 					Log.e(LOG, e.toString());
 					e.printStackTrace();
 				}

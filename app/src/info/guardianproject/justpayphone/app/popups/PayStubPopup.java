@@ -57,7 +57,7 @@ public class PayStubPopup extends Popup implements OnClickListener {
 			setData();
 		} catch (IndexOutOfBoundsException e) {
 			showNoDataForDay();
-		} catch(NullPointerException e) {
+		} catch(Exception e) {
 			showNoDataForDay();
 		}
 		currentDate.setText(TimeUtility.millisecondsToDayOnly(currentTime));
@@ -109,7 +109,7 @@ public class PayStubPopup extends Popup implements OnClickListener {
 				workSummary = new JPPWorkSummary(new ILog(informaCam.mediaManifest.getByDay(pDay, MimeType.LOG, 1).get(0)));
 				
 				setData();
-			} catch(NullPointerException e) {
+			} catch(Exception e) {
 				Log.e(LOG, e.toString());
 				e.printStackTrace();
 				
@@ -125,7 +125,7 @@ public class PayStubPopup extends Popup implements OnClickListener {
 				workSummary = new JPPWorkSummary(new ILog(informaCam.mediaManifest.getByDay(nDay, MimeType.LOG, 1).get(0)));
 			
 				setData();
-			} catch(NullPointerException e) {
+			} catch(Exception e) {
 				Log.e(LOG, e.toString());
 				e.printStackTrace();
 				

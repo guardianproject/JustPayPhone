@@ -23,6 +23,7 @@ import org.witness.informacam.models.media.IMedia;
 import org.witness.informacam.models.media.IRegion;
 import org.witness.informacam.models.notifications.INotification;
 import org.witness.informacam.storage.FormUtility;
+import org.witness.informacam.utils.Constants.Logger;
 import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.App.Storage.Type;
 import org.witness.informacam.utils.TimeUtility;
@@ -160,20 +161,31 @@ public class ILogGallery extends BaseAdapter {
 	
 	private String getLunchDisplayString(ILog iLog)
 	{
+		
 		String lunchTaken = a.getString(R.string.time_lunch_no_lunch);
-		List<IForm> forms = iLog.getForms(a);
+		
+		try
+		{
+			List<IForm> forms = iLog.getForms(a);
+		
 	
-		for(IForm form : forms) {
-			if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
-				form.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
-				form.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
+			for(IForm form : forms) {
+				if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
+					form.associate(lunchTakenProxy, Forms.LunchQuestionnaire.LUNCH_TAKEN);
+					form.associate(lunchMinutesProxy, Forms.LunchQuestionnaire.LUNCH_MINUTES);
+					
+					Integer lunchMinutes = Integer.valueOf(lunchMinutesProxy.getText().toString());
+					lunchTaken = a.getString(R.string.time_lunch_minutes, lunchMinutes);
 				
-				Integer lunchMinutes = Integer.valueOf(lunchMinutesProxy.getText().toString());
-				lunchTaken = a.getString(R.string.time_lunch_minutes, lunchMinutes);
-			
-				
+					
+				}
 			}
 		}
+		catch (Exception e)
+		{
+			Logger.e(LOG, e);
+		}
+		
 		return lunchTaken;
 	}
 	

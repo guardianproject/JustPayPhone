@@ -1,10 +1,17 @@
 package info.guardianproject.justpayphone.app.screens;
 
+import info.guardianproject.justpayphone.R;
+import info.guardianproject.justpayphone.app.SelfieActivity;
+import info.guardianproject.justpayphone.utils.Constants;
+import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
+import info.guardianproject.justpayphone.utils.Constants.Forms;
+import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
+import info.guardianproject.justpayphone.utils.SelfieIntake;
+
 import java.io.FileNotFoundException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.json.JSONException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.forms.IForm;
 import org.witness.informacam.models.media.ILog;
@@ -15,13 +22,6 @@ import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
 import org.witness.informacam.utils.TimeUtility;
 
-import info.guardianproject.justpayphone.R;
-import info.guardianproject.justpayphone.app.SelfieActivity;
-import info.guardianproject.justpayphone.utils.Constants;
-import info.guardianproject.justpayphone.utils.SelfieIntake;
-import info.guardianproject.justpayphone.utils.Constants.Forms;
-import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
-import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -390,7 +390,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 						// Save the log as closed
 						try {
 							((HomeActivityListener)a).getCurrentLog().put(Models.IMedia.ILog.IS_CLOSED, true);
-						} catch (JSONException e) {
+						} catch (Exception e) {
 						}
 						((HomeActivityListener) a).persistLog();
 					
@@ -509,7 +509,7 @@ public class WorkStatusFragment extends Fragment implements OnClickListener, Inf
 	{
 		try {
 			getCurrentLog().put(name, filePath);
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}

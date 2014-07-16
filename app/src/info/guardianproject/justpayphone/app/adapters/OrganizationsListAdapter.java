@@ -7,16 +7,11 @@ import info.guardianproject.justpayphone.app.popups.TextareaPopup;
 
 import java.util.List;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.utils.Constants.App;
-import org.witness.informacam.utils.Constants.Models;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;

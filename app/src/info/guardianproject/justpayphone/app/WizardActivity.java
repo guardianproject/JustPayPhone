@@ -15,12 +15,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.spongycastle.openpgp.PGPException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.crypto.KeyUtility;
+import org.witness.informacam.json.JSONException;
+import org.witness.informacam.json.JSONObject;
+import org.witness.informacam.json.JSONTokener;
 import org.witness.informacam.models.notifications.INotification;
 import org.witness.informacam.models.organizations.IOrganization;
 import org.witness.informacam.models.transport.ITransportStub;
@@ -200,7 +200,7 @@ public class WizardActivity extends FragmentActivity implements WizardActivityLi
 			ft.addToBackStack(null);
 			ft.commit();
 
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

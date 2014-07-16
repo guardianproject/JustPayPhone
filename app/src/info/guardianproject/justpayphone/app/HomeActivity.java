@@ -17,8 +17,6 @@ import info.guardianproject.justpayphone.utils.Constants.HomeActivityListener;
 import info.guardianproject.justpayphone.utils.Constants.Settings;
 import info.guardianproject.odkparser.utils.QD;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,11 +27,11 @@ import java.util.Vector;
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
 
-import org.json.JSONException;
 import org.witness.informacam.InformaCam;
 import org.witness.informacam.models.forms.IForm;
 import org.witness.informacam.models.media.IAsset;
 import org.witness.informacam.models.media.ILog;
+import org.witness.informacam.models.media.IMedia;
 import org.witness.informacam.models.media.IRegion;
 import org.witness.informacam.models.notifications.INotification;
 import org.witness.informacam.models.organizations.IOrganization;
@@ -41,6 +39,7 @@ import org.witness.informacam.storage.FormUtility;
 import org.witness.informacam.utils.Constants.App.Camera;
 import org.witness.informacam.utils.Constants.Codes;
 import org.witness.informacam.utils.Constants.InformaCamEventListener;
+import org.witness.informacam.utils.Constants.Logger;
 import org.witness.informacam.utils.Constants.Models;
 import org.witness.informacam.utils.Constants.Models.IMedia.MimeType;
 import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
@@ -55,7 +54,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -342,7 +340,15 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 		// if we have a log going...
 		if(currentLog != null && !currentLog.shouldAutoLog) {
 			Log.d(LOG, "FUCKING CURRENT LOG: " + currentLog.asJson().toString());
-			currentLog.save();
+			try {
+				currentLog.save();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		setResult(Activity.RESULT_OK);
@@ -500,8 +506,15 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	@Override
 	public void persistLog() {
 		if(currentLog != null) {
-			informaCam.mediaManifest.getById(currentLog._id).inflate(currentLog.asJson());
-			informaCam.mediaManifest.save();
+			try
+			{
+				informaCam.mediaManifest.getById(currentLog._id).inflate(currentLog.asJson());
+				informaCam.mediaManifest.save();
+			}
+			catch (Exception e)
+			{
+				Logger.e(LOG, e);
+			}
 		}
 	}
 
@@ -517,10 +530,16 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 //					informaCam.mediaManifest.removeMediaItem(m);
 //				}
 				long currentTime = informaCam.informaService.getCurrentTime();
-				currentLog = new ILog(informaCam.mediaManifest.getByDay(currentTime, MimeType.LOG, 1).get(0));
-				if(currentLog.endTime != 0) {
-					Log.d(LOG, "LOG SHOULD BE CLOSED (endTime: " + currentLog.endTime + ")");
-					currentLog.put(Models.IMedia.ILog.IS_CLOSED, true);
+				List<IMedia> listLog = informaCam.mediaManifest.getByDay(currentTime, MimeType.LOG, 1);
+				
+				if (!listLog.isEmpty())
+				{
+					currentLog = new ILog(informaCam.mediaManifest.getByDay(currentTime, MimeType.LOG, 1).get(0));
+				
+					if(currentLog.endTime != 0) {
+					//	Log.d(LOG, "LOG SHOULD BE CLOSED (endTime: " + currentLog.endTime + ")");
+						currentLog.put(Models.IMedia.ILog.IS_CLOSED, true);
+					}
 				}
 			} catch(IndexOutOfBoundsException e) {
 				Log.e(LOG, e.toString());
@@ -528,7 +547,7 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 			} catch(NullPointerException e) {
 				Log.e(LOG, e.toString());
 				e.printStackTrace();
-			} catch (JSONException e) {
+			} catch (Exception e) {
 				Log.e(LOG, e.toString());
 				e.printStackTrace();
 			}
@@ -600,8 +619,16 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 								log.remove(info.guardianproject.justpayphone.utils.Constants.Models.IMedia.ILog.SIGN_IN_FILE);
 							else if (signOutFile != null && signOutFile.equals(filePath))
 								log.remove(info.guardianproject.justpayphone.utils.Constants.Models.IMedia.ILog.SIGN_OUT_FILE);
-							log.save();
-							checkAndSendLogIfComplete(log);
+							try
+							{
+								log.save();
+							
+								checkAndSendLogIfComplete(log);
+							}
+							catch (Exception e)
+							{
+								Logger.e(LOG, e);
+							}
 						}
 						
 					}.init(log, filePath));
@@ -612,28 +639,37 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 	
 	public IForm getLunchForm(ILog iLog, boolean createIfNotFound)
 	{
-		List<IForm> forms = iLog.getForms(this);
-		for(IForm form : forms) {
-			if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
-				return form;
-			}
-		}
-		
-		if (createIfNotFound)
+		try
 		{
-			for(IForm form : FormUtility.getAvailableForms()) {
+			List<IForm> forms = iLog.getForms(this);
+			for(IForm form : forms) {
 				if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
-					info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(getCurrentLog().rootFolder, "form");
-
-					IForm lunchForm = new IForm(form, this);
-					lunchForm.answerPath = formContent.getAbsolutePath();
-					IRegion topRegion = iLog.getTopLevelRegion();
-					if (topRegion == null)
-						topRegion = iLog.addRegion(this, null);
-					topRegion.addForm(lunchForm);
-					return lunchForm;
+					return form;
 				}
 			}
+			
+			if (createIfNotFound)
+			{
+				for(IForm form : FormUtility.getAvailableForms()) {
+					if(form.namespace.equals(Forms.LUNCH_QUESTIONNAIRE)) {
+						info.guardianproject.iocipher.File formContent = new info.guardianproject.iocipher.File(getCurrentLog().rootFolder, "form");
+	
+						IForm lunchForm = new IForm(form, this);
+						lunchForm.answerPath = formContent.getAbsolutePath();
+						IRegion topRegion = iLog.getTopLevelRegion();
+						if (topRegion == null)
+							topRegion = iLog.addRegion(this, null);
+						topRegion.addForm(lunchForm);
+						return lunchForm;
+					}
+				}
+			}
+			
+		}
+		catch (Exception e)
+		{
+			Logger.e(LOG, e);
+			
 		}
 		return null;
 	}
@@ -704,8 +740,8 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 									this.sendEmptyMessageDelayed(1, 1000);
 									
 								}
-							} catch (FileNotFoundException e) {
-								e.printStackTrace();
+							} catch (Exception e) {
+								Logger.e(LOG,e);
 							}
 						} else if (msg.what == 1) {
 							// Wait for completion.

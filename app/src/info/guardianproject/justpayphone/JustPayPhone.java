@@ -157,7 +157,7 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 				//informaCam.startup();
 				break;
 			case Codes.Routes.HOME:
-				Log.d(LOG, "HEY I AM RETURNING HOME");
+				//Log.d(LOG, "HEY I AM RETURNING HOME");
 				
 				try {
 					if(data != null && data.hasExtra(Codes.Extras.CHANGE_LOCALE)) {
@@ -165,7 +165,7 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 						break;
 					}
 					
-					if(data.hasExtra(Codes.Extras.LOGOUT_USER) && data.getBooleanExtra(Codes.Extras.LOGOUT_USER, false)) {
+					if(data != null && data.hasExtra(Codes.Extras.LOGOUT_USER) && data.getBooleanExtra(Codes.Extras.LOGOUT_USER, false)) {
 						informaCam.attemptLogout();
 						break;
 					}
@@ -240,11 +240,22 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 	}
 	
 	private void checkICTD() {
-		IOrganization glsp = informaCam.installedOrganizations.getByName("GLSP");		
-		glsp.repositories.get(0).asset_id = "glsp1.jpp@gmail.com";
-		glsp.save();
 		
-		Logger.d(LOG, "GLSP ICTD updated as:\n" + glsp.asJson().toString());
+		try
+		{
+			IOrganization glsp = informaCam.installedOrganizations.getByName("GLSP");		
+		
+			glsp.repositories.get(0).asset_id = "glsp1.jpp@gmail.com";
+			glsp.save();
+		
+			Logger.d(LOG, "GLSP ICTD updated as:\n" + glsp.asJson().toString());
+		}
+		catch (Exception e)
+		{
+			Logger.d(LOG, "GLSP ICTD failed to parse");
+			Logger.e(LOG, e);
+
+		}
 	}
 	
 	private void autoLogin()
