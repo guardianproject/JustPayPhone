@@ -87,7 +87,7 @@
     <style name="jpp_h2">
         <item name="asset_font">NotoSans-Bold</item>
         <item name="android:textColor">@color/cream</item>
-        <item name="android:textSize">30sp</item>
+        <item name="android:textSize">28sp</item>
     </style>
     
     <style name="jpp_h3">

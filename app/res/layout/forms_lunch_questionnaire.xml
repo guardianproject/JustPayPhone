@@ -18,18 +18,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_margin="30dp"
+            android:layout_margin="5dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/how_long_was_your_lunch_break" />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:background="@drawable/black_border"
             android:scaleType="centerInside"
+                        android:layout_gravity="center_horizontal"
+            
             android:src="@drawable/ic_pic_lunch" />
     </LinearLayout>
 
