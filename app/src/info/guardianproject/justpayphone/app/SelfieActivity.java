@@ -12,6 +12,7 @@ import org.witness.informacam.ui.SurfaceGrabberActivity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -44,7 +45,13 @@ public class SelfieActivity extends SurfaceGrabberActivity {
 	
 	@Override
 	protected int getCameraDirection() {
-		return CameraInfo.CAMERA_FACING_FRONT;
+		
+			PackageManager pm = getPackageManager();
+
+		if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT))
+			return CameraInfo.CAMERA_FACING_FRONT;
+		else
+			return CameraInfo.CAMERA_FACING_BACK;
 	}
 
 	@Override
