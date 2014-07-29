@@ -83,7 +83,7 @@
     <string name="wizard_lawyer_information">Enter emergency contact information</string>
 	<string name="wizard_phone_number">Phone number</string>    
     
-    <string name="time_date">Sept / Oct</string>
+    <string name="time_date">Date</string>
     <string name="time_work_hours">Work Hours</string>
     <string name="time_lunch">Lunch</string>
     <string name="time_span_same_month">%1$s</string>
