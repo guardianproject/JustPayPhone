@@ -107,14 +107,15 @@ public class DropdownSpinner extends RelativeLayout implements OnItemClickListen
 				mPopup.setOutsideTouchable(true);
 				mPopup.setBackgroundDrawable(mDropDownBackground);
 				mPopup.showAtLocation(this, Gravity.TOP | Gravity.LEFT, rectGlobal.left, rectGlobal.top);
-				mPopup.getContentView().setOnClickListener(new View.OnClickListener()
+				((AdapterView)mPopup.getContentView()).setOnItemClickListener(new OnItemClickListener()
 				{
 					@Override
-					public void onClick(View v)
-					{
+					public void onItemClick(AdapterView<?> arg0, View arg1,
+							int arg2, long arg3) {
 						mPopup.dismiss();
 						mPopup = null;
 					}
+					
 				});
 			}
 			catch (Exception e)
