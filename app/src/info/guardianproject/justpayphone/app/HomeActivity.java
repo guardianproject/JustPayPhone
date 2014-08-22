@@ -78,6 +78,10 @@ import android.view.Window;
 import android.widget.TabHost;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+
 public class HomeActivity extends FragmentActivity implements HomeActivityListener, InformaCamStatusListener, InformaCamEventListener {
 	private final static String LOG = Constants.App.Home.LOG;
 	private String lastLocale;
@@ -158,32 +162,23 @@ public class HomeActivity extends FragmentActivity implements HomeActivityListen
 				
 				if (accounts.length > 0)
 				{
-						
-						
-						am.getAuthToken(accounts[0], Models.ITransportStub.GoogleDrive.SCOPE, null, HomeActivity.this, new AccountManagerCallback<Bundle> () {
-
-							@Override
-							public void run(AccountManagerFuture<Bundle> result) {
-					            try {
-									final String token = result.getResult().getString(AccountManager.KEY_AUTHTOKEN);
-								} catch (OperationCanceledException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (AuthenticatorException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								
-							}
+												
+						try {
+							Bundle bund = new Bundle();
+							String resp = GoogleAuthUtil.getTokenWithNotification(HomeActivity.this.getApplicationContext(), accounts[0].name, Models.ITransportStub.GoogleDrive.SCOPE,bund);
 							
+							Log.i(LOG,"response to google auth: " + resp);
 							
-						}, null);
-						
-						//String scope = Models.ITransportStub.GoogleDrive.SCOPE;
-						//GoogleAuthUtil.getToken(HomeActivity.this, accounts[0].name, scope,new Bundle());
+						} catch (UserRecoverableAuthException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (GoogleAuthException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 				
 				}
 				else
