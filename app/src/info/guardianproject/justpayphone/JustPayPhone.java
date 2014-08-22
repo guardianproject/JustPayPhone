@@ -1,14 +1,5 @@
 package  info.guardianproject.justpayphone;
 
-import net.hockeyapp.android.CrashManager;
-import net.hockeyapp.android.UpdateManager;
-
-import org.witness.informacam.InformaCam;
-import org.witness.informacam.models.organizations.IOrganization;
-import org.witness.informacam.models.organizations.IRepository;
-import org.witness.informacam.utils.Constants.Logger;
-import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
-
 import info.guardianproject.justpayphone.app.HomeActivity;
 import info.guardianproject.justpayphone.app.KillScreen;
 import info.guardianproject.justpayphone.app.WizardActivity;
@@ -16,9 +7,21 @@ import info.guardianproject.justpayphone.utils.Constants;
 import info.guardianproject.justpayphone.utils.Constants.Codes;
 import info.guardianproject.justpayphone.utils.Constants.Codes.Extras;
 import info.guardianproject.justpayphone.utils.Constants.Settings;
+
+import java.util.Locale;
+
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.UpdateManager;
+
+import org.witness.informacam.InformaCam;
+import org.witness.informacam.models.organizations.IOrganization;
+import org.witness.informacam.utils.Constants.Logger;
+import org.witness.informacam.utils.InformaCamBroadcaster.InformaCamStatusListener;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -42,6 +45,16 @@ public class JustPayPhone extends Activity implements InformaCamStatusListener {
 		
 		setContentView(R.layout.activity_camera_waiter);
 		
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		String languageCode = sp.getString(org.witness.informacam.utils.Constants.Codes.Extras.LOCALE_PREF_KEY, null);
+
+		if (languageCode != null)
+		{
+			Configuration configuration = new Configuration();
+			configuration.locale = new Locale(languageCode);
+			getBaseContext().getResources().updateConfiguration(configuration, getBaseContext().getResources().getDisplayMetrics());
+		}
+
 		
 		informaCam = (InformaCam)getApplication();
 
