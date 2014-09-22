@@ -77,7 +77,7 @@
     <string name="wizard_key_information">Your device key will allow you and the information you captured to be secured and verified.</string>
     <string name="wizard_take_photo">Take Photos</string>
     <string name="wizard_take_photo_take">Take</string>
-    <string name="wizard_key_is_being_made">Your personal device key is being made... this may take a while (but it will open happen once!)</string>
+    <string name="wizard_key_is_being_made">Your personal device key is being made... this may take a while (but it will only happen once!)</string>
     <string name="wizard_key_made">Your key has been made.</string>
     <string name="wizard_original_images_should_be">Original images should be:</string>
     <string name="wizard_lawyer_information">Enter emergency contact information</string>
